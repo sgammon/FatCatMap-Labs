@@ -1,0 +1,20 @@
+{% extends "core/__base_web.html" %}
+
+{% block content %}
+
+	<div id='contentHeader' class='{% block content_header_class %}content_header{% endblock %}'>
+		{% block content_header %}
+		{% endblock %}
+	</div>
+	
+	<div id='contentBody' class='{% block content_body_class %}content_body{% endblock %}'>
+		{% block content_body %}
+		{% endblock %}
+	</div>
+	
+	<div id='contentFooter' class='{% block content_footer_class %}content_footer{% endblock %}'>
+		{% block content_footer %}
+		{% endblock %}
+	</div>
+
+{% endblock %}

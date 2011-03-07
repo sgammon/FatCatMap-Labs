@@ -1,0 +1,56 @@
+application: momentum-labs
+version: 1-dev
+runtime: python
+api_version: 1
+
+builtins:
+- appstats: on
+- datastore_admin: on
+- remote_api: on
+
+handlers:
+
+
+###### Asset Handlers
+
+# Images (Static)
+- url: /assets/img/static
+  static_dir: assets/img/static
+
+# Images (Dynamic)
+- url: /assets/img/.*
+  script: assets/img/retrieve.py
+
+# Style (Static Only)
+- url: /assets/style
+  static_dir: assets/style
+  mime_type: text/css
+
+# Scripts (Static Only)
+- url: /assets/js
+  static_dir: assets/js
+  mime_type: text/javascript
+
+# Generic (Static)
+- url: /assets/ext/static
+  static_dir: assets/ext/static
+
+# Generic (Dynamic)
+- url: /assets/ext/.*
+  script: assets/ext/static/retrieve.py
+
+
+###### Static Handlers
+
+# Root-level files
+- url: /(robots\.txt|favicon\.ico)
+  static_files: static/\1
+  upload: static/(.*)
+
+# Static directory
+- url: /static
+  static_dir: static
+
+###### Send to Tipfy
+- url: /.*
+  script: main.py
