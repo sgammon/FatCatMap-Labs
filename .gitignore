@@ -1,0 +1,9 @@
+*.pyc
+app/lib/dist/*
+var/data.store
+bin/*
+eggs/*
+var/*
+etc/develop-eggs/*
+etc/downloads/*
+etc/parts/*

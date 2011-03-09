@@ -76,6 +76,5 @@ class NDBModel(ProvidenceClarityNDBModel):
 	pass
 	
 
-## 
-class FCMPolyModel(ProvidenceClarityPolyModel):
-	pass
+## PolyModel
+FCMPolyModel = ProvidenceClarityPolyModel
