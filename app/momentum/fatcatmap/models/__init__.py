@@ -6,15 +6,16 @@ from google.appengine.ext import db as ldb
 from google.appengine.ext import blobstore
 
 ## ProvidenceClarity
-from ProvidenceClarity.struct.util import ProvidenceClarityDictProxy
+from ProvidenceClarity.struct.util import DictProxy
 from ProvidenceClarity.data.core.model import Model as ProvidenceClarityModel
 from ProvidenceClarity.data.core.model import NDBModel as ProvidenceClarityNDBModel
 from ProvidenceClarity.data.core.polymodel import PolyPro as ProvidenceClarityPolyModel
 
-###### ====== Map Property Classes ====== ######
+
+###### ====== Property Classes ====== ######
 
 ## NDB/New Style
-ndb = ProvidenceClarityDictProxy({
+ndb = DictProxy({
 		'IntegerProperty' : model.IntegerProperty,
 		'FloatProperty' : model.FloatProperty,
 		'StringProperty' : model.StringProperty,
@@ -27,7 +28,7 @@ ndb = ProvidenceClarityDictProxy({
 })
 
 ## DB/Old Style
-db = ProvidenceClarityDictProxy({
+db = DictProxy({
 		'StringProperty' : ldb.StringProperty,
 		'ByteStringProperty' : ldb.ByteStringProperty,		
 		'BooleanProperty' : ldb.BooleanProperty,

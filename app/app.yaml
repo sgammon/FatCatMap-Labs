@@ -38,6 +38,33 @@ handlers:
 # Generic (Dynamic)
 - url: /assets/ext/.*
   script: assets/ext/static/retrieve.py
+  
+# Library/system mappings
+- url: /_ah/datastore_admin.*
+  script: $PYTHON_LIB/google/appengine/ext/datastore_admin/main.py
+  login: admin
+
+- url: /_ah/mapreduce.*
+  script: $PYTHON_LIB/google/appengine/ext/mapreduce/main.py
+  login: admin
+
+- url: /_ah/pipeline(/.*)?
+  script: lib/pipeline/handlers.py
+  login: admin
+
+- url: /_pc/remote_api
+  script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
+  login: admin
+
+- url: /_pc/mapreduce(/.*)?
+  script: lib/mapreduce/main.py
+  login: admin
+
+- url: /_pc/manage/.*
+  script: $PYTHON_LIB/google/appengine/ext/admin
+  login: admin
+  secure: always
+
 
 
 ###### Static Handlers

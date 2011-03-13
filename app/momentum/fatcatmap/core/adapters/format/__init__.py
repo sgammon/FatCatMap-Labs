@@ -1,0 +1,5 @@
+from ProvidenceClarity.adapters.format import ProvidenceClarityFormatAdapter
+
+
+class FCMFormatAdapter(ProvidenceClarityFormatAdapter):
+	pass

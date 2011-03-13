@@ -1,0 +1,17 @@
+.foldNavigation
+{
+	text-align:center;
+	font-size:9pt;
+	position:absolute;
+	bottom:0;
+	margin-bottom:-20px;
+	width:100%;
+}
+.foldNavigation a
+{
+	color:#666;
+}
+.foldNavigation a:hover
+{
+	color:white;
+}

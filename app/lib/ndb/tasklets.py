@@ -761,7 +761,7 @@ def get_context():
   return ctx
 
 def make_default_context():
-  import context  # Late import to deal with circular imports.
+  from ndb import context # Late import to deal with circular imports.
   return context.Context()
 
 def set_context(new_context):

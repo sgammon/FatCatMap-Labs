@@ -5,7 +5,7 @@ from momentum.fatcatmap import models as m
 class ExtService(m.FCMModel):
 	name = m.db.StringProperty()
 	description = m.db.TextProperty()
-	homepage = m.db.LinkProperty()
+	homepage = m.db.StringProperty()
 
 class ExtServiceKey(m.FCMModel):
 	name = m.db.StringProperty()
@@ -29,9 +29,9 @@ class ExtInteraction(m.FCMPolyModel):
 
 #### ==== External ID Models ==== ####
 class ExtID(m.NDBModel):
-	name = m.ndb.StringProperty(default=None)
+	name = m.ndb.StringProperty()
 	value = m.ndb.StringProperty()
-	link = m.ndb.LinkProperty()
+	link = m.ndb.StringProperty()
 	service = m.ndb.KeyProperty()
 	
 	

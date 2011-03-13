@@ -2,9 +2,31 @@
 
 {% block content %}
 
-	<div id='contentHeader' class='{% block content_header_class %}content_header{% endblock %}'>
+	<div id='contentHeader' class='{% block content_header_class %}content_header{% endblock %} hidden'>
 		{% block content_header %}
+			<div class='extendedNav'>
+
+				<div id='browsePane' class='navPane hidden' data-navref='browse'>
+					{{ lipsum(1) }}
+				</div>
+
+				<div id='mapPane' class='navPane hidden' data-navref='map'>
+					{{ lipsum(1) }}		
+				</div>
+
+				<div id='visualizePane' class='navPane hidden' data-navref='visualize'>
+					{{ lipsum(1) }}
+				</div>
+				
+				<div id='interactPane' class='navPane hidden' data-navref='interact'>
+					{{ lipsum(1) }}
+				</div>				
+
+			</div>		
 		{% endblock %}
+		<div class='foldNavigation'>
+			<a href='#'>close menu</a>
+		</div>
 	</div>
 	
 	<div id='contentBody' class='{% block content_body_class %}content_body{% endblock %}'>
@@ -12,7 +34,7 @@
 		{% endblock %}
 	</div>
 	
-	<div id='contentFooter' class='{% block content_footer_class %}content_footer{% endblock %}'>
+	<div id='contentFooter' class='{% block content_footer_class %}content_footer{% endblock %} hidden'>
 		{% block content_footer %}
 		{% endblock %}
 	</div>

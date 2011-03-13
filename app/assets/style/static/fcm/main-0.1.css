@@ -1,36 +1,151 @@
+body
+{
+	background-color:#222;
+}
+
 .rootWrapper
 {
 }
+
+/* === General Classes === */
+.hidden { display:none; }
+.floatleft { float:left; }
+.floatright { float:right; }
+.clearleft { clear:left; }
+.clearright { clear:right; }
+.clearboth { clear:both; }
+.fullwidth { width:100%; }
+.fullheight { height:100%; }
+.textcenter { text-align:center; }
+.alignmiddle { margin-left:auto;margin-right:auto; }
+
+/* === Superbar === */
 .momentumSuperbar
 {
+	opacity:0.8;
 	width:100%;
 	z-index:600;
-	height: 1.5em;
+	height:25px;
 	background:#222;
 	position:absolute;
 	top:0;
 }
-.rootContent
+.momentumSuperbar #dotSpacer
 {
-	height:95%;
-	width:100%;
-	background:#333;
-	position:absolute;
+	font-size:12pt;
+	padding-right:0;
 }
-.rootFooter
+.momentumSuperbar #fcmTopBranding
+{
+	padding-top:4px;
+	padding-left:15px;
+	padding-right:5px;
+	width:135px;
+	float:left;
+}
+.momentumSuperbar li a
+{
+	color:#555;
+	text-shadow: 1px 1px 0px #111;
+	text-decoration:none;
+}
+.momentumSuperbar li a:hover
+{
+	color:white;
+}
+.momentumSuperbar ul.topNavigation
+{
+	line-height:23px;
+	list-style:none;
+	display:inline;
+}
+.momentumSuperbar ul.topNavigation li
+{
+	list-style:none;
+	padding-left:10px;
+	padding-right:10px;
+	display:inline;
+	font-size:10pt;
+	color:#777;	
+}
+.momentumSuperbar ul.utilNavigation
+{
+	list-style:none;
+	display:inline;
+	height:25px;
+	line-height:23px;
+}
+.momentumSuperbar ul.utilNavigation li
+{
+	list-style:none;
+	padding-left:10px;
+	padding-right:10px;
+	display:inline;
+	font-size:10pt;
+	color:#777;
+}
+
+/* === Header Nav === */
+.extendedNav
+{
+	overflow:hidden;
+	padding:5px;
+}
+
+
+/* === Superfooter === */
+.momentumSuperfooter
 {
 	width:100%;
 	height:55px;
 	bottom:0;
 	position:absolute;
-	background:#222;
+	background:#222 url('/assets/img/static/layout/superfooter/superfooter-bg-dark-v1.png');
+	overflow:hidden;
+	line-height:55px;
+	opacity:0.5;
+}
+.momentumSuperfooter div
+{
+	margin-left:10px;
+	margin-right:10px;
+	color:#666;
+}
+.momentumSuperfooter #bottomFcmBranding
+{
+	width:155px;
+	height:50px;
+	overflow:hidden;
+}
+.momentumSuperfooter #bottomFcmBranding a
+{
+	width:100%;
+	height:100%;
+}
+.momentumSuperfooter #bottomFcmBranding a #momentumBrand
+{
+	height:55px;
+	opacity:0.5;
+	background: no-repeat center transparent url('/assets/img/static/branding/momentum-gray-v1-25.png');	
+}
+.brandingHover
+{
+	opacity:1.0 !important;
+	background: no-repeat center transparent url('/assets/img/static/branding/momentum-v1-25.png') !important;
 }
 
+.rootContent
+{
+	height:94%;
+	width:100%;
+	background:#333;
+	position:absolute;
+}
 .content_header
 {
+	background:#222;
 	height:15%;
 	z-index:500;
-	display:none;
 	position:absolute;
 	width:100%;
 	margin-top:1.5em;
@@ -40,14 +155,13 @@
 {
 	top:0;
 	margin-top:1.5em;
-	height: 96%;
+	height: 95%;
 	width:100%;
 }
 
 .content_footer
 {
 	height:10%;
-	display:none;
 	position:absolute;
 	width:100%;
 	bottom:0;

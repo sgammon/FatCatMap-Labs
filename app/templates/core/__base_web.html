@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+
 <!-- Copyright (c) 2011 - Political Momentum -->
 <!-- Author: Sam Gammon <sg@samgammon.com> -->
 <html>
@@ -17,16 +19,15 @@
 			<div class='{% block wrapper_class %}rootWrapper{% endblock %}'>
 				{% block superbar %}
 				<div class='momentumSuperbar'>
-					supabar
+					{% include 'snippets/superbar.html' %}
 				</div>
 				{% endblock %}
 				<div class='{% block content_class %}rootContent{% endblock %}'>
 					{% block content %}
 					{% endblock %}
 				</div>
-				<div class='{% block footer_class %}rootFooter{% endblock %}'>
-					{% block footer %}
-					{% endblock %}
+				<div class='momentumSuperfooter'>
+					{% include 'snippets/superfooter.html' %}
 				</div>
 			</div>
 		{% endblock %}

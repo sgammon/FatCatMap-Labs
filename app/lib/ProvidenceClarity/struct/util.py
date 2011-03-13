@@ -1,48 +1,30 @@
+from ProvidenceClarity.struct.core import Struct
 
-
-class ProvidenceClarityDictProxy(object):
+class DictProxy(Struct):
 	
 	''' Handy little object that takes a dict and makes it accessible via var[item] and var.item formats. Also handy for caching. '''
 	
-	_entries = {}
-	
 	## Init
-	def __init__(self, struct=None, **kwargs):
+	def fillStructure(self, struct=None, **kwargs):
 		if struct is not None:
 			if isinstance(struct, dict):
 				for k, v in struct.items():
-					self._entries[k] = v
+					setattr(self, k, v)
 			elif isinstance(struct, list):
 				for k, v in struct:
-					self._entries[k] = v
+					setattr(self, k, v)
 		if len(kwargs) > 0:
 			for k, v in kwargs.items():
-				self._entries[k] = v
-	
-	## Getters
-	def __getattr__(self, name, default=False):
-		if name in self._entries:
-			return self._entries[name]
-		else:
-			return default
+				setattr(self, k, v)
 			
-	def __getitem__(self, name, default=False):
-		if name in self._entries:
-			return self._entries[name]
+	def __getitem__(self, name):
+		if name in self.__dict__:
+			return getattr(self, name)
 		else:
 			return default
-	
-	## Setters
-	def __setattr__(self, name, value):
-		self._entries[name] = value
 		
 	def __setitem__(self, name, value):
-		self._entries[name] = value
-		
-	## Deleters
-	def __delattr__(self, name):
-		if name in self._entries:
-			del self._entries[name]
+		setattr(self, name, value)
 			
 	def __delitem__(self, name):
 		if name in self._entries:
@@ -50,4 +32,31 @@ class ProvidenceClarityDictProxy(object):
 			
 	## Utiliy Methods
 	def items(self):
-		return [(k, v) for k, v in self._entries.items()]
+		return [(k, v) for k, v in self.__dict__.items()]
+		
+		
+class ConfigurableStruct(object):
+	
+	_config = {}
+	
+	def bind_config(self, config={}, **kwargs):
+		if isinstance(config, dict) and len(config) > 0:
+			self._config = config
+		if len(kwargs) > 0:
+			for k, v in kwargs.items():
+				self._config[k] = v
+		return self
+				
+	def set_config(self, config, **kwargs):
+		return self.bind_config(config, **kwargs)
+				
+	def getConfig(self, key=None, default=KeyError):
+		if key is None:
+			return _config
+		else:
+			if key in self._config:
+				return key
+			if isinstance(default, Exception):
+				raise default
+			else:
+				return default

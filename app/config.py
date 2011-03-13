@@ -17,3 +17,10 @@ config['momentum.fatcatmap'] = {
 	}
 
 }
+
+# Pipelines Configuration
+config['momentum.fatcatmap.pipelines'] = {
+
+    'debug': True
+
+}
