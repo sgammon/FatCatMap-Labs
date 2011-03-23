@@ -19,17 +19,13 @@ from difflib import get_close_matches
 from email import message_from_string
 from copy import copy
 import re
-try:
-    set
-except NameError:
-    from sets import Set as set
 import time
 
 from babel import __version__ as VERSION
 from babel.core import Locale
 from babel.dates import format_datetime
 from babel.messages.plurals import get_plural
-from babel.util import odict, distinct, LOCALTZ, UTC, FixedOffsetTimezone
+from babel.util import odict, distinct, set, LOCALTZ, UTC, FixedOffsetTimezone
 
 __all__ = ['Message', 'Catalog', 'TranslationError']
 __docformat__ = 'restructuredtext en'
@@ -351,13 +347,61 @@ class Catalog(object):
             elif name == 'pot-creation-date':
                 # FIXME: this should use dates.parse_datetime as soon as that
                 #        is ready
-                value, tzoffset, _ = re.split('[+-](\d{4})$', value, 1)
+                value, tzoffset, _ = re.split('([+-]\d{4})$', value, 1)
+
                 tt = time.strptime(value, '%Y-%m-%d %H:%M')
                 ts = time.mktime(tt)
-                tzoffset = FixedOffsetTimezone(int(tzoffset[:2]) * 60 +
-                                               int(tzoffset[2:]))
+
+                # Separate the offset into a sign component, hours, and minutes
+                plus_minus_s, rest = tzoffset[0], tzoffset[1:]
+                hours_offset_s, mins_offset_s = rest[:2], rest[2:]
+
+                # Make them all integers
+                plus_minus = int(plus_minus_s + '1')
+                hours_offset = int(hours_offset_s)
+                mins_offset = int(mins_offset_s)
+
+                # Calculate net offset
+                net_mins_offset = hours_offset * 60
+                net_mins_offset += mins_offset
+                net_mins_offset *= plus_minus
+
+                # Create an offset object
+                tzoffset = FixedOffsetTimezone(net_mins_offset)
+
+                # Store the offset in a datetime object
                 dt = datetime.fromtimestamp(ts)
                 self.creation_date = dt.replace(tzinfo=tzoffset)
+            elif name == 'po-revision-date':
+                # Keep the value if it's not the default one
+                if 'YEAR' not in value:
+                    # FIXME: this should use dates.parse_datetime as soon as
+                    #        that is ready
+                    value, tzoffset, _ = re.split('([+-]\d{4})$', value, 1)
+                    tt = time.strptime(value, '%Y-%m-%d %H:%M')
+                    ts = time.mktime(tt)
+
+                    # Separate the offset into a sign component, hours, and
+                    # minutes
+                    plus_minus_s, rest = tzoffset[0], tzoffset[1:]
+                    hours_offset_s, mins_offset_s = rest[:2], rest[2:]
+
+                    # Make them all integers
+                    plus_minus = int(plus_minus_s + '1')
+                    hours_offset = int(hours_offset_s)
+                    mins_offset = int(mins_offset_s)
+
+                    # Calculate net offset
+                    net_mins_offset = hours_offset * 60
+                    net_mins_offset += mins_offset
+                    net_mins_offset *= plus_minus
+
+                    # Create an offset object
+                    tzoffset = FixedOffsetTimezone(net_mins_offset)
+
+                    # Store the offset in a datetime object
+                    dt = datetime.fromtimestamp(ts)
+                    self.revision_date = dt.replace(tzinfo=tzoffset)
 
     mime_headers = property(_get_mime_headers, _set_mime_headers, doc="""\
     The MIME headers of the catalog, used for the special ``msgid ""`` entry.
@@ -710,6 +754,9 @@ class Catalog(object):
         for msgid in remaining:
             if no_fuzzy_matching or msgid not in fuzzy_matches:
                 self.obsolete[msgid] = remaining[msgid]
+        # Make updated catalog's POT-Creation-Date equal to the template
+        # used to update the catalog
+        self.creation_date = template.creation_date
 
     def _key_for(self, id):
         """The key for a message is just the singular ID even for pluralizable

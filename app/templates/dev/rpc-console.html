@@ -1,0 +1,68 @@
+{% extends 'layouts/main.html' %}
+
+{% block content_body %}
+
+<div class='padding-20 fullwidth fullheight'>
+
+	<div class='contentPanel'>
+
+		<div class='panelHeader'>
+			<h1>RPC Console</h1>
+		</div>
+		<div class='panelContent'>
+
+			<h2>Operations:</h2><br />
+
+			<a href='#' id='drawGraph'>Draw Graph</a>
+
+			<br />
+			<br />
+			<hr />
+			<br />
+			<div class='floatleft'>
+				<b>API Request:<b><br />
+				<textarea id='api_request_content' style='width:400px; height:300px; background:white;'></textarea>
+			</div>
+			
+			<div class='floatleft'>
+				<b>API Response:<b><br />
+				<textarea id='api_response_content' style='width:400px; height:300px; background:white;'></textarea>
+			</div>
+			
+			<div class='clearboth'></div>
+
+		</div>
+
+	</div>
+	
+</div>
+
+{% endblock %}
+
+{% block postsouth %}
+
+<script type='text/javascript'>
+_error = null;
+	$('#drawGraph').click(function doGrpahRPC()
+		{
+			alert('making graph RPC request...');
+			$.jsonRPC.setup({endPoint: "{{ link('api-call-rest', module='graph', service='draw', method='drawFromNode') }}"});
+			$.jsonRPC.request('drawFromNode', {node:'ag1tb21lbnR1bS1sYWJzchYLEgZPYmplY3QYAQwLEgROb2RlGAEM'},{
+
+					success: function(response)
+					{
+						$('#api_response_content').val(JSON.stringify(response));
+					},
+					error: function(response)
+					{
+						_error = response;
+						alert('rpc failure: '+response.error);
+					}
+			
+				}
+			);
+		}
+	);
+</script>
+
+{% endblock %}

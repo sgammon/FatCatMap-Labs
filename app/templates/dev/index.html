@@ -1,0 +1,22 @@
+{% extends 'layouts/main.html' %}
+
+{% block content_body %}
+
+<div class='padding-20 halfwidth fullheight'>
+
+	<div class='contentPanel'>
+
+		<div class='panelHeader'>
+			<h1>Development Console</h1>
+		</div>
+		<div class='panelContent'>
+				<a href="{{ link('dev-rpc-console') }}">RPC Console<a><br />
+				<a href="{{ link('dev-cache-management') }}">Cache Management</a><br />
+				<a href="{{ link('dev-shell') }}">Command Shell</a>
+		</div>
+
+	</div>
+	
+</div>
+
+{% endblock %}

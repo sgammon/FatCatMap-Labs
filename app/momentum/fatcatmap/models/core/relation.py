@@ -7,13 +7,13 @@ class Vector(m.NDBModel):
 	hints = m.ndb.KeyProperty(repeated=True)
 	
 	
-class EdgeType(m.NDBModle):
+class EdgeType(m.NDBModel):
 	name = m.ndb.StringProperty()
 	schema = m.ndb.KeyProperty()
 	
 	
 class Edge(m.NDBModel):
-	origin = m.ndb.KeyProperty()
+	source = m.ndb.KeyProperty()
 	target = m.ndb.KeyProperty()
 	score = m.ndb.FloatProperty()
 	

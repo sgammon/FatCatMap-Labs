@@ -14,10 +14,13 @@ body
 .clearleft { clear:left; }
 .clearright { clear:right; }
 .clearboth { clear:both; }
-.fullwidth { width:100%; }
+.fullwidth { width:96%; }
+.halfwidth { width:50%; }
 .fullheight { height:100%; }
+.halfheight { height:50%; }
 .textcenter { text-align:center; }
 .alignmiddle { margin-left:auto;margin-right:auto; }
+.padding-20 { padding:20px; }
 
 /* === Superbar === */
 .momentumSuperbar

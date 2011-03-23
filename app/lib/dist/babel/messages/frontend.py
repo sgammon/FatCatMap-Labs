@@ -243,7 +243,7 @@ class extract_messages(Command):
         self.omit_header = False
         self.output_file = None
         self.input_dirs = None
-        self.width = 76
+        self.width = None
         self.no_wrap = False
         self.sort_output = False
         self.sort_by_file = False
@@ -267,9 +267,9 @@ class extract_messages(Command):
         if self.no_wrap and self.width:
             raise DistutilsOptionError("'--no-wrap' and '--width' are mutually "
                                        "exclusive")
-        if self.no_wrap:
-            self.width = None
-        else:
+        if not self.no_wrap and not self.width:
+            self.width = 76
+        elif self.width is not None:
             self.width = int(self.width)
 
         if self.sort_output and self.sort_by_file:
@@ -626,20 +626,13 @@ class CommandLineInterface(object):
 
         options, args = self.parser.parse_args(argv[1:])
 
-        # Configure logging
-        self.log = logging.getLogger('babel')
-        self.log.setLevel(options.loglevel)
-        handler = logging.StreamHandler()
-        handler.setLevel(options.loglevel)
-        formatter = logging.Formatter('%(message)s')
-        handler.setFormatter(formatter)
-        self.log.addHandler(handler)
-
+        self._configure_logging(options.loglevel)
         if options.list_locales:
             identifiers = localedata.list()
             longest = max([len(identifier) for identifier in identifiers])
+            identifiers.sort()
             format = u'%%-%ds %%s' % (longest + 1)
-            for identifier in localedata.list():
+            for identifier in identifiers:
                 locale = Locale.parse(identifier)
                 output = format % (identifier, locale.english_name)
                 print output.encode(sys.stdout.encoding or
@@ -648,13 +641,29 @@ class CommandLineInterface(object):
             return 0
 
         if not args:
-            self.parser.error('incorrect number of arguments')
+            self.parser.error('no valid command or option passed. '
+                              'Try the -h/--help option for more information.')
 
         cmdname = args[0]
         if cmdname not in self.commands:
             self.parser.error('unknown command "%s"' % cmdname)
 
         return getattr(self, cmdname)(args[1:])
+
+    def _configure_logging(self, loglevel):
+        self.log = logging.getLogger('babel')
+        self.log.setLevel(loglevel)
+        # Don't add a new handler for every instance initialization (#227), this
+        # would cause duplicated output when the CommandLineInterface as an
+        # normal Python class.
+        if self.log.handlers:
+            handler = self.log.handlers[0]
+        else:
+            handler = logging.StreamHandler()
+            self.log.addHandler(handler)
+        handler.setLevel(loglevel)
+        formatter = logging.Formatter('%(message)s')
+        handler.setFormatter(formatter)
 
     def _help(self):
         print self.parser.format_help()
@@ -803,7 +812,7 @@ class CommandLineInterface(object):
         parser.add_option('-o', '--output', dest='output',
                           help='path to the output POT file')
         parser.add_option('-w', '--width', dest='width', type='int',
-                          help="set output line width (default %default)")
+                          help="set output line width (default 76)")
         parser.add_option('--no-wrap', dest='no_wrap', action = 'store_true',
                           help='do not break long message lines, longer than '
                                'the output line width, into several lines')
@@ -818,6 +827,10 @@ class CommandLineInterface(object):
                           help='set report address for msgid')
         parser.add_option('--copyright-holder', dest='copyright_holder',
                           help='set copyright holder in output')
+        parser.add_option('--project', dest='project',
+                          help='set project name in output')
+        parser.add_option('--version', dest='version',
+                          help='set project version in output')
         parser.add_option('--add-comments', '-c', dest='comment_tags',
                           metavar='TAG', action='append',
                           help='place comment block with TAG (or those '
@@ -829,7 +842,7 @@ class CommandLineInterface(object):
 
         parser.set_defaults(charset='utf-8', keywords=[],
                             no_default_keywords=False, no_location=False,
-                            omit_header = False, width=76, no_wrap=False,
+                            omit_header = False, width=None, no_wrap=False,
                             sort_output=False, sort_by_file=False,
                             comment_tags=[], strip_comment_tags=False)
         options, args = parser.parse_args(argv)
@@ -864,15 +877,15 @@ class CommandLineInterface(object):
             parser.error("'--no-wrap' and '--width' are mutually exclusive.")
         elif not options.width and not options.no_wrap:
             options.width = 76
-        elif not options.width and options.no_wrap:
-            options.width = 0
 
         if options.sort_output and options.sort_by_file:
             parser.error("'--sort-output' and '--sort-by-file' are mutually "
                          "exclusive")
 
         try:
-            catalog = Catalog(msgid_bugs_address=options.msgid_bugs_address,
+            catalog = Catalog(project=options.project,
+                              version=options.version,
+                              msgid_bugs_address=options.msgid_bugs_address,
                               copyright_holder=options.copyright_holder,
                               charset=options.charset)
 
@@ -1000,13 +1013,13 @@ class CommandLineInterface(object):
         parser.add_option('--ignore-obsolete', dest='ignore_obsolete',
                           action='store_true',
                           help='do not include obsolete messages in the output '
-                               '(default %default)'),
+                               '(default %default)')
         parser.add_option('--no-fuzzy-matching', '-N', dest='no_fuzzy_matching',
                           action='store_true',
-                          help='do not use fuzzy matching (default %default)'),
+                          help='do not use fuzzy matching (default %default)')
         parser.add_option('--previous', dest='previous', action='store_true',
                           help='keep previous msgids of translated messages '
-                               '(default %default)'),
+                               '(default %default)')
 
         parser.set_defaults(domain='messages', ignore_obsolete=False,
                             no_fuzzy_matching=False, previous=False)
@@ -1017,7 +1030,7 @@ class CommandLineInterface(object):
         if not options.output_file and not options.output_dir:
             parser.error('you must specify the output file or directory')
         if options.output_file and not options.locale:
-            parser.error('you must specify the loicale')
+            parser.error('you must specify the locale')
         if options.no_fuzzy_matching and options.previous:
             options.previous = False
 
@@ -1170,8 +1183,9 @@ def parse_mapping(fileobj, filename=None):
 def parse_keywords(strings=[]):
     """Parse keywords specifications from the given list of strings.
 
-    >>> kw = parse_keywords(['_', 'dgettext:2', 'dngettext:2,3'])
-    >>> for keyword, indices in sorted(kw.items()):
+    >>> kw = parse_keywords(['_', 'dgettext:2', 'dngettext:2,3']).items()
+    >>> kw.sort()
+    >>> for keyword, indices in kw:
     ...     print (keyword, indices)
     ('_', None)
     ('dgettext', (2,))

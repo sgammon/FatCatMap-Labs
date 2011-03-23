@@ -1,4 +1,5 @@
 from ProvidenceClarity.struct.core import Struct
+from ProvidenceClarity.struct.config import Config
 
 class DictProxy(Struct):
 	
@@ -37,26 +38,40 @@ class DictProxy(Struct):
 		
 class ConfigurableStruct(object):
 	
-	_config = {}
+	''' Implements a pattern for a configurable object (manages config parameters, can load and rebind at runtime). '''
+
+	config = Config()
 	
 	def bind_config(self, config={}, **kwargs):
 		if isinstance(config, dict) and len(config) > 0:
-			self._config = config
+			self.config = config
 		if len(kwargs) > 0:
 			for k, v in kwargs.items():
-				self._config[k] = v
+				self.config[k] = v
 		return self
 				
-	def set_config(self, config, **kwargs):
-		return self.bind_config(config, **kwargs)
+	def set_config(self, name=None, value=None, **kwargs):
+		if name is not None:
+			self.config[name] = value
+		if len(kwargs) > 0:
+			for key, value in kwargs.items():
+				self.config[key] = value
 				
-	def getConfig(self, key=None, default=KeyError):
+	def get_config(self, key=None, default=KeyError):
 		if key is None:
 			return _config
 		else:
-			if key in self._config:
+			if key in self.config:
 				return key
 			if isinstance(default, Exception):
 				raise default
 			else:
 				return default
+				
+				
+class SerializableStruct(object):
+	
+	''' Implements an object that can be normalized into a basic type for later serialization. '''
+	
+	def normalize(self):
+		raise NotImplementedError, "SerializableStruct subclasses must implement the normalize function."

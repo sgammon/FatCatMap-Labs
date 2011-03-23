@@ -33,7 +33,7 @@
       },
 
       // Performas a single RPC request
-      request: function(method, params, callbacks, url, extra_params) {
+      request: function(method, async, params, callbacks, url, extra_params) {
         // Validate or method arguments
         this._validateRequestMethod(method);
         this._validateRequestParams(params);
@@ -41,6 +41,7 @@
 
         // Perform the actual request
         this._doRequest(JSON.stringify(this._requestDataObj(method, params, 1)),
+						async,
                         callbacks,
                         url);
         
@@ -117,7 +118,7 @@
       },
 
       // Internal method used for generic ajax requests
-      _doRequest: function(data, callbacks, url) {
+      _doRequest: function(data, async, callbacks, url) {
         var _that = this;
         $.ajax({
           type: 'POST',
@@ -125,6 +126,7 @@
           url: this._requestUrl(url),
           data: data,
           cache: true,
+		  async: async,
           processData: false,
           error: function(json) {
             _that._requestError.call(_that, callbacks, json);

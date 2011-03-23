@@ -216,6 +216,9 @@ class Locale(object):
     def __eq__(self, other):
         return str(self) == str(other)
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         return '<Locale "%s">' % str(self)
 
@@ -639,7 +642,10 @@ def default_locale(category=None, aliases=LOCALE_ALIASES):
                 locale = 'en_US_POSIX'
             elif aliases and locale in aliases:
                 locale = aliases[locale]
-            return '_'.join(filter(None, parse_locale(locale)))
+            try:
+                return '_'.join(filter(None, parse_locale(locale)))
+            except ValueError:
+                pass
 
 def negotiate_locale(preferred, available, sep='_', aliases=LOCALE_ALIASES):
     """Find the best match between available and requested locale strings.

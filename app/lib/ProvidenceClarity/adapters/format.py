@@ -8,17 +8,17 @@ class ProvidenceClarityFormatAdapter(ProvidenceClarityAdapter):
 
 	@classmethod
 	def loadEncoder(cls, **kwargs):
-		return cls().set_encoder(cls.encoder().set_config(kwargs))
+		return cls().set_encoder(cls.encoder().bind_config(kwargs))
 
 	@classmethod
 	def loadDecoder(cls, **kwargs):
-		return cls().set_decoder(cls.decoder().set_config(kwargs))
+		return cls().set_decoder(cls.decoder().bind_config(kwargs))
 		
 	def encode(self, **kwargs):
-		raise NotImplementedError, 'LoadDecoder hook must be handled by adapter subclasses and cannot be called directly.'
+		raise NotImplementedError, 'Encode method must be handled by adapter subclasses and cannot be called directly.'
 		
 	def decode(self, **kwargs):
-		raise NotImplementedError, 'LoadDecoder hook must be handled by adapter subclasses and cannot be called directly.'
+		raise NotImplementedError, 'Decode method must be handled by adapter subclasses and cannot be called directly.'
 		
 	def set_encoder(self, encoder):
 		self.encoder = encoder

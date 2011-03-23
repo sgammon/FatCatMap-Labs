@@ -15,7 +15,7 @@ class ProvidenceClarityAdapter(ConfigurableStruct):
 
 	@classmethod
 	def createAdapter(cls, config={}):
-		return cls().set_config(config)
+		return cls().bind_config(config)
 		
 	def set_input(self, input_s):
 		self._input = input_s

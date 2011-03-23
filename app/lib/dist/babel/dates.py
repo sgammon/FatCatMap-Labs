@@ -220,7 +220,7 @@ def get_timezone_location(dt_or_tzinfo=None, locale=LC_TIME):
     """Return a representation of the given timezone using "location format".
     
     The result depends on both the local display name of the country and the
-    city assocaited with the time zone:
+    city associated with the time zone:
     
     >>> from pytz import timezone
     >>> tz = timezone('America/St_Johns')
@@ -340,7 +340,7 @@ def get_timezone_name(dt_or_tzinfo=None, width='long', uncommon=False,
     
     The `uncommon` parameter can be set to `True` to enable the use of timezone
     representations that are not commonly used by the requested locale. For
-    example, while in frensh the central europian timezone is usually
+    example, while in French the central European timezone is usually
     abbreviated as "HEC", in Canadian French, this abbreviation is not in
     common use, so a generic name would be chosen by default:
     
@@ -456,7 +456,7 @@ def format_date(date=None, format='medium', locale=LC_TIME):
     if format in ('full', 'long', 'medium', 'short'):
         format = get_date_format(format, locale=locale)
     pattern = parse_pattern(format)
-    return parse_pattern(format).apply(date, locale)
+    return pattern.apply(date, locale)
 
 def format_datetime(datetime=None, format='medium', tzinfo=None,
                     locale=LC_TIME):
@@ -578,7 +578,7 @@ def format_time(time=None, format='medium', tzinfo=None, locale=LC_TIME):
     if isinstance(time, datetime):
         if tzinfo is not None:
             time = time.astimezone(tzinfo)
-            if hasattr(tzinfo, 'localize'): # pytz
+            if hasattr(tzinfo, 'normalize'): # pytz
                 time = tzinfo.normalize(time)
         time = time.timetz()
     elif tzinfo is not None:

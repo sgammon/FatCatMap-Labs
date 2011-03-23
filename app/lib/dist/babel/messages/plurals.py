@@ -13,9 +13,8 @@
 
 """Plural form definitions."""
 
-
-from operator import itemgetter
 from babel.core import default_locale, Locale
+from babel.util import itemgetter
 
 
 LC_CTYPE = default_locale('LC_CTYPE')
@@ -177,7 +176,7 @@ PLURALS = {
     # Slovenian
     'sl': (4, '(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3)'),
     # Serbian - From Pootle's PO's
-    'sr': (3, '(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10< =4 && (n%100<10 || n%100>=20) ? 1 : 2)'),
+    'sr': (3, '(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)'),
     # Southern Sotho - From Pootle's PO's
     'st': (2, '(n != 1)'),
     # Swedish
