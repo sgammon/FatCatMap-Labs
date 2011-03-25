@@ -1,0 +1,1 @@
+This folder holds binaries to be executed at the command line.
