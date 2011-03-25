@@ -11,6 +11,14 @@ def CallResponder(func):
 		self.result = result
 	return decorated		
 	
+
+def ModelResponder(func):
+	
+	def decorated(self, *args, **kwargs):
+		return func(*args, **kwargs)
+		
+	return decodated
+	
 	
 def QueryResponder(func):
 

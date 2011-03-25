@@ -9,7 +9,6 @@ import logging
 from pipeline import common
 from pipeline import pipeline
 
-import ndb
 from google.appengine.ext import db
 from google.appengine.api import xmpp
 from google.appengine.api import channel
@@ -129,6 +128,8 @@ class FCMPipeline(pipeline.Pipeline):
 	common = common
 
 	def __init__(self, *args, **kwargs):
+		
+		import ndb
 		
 		## Reload NDB
 		reload(ndb)

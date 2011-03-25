@@ -1,0 +1,39 @@
+{% extends 'layouts/main.html' %}
+{% from 'macros/form.html' import renderForm %}
+
+{% block content_body %}
+
+<div class='padding-20 fullwidth fullheight'>
+
+	<div class='contentPanel'>
+
+		<div class='panelHeader'>
+			<h1>Add Graph Data</h1>
+		</div>
+		<div class='panelContent'>
+			
+			{% if msg is not none %}
+				<div class='notice'><p>{{ msg }}</p></div>
+			{% endif %}
+
+			<h2>Create Object Collection:</h2><br />
+
+			{{ renderForm(create_collection) }}
+
+			<br />
+			<br />
+			
+			<h2>Create Object Relation:</h2><br />
+
+			{{ renderForm(create_relation) }}
+			
+			<br />
+			<br />
+
+		</div>
+
+	</div>
+	
+</div>
+
+{% endblock %}

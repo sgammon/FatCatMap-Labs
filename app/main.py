@@ -35,9 +35,10 @@ sys_config = config.get('momentum.fatcatmap')
 
 app = Tipfy(rules=get_rules(), config=config, debug=debug)
 
-if sys_config.get('enable_hooks', False) == True:
-	if debug:
-		enable_jinja2_debugging()
+if debug:
+	enable_jinja2_debugging()
+
+if sys_config.get('enable_hooks', False) != False:
 	if sys_config['enable_hooks'].get('appstats', False) == True:
 		enable_appstats(app)
 

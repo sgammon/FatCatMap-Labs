@@ -8,7 +8,7 @@ rules = [
 	HandlerPrefix('momentum.fatcatmap.handlers.', [
 	
 		## === Main URLs === ##
-		Rule('/', name='hello-world', handler='main.Landing'),
+		Rule('/', name='landing', handler='main.Landing'),
 		Rule('/login', name='auth/login', handler='security.Login'),
 		Rule('/logout', name='auth/logout', handler='security.Logout'),
 		Rule('/register', name='auth/register', handler='security.Register'),
@@ -16,6 +16,8 @@ rules = [
 		## === Dev URLs === ##
 		Rule('/dev', name='dev-index', handler='dev.Index'),
 		Rule('/dev/cache', name='dev-cache-management', handler='dev.CacheManagement'),
+		Rule('/dev/add-data', name='dev-add-data', handler='dev.AddData'),
+		Rule('/dev/default-data', name='dev-default-data', handler='dev.DefaultData'),
 		Rule('/dev/rpc-console', name='dev-rpc-console', handler='dev.RPCConsole'),
 		Rule('/dev/shell', name='dev-shell', handler='dev.WebShell'),
 		

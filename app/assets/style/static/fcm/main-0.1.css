@@ -19,8 +19,13 @@ body
 .fullheight { height:100%; }
 .halfheight { height:50%; }
 .textcenter { text-align:center; }
+.textleft { text-align:left; }
+.textright { text-align:right; }
 .alignmiddle { margin-left:auto;margin-right:auto; }
 .padding-20 { padding:20px; }
+.snapright { right:0px; }
+.snapleft { left:0px; }
+.notice { min-width:500px;min-height:20px;background:yellow;color:black;border-radius:3px;-moz-border-radius:3px;opacity:0.8;padding:5px;margin:5px; }
 
 /* === Superbar === */
 .momentumSuperbar
@@ -58,7 +63,7 @@ body
 }
 .momentumSuperbar ul.topNavigation
 {
-	line-height:23px;
+	line-height:25px;
 	list-style:none;
 	display:inline;
 }
@@ -69,23 +74,55 @@ body
 	padding-right:10px;
 	display:inline;
 	font-size:10pt;
-	color:#777;	
+	color:#777;
+	float:left;
+	position:relative;
 }
 .momentumSuperbar ul.utilNavigation
 {
+	position: relative;
+	float: right;	
 	list-style:none;
 	display:inline;
 	height:25px;
-	line-height:23px;
+	line-height:25px;
 }
-.momentumSuperbar ul.utilNavigation li
+.momentumSuperbar ul.utilNavigation li.naventry
 {
 	list-style:none;
-	padding-left:10px;
-	padding-right:10px;
 	display:inline;
+	float:left;
 	font-size:10pt;
 	color:#777;
+}
+.momentumSuperbar ul.utilNavigation li.naventry a
+{
+	padding-left:10px;
+	padding-right:10px;
+	height:100%;
+	line-height:25px;
+}
+.momentumSuperbar ul li ul.subnav
+{
+	position:absolute;
+	top:25px;
+	margin-top:0px;
+	z-index:1000;
+	background:#111;
+	display:none;
+	width:145px;
+	padding-left:5px;
+	padding-right:5px;
+	opacity:0.8;
+}
+.momentumSuperbar ul li:hover ul.subnav
+{
+	display:block !important;
+}
+.momentumSuperbar ul li ul.subnav li.subnav_entry
+{
+	list-style:normal;
+	display:block;
 }
 
 /* === Header Nav === */
@@ -139,7 +176,8 @@ body
 
 .rootContent
 {
-	height:94%;
+	margin-top:25px;
+	height:90.5%;
 	width:100%;
 	background:#333;
 	position:absolute;

@@ -11,7 +11,7 @@
 
 		// Set up Graph API RPC
 		$.jsonRPC.setup({endPoint: "{{ link('api-call-rest', module='graph', service='draw', method='drawFromNode') }}"});
-		$.jsonRPC.request('drawFromNode', false, {node:'ag1tb21lbnR1bS1sYWJzchYLEgZPYmplY3QYAQwLEgROb2RlGAEM'},{
+		$.jsonRPC.request('drawFromNode', false, {},{
 
 				success: function(response)
 				{

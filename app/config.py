@@ -8,6 +8,9 @@ config['tipfy'] = {
 	],
 
 }
+config['tipfy.sessions'] = {
+	'secret_key':'ASKLdjOF)H#*@G@)*GCJDBUVF(!&Gouhf981g27gd2G@H)'
+}
 
 """ FatCatMap Configuration """
 config['momentum.fatcatmap'] = {

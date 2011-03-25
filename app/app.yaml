@@ -1,5 +1,5 @@
-application: momentum-labs
-version: 2-dev
+application: fatcatmap
+version: 3-dev
 runtime: python
 api_version: 1
 
@@ -81,3 +81,4 @@ handlers:
 ###### Send to Tipfy
 - url: /.*
   script: main.py
+  login: admin

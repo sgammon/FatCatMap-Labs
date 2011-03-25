@@ -1,0 +1,25 @@
+{% extends 'layouts/main.html' %}
+{% from 'macros/form.html' import renderForm %}
+
+{% block content_body %}
+
+<div class='padding-20 fullwidth fullheight'>
+
+	<div class='contentPanel'>
+
+		<div class='panelHeader'>
+			<h1>Default Data</h1>
+		</div>
+		<div class='panelContent'>
+						
+			{% for msg in msgs %}
+				<p>{{ msg }}</p>
+			{% endfor %}
+			
+		</div>
+
+	</div>
+	
+</div>
+
+{% endblock %}
