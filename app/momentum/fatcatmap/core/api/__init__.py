@@ -1,0 +1,4 @@
+
+
+class MomentumCoreAPI(object):
+	pass

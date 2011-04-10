@@ -1,0 +1,4 @@
+
+
+class MomentumCoreAdapter(object):
+	pass

@@ -8,7 +8,7 @@ from ProvidenceClarity.struct.util import ConfigurableStruct
 from ProvidenceClarity.struct.util import SerializableStruct
 
 from momentum.fatcatmap import models as m
-from momentum.fatcatmap.core.adapters.format import FCMFormatAdapter
+from momentum.fatcatmap.core.adapters.format import FormatAdapter
 
 
 ###### ========== Key/Model Encoders ========== ######
@@ -101,7 +101,7 @@ class FCMJSONDecoderMiddleware(json.JSONDecoder, ConfigurableStruct):
 		
 
 ###### ======== JSON Adapter Interface ======== ######
-class FCMJSONAdapter(FCMFormatAdapter):
+class FCMJSONAdapter(FormatAdapter):
 
 	encoder = FCMJSONEncoderMiddleware
 	decoder = FCMJSONDecoderMiddleware

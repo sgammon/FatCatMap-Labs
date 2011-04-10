@@ -1,0 +1,4 @@
+
+
+class ProvidenceClarityStructure(object):
+	pass

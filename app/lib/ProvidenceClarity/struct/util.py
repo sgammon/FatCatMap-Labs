@@ -1,6 +1,7 @@
 from ProvidenceClarity.struct.core import Struct
 from ProvidenceClarity.struct.config import Config
 
+
 class DictProxy(Struct):
 	
 	''' Handy little object that takes a dict and makes it accessible via var[item] and var.item formats. Also handy for caching. '''
@@ -22,12 +23,67 @@ class DictProxy(Struct):
 		if name in self.__dict__:
 			return getattr(self, name)
 		else:
-			return default
+			raise AttributeError
 		
 	def __setitem__(self, name, value):
 		setattr(self, name, value)
 			
 	def __delitem__(self, name):
+		if name in self.__dict__:
+			del self.__dict__[name]
+		else:
+			raise AttributeError
+			
+	def __contains__(self, name):
+		return name in self._entries
+			
+	## Utiliy Methods
+	def items(self):
+		return [(k, v) for k, v in self.__dict__.items()]
+
+
+class ObjectProxy(Struct):
+	
+	''' Same handy object as above, but stores the entries in an _entries attribute rather than the class dict.  '''
+	
+	_entries = {}
+	
+	## Init
+	def fillStructure(self, struct=None, **kwargs):
+		if struct is not None:
+			if isinstance(struct, dict):
+				for k, v in struct.items():
+					self._entries[k] = v
+			elif isinstance(struct, list):
+				for k, v in struct:
+					self._entries[k] = v
+		if len(kwargs) > 0:
+			for k, v in kwargs.items():
+				self._entries[k] = v
+			
+	def __getitem__(self, name):
+		if name in self._entries:
+			return self._entries[name]
+		else:
+			raise KeyError
+		
+	def __setitem__(self, name, value):
+		self._entries[name] = value
+
+	def __delitem__(self, name):
+		if name in self._entries:
+			del self._entries[name]
+
+	def __setattr__(self, name, value):
+		self._entries[name] = value
+		
+	def __getattr__(self, name):
+		return self._entries.get(name)
+		
+	def __contains__(self, name):
+		return name in self._entries
+		
+	def __delattr__(self, name):
 		if name in self._entries:
 			del self._entries[name]
 			
@@ -40,7 +96,10 @@ class ConfigurableStruct(object):
 	
 	''' Implements a pattern for a configurable object (manages config parameters, can load and rebind at runtime). '''
 
-	config = Config()
+	config = {}
+	
+	def __init__(self):
+		self.config = Config()
 	
 	def bind_config(self, config={}, **kwargs):
 		if isinstance(config, dict) and len(config) > 0:

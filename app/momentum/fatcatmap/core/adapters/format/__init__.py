@@ -1,5 +1,6 @@
+from momentum.fatcatmap.core.adapters import MomentumCoreAdapter
 from ProvidenceClarity.adapters.format import ProvidenceClarityFormatAdapter
 
 
-class FCMFormatAdapter(ProvidenceClarityFormatAdapter):
+class FormatAdapter(MomentumCoreAdapter, ProvidenceClarityFormatAdapter):
 	pass
