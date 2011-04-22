@@ -738,10 +738,10 @@ def synctasklet(func):
   webapp.RequestHandler.get method).
   """
   @utils.wrapping(func)
-  def synctasklet_wrapper(*args):
+  def synctasklet_wrapper(*args, **kwds):
     __ndb_debug__ = utils.func_info(func)
     taskletfunc = tasklet(func)
-    return taskletfunc(*args).get_result()
+    return taskletfunc(*args, **kwds).get_result()
   return synctasklet_wrapper
 
 
@@ -761,7 +761,7 @@ def get_context():
   return ctx
 
 def make_default_context():
-  from ndb import context # Late import to deal with circular imports.
+  import context  # Late import to deal with circular imports.
   return context.Context()
 
 def set_context(new_context):

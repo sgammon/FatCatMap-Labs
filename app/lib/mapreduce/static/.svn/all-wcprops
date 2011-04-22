@@ -1,7 +1,7 @@
 K 25
 svn:wc:ra_dav:version-url
-V 50
-/svn/!svn/ver/93/trunk/python/src/mapreduce/static
+V 51
+/svn/!svn/ver/159/trunk/python/src/mapreduce/static
 END
 base.css
 K 25
@@ -30,6 +30,6 @@ END
 status.js
 K 25
 svn:wc:ra_dav:version-url
-V 60
-/svn/!svn/ver/93/trunk/python/src/mapreduce/static/status.js
+V 61
+/svn/!svn/ver/159/trunk/python/src/mapreduce/static/status.js
 END

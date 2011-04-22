@@ -80,8 +80,8 @@ class Context(object):
     self._put_batcher = auto_batcher_class(self._put_tasklet)
     self._delete_batcher = auto_batcher_class(self._delete_tasklet)
     self._cache = {}
-    self._cache_policy = None
-    self._memcache_policy = None
+    self._cache_policy = lambda key: True
+    self._memcache_policy = lambda key: True
     # TODO: Also add a way to compute the memcache expiration time.
 
   @tasklets.tasklet
@@ -128,7 +128,10 @@ class Context(object):
     results = yield self._conn.async_put(None, ents)
     for key, (fut, ent) in zip(results, todo):
       if key != ent.key:
-        assert ent.key is None or not list(ent.key.flat())[-1]
+        if ent._has_complete_key():
+          raise datastore_errors.BadKeyError(
+              'Entity key differs from the one returned by the datastore. '
+              'Expected %r, got %r' % (key, ent.key))
         ent.key = key
       fut.set_result(key)
     # Now update memcache.
@@ -164,22 +167,62 @@ class Context(object):
       # The value returned by delete_multi() is pretty much useless, it
       # could be the keys were never cached in the first place.
 
+  def get_cache_policy(self):
+    """Returns the current context cache policy.
+
+    Returns:
+      A function that accepts a Key instance as argument and returns
+      a boolean indicating if it should be cached.
+    """
+    return self._cache_policy
+
   def set_cache_policy(self, func):
+    """Sets the context cache policy.
+
+    Args:
+      func: A function that accepts a Key instance as argument and returns
+        a boolean indicating if it should be cached.
+    """
     self._cache_policy = func
 
   def should_cache(self, key):
-    # TODO: Don't need this, set_cache_policy() could substitute a lambda.
-    if self._cache_policy is None:
-      return True
+    """Return whether to use the context cache for this key.
+
+    Args:
+      key: Key instance.
+
+    Returns:
+      True if the key should be cached, False otherwise.
+    """
     return self._cache_policy(key)
 
+  def get_memcache_policy(self):
+    """Returns the current memcache policy.
+
+    Returns:
+      A function that accepts a Key instance as argument and returns
+      a boolean indicating if it should be cached.
+    """
+    return self._memcache_policy
+
   def set_memcache_policy(self, func):
+    """Sets the memcache policy.
+
+    Args:
+      func: A function that accepts a Key instance as argument and returns
+        a boolean indicating if it should be cached.
+    """
     self._memcache_policy = func
 
   def should_memcache(self, key):
-    # TODO: Don't need this, set_memcache_policy() could substitute a lambda.
-    if self._memcache_policy is None:
-      return True
+    """Return whether to use memcache for this key.
+
+    Args:
+      key: Key instance.
+
+    Returns:
+      True if the key should be cached, False otherwise.
+    """
     return self._memcache_policy(key)
 
   # TODO: What about conflicting requests to different autobatchers,
@@ -191,11 +234,23 @@ class Context(object):
 
   @tasklets.tasklet
   def get(self, key):
-    if key in self._cache:
+    """Returns a Model instance given the entity key.
+
+    It will use the context cache if the cache policy for the given
+    key is enabled.
+
+    Args:
+      key: Key instance.
+
+    Returns:
+      A Model instance it the key exists in the datastore; None otherwise.
+    """
+    should_cache = self.should_cache(key)
+    if should_cache and key in self._cache:
       entity = self._cache[key]  # May be None, meaning "doesn't exist".
     else:
       entity = yield self._get_batcher.add(key)
-      if self.should_cache(key):
+      if should_cache:
         self._cache[key] = entity
     raise tasklets.Return(entity)
 
@@ -316,6 +371,13 @@ class Context(object):
     raise datastore_errors.TransactionFailedError(
       'The transaction could not be committed. Please try again.')
 
+  def flush_cache(self):
+    """Clears the in-memory cache.
+
+    NOTE: This does not affect memcache.
+    """
+    self._cache.clear()
+
   def _flush_memcache(self, keys):
     keys = set(key for key in keys if self.should_memcache(key))
     if keys:
@@ -323,19 +385,13 @@ class Context(object):
       memcache.delete_multi(memkeys)
 
   @tasklets.tasklet
-  def get_or_insert(self, model_class, name, parent=None, **kwds):
+  def get_or_insert(self, model_class, name,
+                    app=None, namespace=None, parent=None,
+                    **kwds):
     # TODO: Test the heck out of this, in all sorts of evil scenarios.
     assert isinstance(name, basestring) and name
-    if parent is None:
-      pairs = []
-    else:
-      # The parent shouldn't override the app or namespace,
-      # since we don't allow overriding those otherwise either.
-      assert parent.app() == model._DefaultAppId()
-      assert parent.namespace() == model._DefaultNamespace()
-      pairs = list(parent.pairs())
-    pairs.append((model_class.GetKind(), name))
-    key = model.Key(pairs=pairs)
+    key = model.Key(model_class, name,
+                    app=app, namespace=namespace, parent=parent)
     # TODO: Can (and should) the cache be trusted here?
     ent = yield self.get(key)
     if ent is None:
@@ -358,7 +414,7 @@ def toplevel(func):
   webapp.RequestHandler.get() or Django view functions.
   """
   @utils.wrapping(func)
-  def add_context_wrapper(*args):
+  def add_context_wrapper(*args, **kwds):
     __ndb_debug__ = utils.func_info(func)
     tasklets.Future.clear_all_pending()
     # Reset context; a new one will be created on the first call to
@@ -366,16 +422,7 @@ def toplevel(func):
     tasklets.set_context(None)
     ctx = tasklets.get_context()
     try:
-      return tasklets.synctasklet(func)(*args)
+      return tasklets.synctasklet(func)(*args, **kwds)
     finally:
       eventloop.run()  # Ensure writes are flushed, etc.
   return add_context_wrapper
-
-
-# Transaction API using the default context.
-
-def transaction(callback):
-  return transaction_async(callback).get_result()
-
-def transaction_async(callback):
-  return tasklets.get_context().transaction(callback)

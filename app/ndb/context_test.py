@@ -7,10 +7,7 @@ import sys
 import time
 import unittest
 
-from google.appengine.api import apiproxy_stub_map
-from google.appengine.api import datastore_file_stub
 from google.appengine.api import memcache
-from google.appengine.api.memcache import memcache_stub
 from google.appengine.datastore import datastore_rpc
 
 from ndb import context
@@ -18,6 +15,7 @@ from ndb import eventloop
 from ndb import model
 from ndb import query
 from ndb import tasklets
+from ndb import test_utils
 
 
 class MyAutoBatcher(context.AutoBatcher):
@@ -35,11 +33,11 @@ class MyAutoBatcher(context.AutoBatcher):
     super(MyAutoBatcher, self).__init__(wrap)
 
 
-class ContextTests(unittest.TestCase):
+class ContextTests(test_utils.DatastoreTest):
 
   def setUp(self):
+    super(ContextTests, self).setUp()
     self.set_up_eventloop()
-    self.set_up_stubs()
     MyAutoBatcher.reset_log()
     self.ctx = context.Context(
         conn=model.make_connection(default_model=model.Expando),
@@ -50,14 +48,6 @@ class ContextTests(unittest.TestCase):
       del os.environ[eventloop._EVENT_LOOP_KEY]
     self.ev = eventloop.get_event_loop()
     self.log = []
-
-  def set_up_stubs(self):
-    apiproxy_stub_map.apiproxy = apiproxy_stub_map.APIProxyStubMap()
-    ds_stub = datastore_file_stub.DatastoreFileStub('_', None)
-    apiproxy_stub_map.apiproxy.RegisterStub('datastore_v3', ds_stub)
-    mc_stub = memcache_stub.MemcacheServiceStub()
-    apiproxy_stub_map.apiproxy.RegisterStub('memcache', mc_stub)
-    os.environ['APPLICATION_ID'] = '_'
 
   def testContext_AutoBatcher_Get(self):
     @tasklets.tasklet
@@ -145,6 +135,27 @@ class ContextTests(unittest.TestCase):
       self.assertTrue(a is None)
     self.ctx.set_cache_policy(should_cache)
     foo().check_success()
+
+  def testContext_CachePolicyDisabledLater(self):
+    # If the cache is disabled after an entity is stored in the cache,
+    # further get() attempts *must not* return the result stored in cache.
+
+    self.ctx.set_cache_policy(lambda key: True)
+    key1 = model.Key(flat=('Foo', 1))
+    ent1 = model.Expando(key=key1)
+    self.ctx.put(ent1).get_result()
+
+    # get() uses cache
+    self.assertTrue(key1 in self.ctx._cache)  # Whitebox.
+    self.assertEqual(self.ctx.get(key1).get_result(), ent1)
+
+    # get() uses cache
+    self.ctx._cache[key1] = None  # Whitebox.
+    self.assertEqual(self.ctx.get(key1).get_result(), None)
+
+    # get() doesn't use cache
+    self.ctx.set_cache_policy(lambda key: False)
+    self.assertEqual(self.ctx.get(key1).get_result(), ent1)
 
   def testContext_Memcache(self):
     @tasklets.tasklet
@@ -320,16 +331,39 @@ class ContextTests(unittest.TestCase):
       assert ent2 == ent
     foo().check_success()
 
+  def testContext_GetOrInsertWithParent(self):
+    # This also tests Context.transaction()
+    class Mod(model.Model):
+      data = model.StringProperty()
+    @tasklets.tasklet
+    def foo():
+      parent = model.Key(flat=('Foo', 1))
+      ent = yield self.ctx.get_or_insert(Mod, 'a', parent=parent, data='hello')
+      assert isinstance(ent, Mod)
+      ent2 = yield self.ctx.get_or_insert(Mod, 'a', parent=parent, data='hello')
+      assert ent2 == ent
+    foo().check_success()
+
   def testAddContextDecorator(self):
     class Demo(object):
       @context.toplevel
       def method(self, arg):
         return (tasklets.get_context(), arg)
+
+      @context.toplevel
+      def method2(self, **kwds):
+        return (tasklets.get_context(), kwds)
     a = Demo()
     old_ctx = tasklets.get_context()
     ctx, arg = a.method(42)
     self.assertTrue(isinstance(ctx, context.Context))
     self.assertEqual(arg, 42)
+    self.assertTrue(ctx is not old_ctx)
+
+    old_ctx = tasklets.get_context()
+    ctx, kwds = a.method2(foo='bar', baz='ding')
+    self.assertTrue(isinstance(ctx, context.Context))
+    self.assertEqual(kwds, dict(foo='bar', baz='ding'))
     self.assertTrue(ctx is not old_ctx)
 
   def testDefaultContextTransaction(self):
@@ -381,7 +415,8 @@ class ContextTests(unittest.TestCase):
     ctx.set_cache_policy(lambda key: False)
     @tasklets.tasklet
     def foo():
-      key1 = model.Key(flat=('Foo', 1))
+      # Foo class is declared in query_test, so let's get a unusual class name.
+      key1 = model.Key(flat=('ThisModelClassDoesntExist', 1))
       ent1 = model.Expando(key=key1, foo=42, bar='hello')
       key = yield ctx.put(ent1)
       a = yield ctx.get(key1)

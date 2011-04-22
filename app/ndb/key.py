@@ -74,6 +74,7 @@ __author__ = 'guido@google.com (Guido van Rossum)'
 import base64
 import os
 
+from google.appengine.api import datastore_errors
 from google.appengine.api import namespace_manager
 from google.appengine.datastore import datastore_rpc
 from google.appengine.datastore import entity_pb
@@ -141,6 +142,15 @@ class Key(object):
     [kind1, id1, kind2, id2, ...].
 
   - key.app() -- the application id.
+
+  - key.id() -- the string or integer id in the last (kind, id) pair,
+    or None if the key is incomplete.
+
+  - key.string_id() -- the string id in the last (kind, id) pair,
+    or None if the key has an integer id or is incomplete.
+
+  - key.integer_id() -- the integer id in the last (kind, id) pair,
+    or None if the key has a string id or is incomplete.
 
   - key.namespace() -- the namespace.
 
@@ -273,6 +283,13 @@ class Key(object):
       return None
     return Key(pairs=pairs[:-1], app=self.app(), namespace=self.namespace())
 
+  def root(self):
+    """Return the root key.  This is either self or the highest parent."""
+    pairs = self.pairs()
+    if len(pairs) <= 1:
+      return self
+    return Key(pairs=pairs[:1], app=self.app(), namespace=self.namespace())
+
   def namespace(self):
     """Return the namespace."""
     return self.__reference.name_space()
@@ -280,6 +297,33 @@ class Key(object):
   def app(self):
     """Return the application id."""
     return self.__reference.app()
+
+  def id(self):
+    """Return the string or integer id in the last (kind, id) pair, if any.
+
+    Returns:
+      A string or integer id, or None if the key is incomplete.
+    """
+    elem = self.__reference.path().element(-1)
+    return elem.name() or elem.id() or None
+
+  def string_id(self):
+    """Return the string id in the last (kind, id) pair, if any.
+
+    Returns:
+      A string id, or None if the key has an integer id or is incomplete.
+    """
+    elem = self.__reference.path().element(-1)
+    return elem.name() or None
+
+  def integer_id(self):
+    """Return the integer id in the last (kind, id) pair, if any.
+
+    Returns:
+      An integer id, or None if the key has a string id or is incomplete.
+    """
+    elem = self.__reference.path().element(-1)
+    return elem.id() or None
 
   def pairs(self):
     """Return a list of (kind, id) pairs."""
@@ -312,10 +356,7 @@ class Key(object):
 
     This is the kind from the last (kind, id) pair.
     """
-    kind = None
-    for elem in self.__reference.path().element_list():
-      kind = elem.type()
-    return kind
+    return self.__reference.path().element(-1).type()
 
   def reference(self):
     """Return a copy of the Reference object for this Key.
@@ -403,6 +444,9 @@ def _ConstructReference(cls, pairs=None, flat=None,
       pairs = [(flat[i], flat[i+1]) for i in xrange(0, len(flat), 2)]
     assert pairs
     if parent is not None:
+      if not isinstance(parent, Key):
+        raise datastore_errors.BadValueError(
+            'Expected Key instance, got %r' % parent)
       pairs[:0] = parent.pairs()
       if app:
         assert app == parent.app(), (app, parent.app())
@@ -448,15 +492,17 @@ def _ReferenceFromPairs(pairs, reference=None, app=None, namespace=None):
   path = reference.mutable_path()
   last = False
   for kind, idorname in pairs:
-    assert not last, 'incomplete entry must be last'
+    if last:
+      raise datastore_errors.BadArgumentError(
+          'Incomplete Key entry must be last')
     if not isinstance(kind, basestring):
       if isinstance(kind, type):
         # Late import to avoid cycles.
         from ndb.model import Model
         modelclass = kind
         assert issubclass(modelclass, Model), repr(modelclass)
-        kind = modelclass.GetKind()
-      assert isinstance(kind, basestring), (repr(modelclass), repr(kind))
+        kind = modelclass._get_kind()
+      assert isinstance(kind, basestring), repr(kind)
     if isinstance(kind, unicode):
       kind = kind.encode('utf8')
     assert 1 <= len(kind) <= 500

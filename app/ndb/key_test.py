@@ -4,6 +4,7 @@ import base64
 import pickle
 import unittest
 
+from google.appengine.api import datastore_errors
 from google.appengine.datastore import entity_pb
 
 from ndb import key
@@ -74,6 +75,53 @@ class KeyTests(unittest.TestCase):
     self.assertEqual(k.urlsafe(), urlsafe)
     self.assertEqual(k.reference(), r)
 
+    k1 = key.Key('A', 1)
+    self.assertEqual(k1.urlsafe(), 'agFfcgcLEgFBGAEM')
+    k2 = key.Key(urlsafe=k1.urlsafe())
+    self.assertEqual(k1, k2)
+
+  def testId(self):
+    k1 = key.Key('Kind', 'foo', app='app1', namespace='ns1')
+    self.assertEqual(k1.id(), 'foo')
+
+    k2 = key.Key('Subkind', 42, parent=k1)
+    self.assertEqual(k2.id(), 42)
+
+    k3 = key.Key('Subkind', 'bar', parent=k2)
+    self.assertEqual(k3.id(), 'bar')
+
+    # incomplete key
+    k4 = key.Key('Subkind', None, parent=k3)
+    self.assertEqual(k4.id(), None)
+
+  def testStringId(self):
+    k1 = key.Key('Kind', 'foo', app='app1', namespace='ns1')
+    self.assertEqual(k1.string_id(), 'foo')
+
+    k2 = key.Key('Subkind', 'bar', parent=k1)
+    self.assertEqual(k2.string_id(), 'bar')
+
+    k3 = key.Key('Subkind', 42, parent=k2)
+    self.assertEqual(k3.string_id(), None)
+
+    # incomplete key
+    k4 = key.Key('Subkind', None, parent=k3)
+    self.assertEqual(k4.string_id(), None)
+
+  def testIntegerId(self):
+    k1 = key.Key('Kind', 42, app='app1', namespace='ns1')
+    self.assertEqual(k1.integer_id(), 42)
+
+    k2 = key.Key('Subkind', 43, parent=k1)
+    self.assertEqual(k2.integer_id(), 43)
+
+    k3 = key.Key('Subkind', 'foobar', parent=k2)
+    self.assertEqual(k3.integer_id(), None)
+
+    # incomplete key
+    k4 = key.Key('Subkind', None, parent=k3)
+    self.assertEqual(k4.integer_id(), None)
+
   def testParent(self):
     p = key.Key('Kind', 1, app='app1', namespace='ns1')
     self.assertEqual(p.parent(), None)
@@ -86,6 +134,21 @@ class KeyTests(unittest.TestCase):
                 app=p.app(), namespace=p.namespace())
     self.assertEqual(k.flat(), ['Kind', 1, 'Subkind', 'foobar'])
     self.assertEqual(k.parent(), p)
+
+  def testRoot(self):
+    p = key.Key('Kind', 1, app='app1', namespace='ns1')
+    self.assertEqual(p.root(), p)
+
+    k = key.Key('Subkind', 'foobar', parent=p)
+    self.assertEqual(k.flat(), ['Kind', 1, 'Subkind', 'foobar'])
+    self.assertEqual(k.root(), p)
+
+    k2 = key.Key('Subsubkind', 42, parent=k,
+                app=p.app(), namespace=p.namespace())
+    self.assertEqual(k2.flat(), ['Kind', 1,
+                                 'Subkind', 'foobar',
+                                 'Subsubkind', 42])
+    self.assertEqual(k2.root(), p)
 
   def testRepr_Inferior(self):
     k = key.Key('Kind', 1L, 'Subkind', 'foobar')
@@ -158,7 +221,7 @@ class KeyTests(unittest.TestCase):
 
   def testIncomplete(self):
     k = key.Key(flat=['Kind', None])
-    self.assertRaises(AssertionError,
+    self.assertRaises(datastore_errors.BadArgumentError,
                       key.Key, flat=['Kind', None, 'Subkind', 1])
     self.assertRaises(AssertionError, key.Key, flat=['Kind', ()])
 
@@ -168,12 +231,16 @@ class KeyTests(unittest.TestCase):
       pass
     class N(model.Model):
       @classmethod
-      def GetKind(cls):
+      def _get_kind(cls):
         return 'NN'
     k = key.Key(M, 1)
     self.assertEqual(k, key.Key('M', 1))
     k = key.Key('X', 1, N, 2, 'Y', 3)
     self.assertEqual(k, key.Key('X', 1, 'NN', 2, 'Y', 3))
+
+  def testKindFromBadValue(self):
+    # TODO: BadArgumentError
+    self.assertRaises(Exception, key.Key, 42, 42)
 
 
 def main():

@@ -3,6 +3,15 @@ from google.appengine.ext import db as ldb
 from ProvidenceClarity.struct.simple import SimpleStruct
 
 
+class EntryType(SimpleStruct):
+
+	''' Represents a type of IndexEntry. '''
+
+	name = str
+	indexer = str
+	adapter = str
+	
+
 class Entry(SimpleStruct):
 
 	''' Represents a value in an index that can be mapped to datastore keys. '''
