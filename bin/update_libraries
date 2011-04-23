@@ -1,0 +1,10 @@
+rm -fr ../app/ndb
+rm -fr ../app/lib/mapreduce
+rm -fr ../app/lib/pipeline
+hg clone https://appengine-ndb-experiment.googlecode.com/hg ../app/ndb
+rm ../app/ndb/*
+rm -fr ../app/ndb/demo
+mv ../app/ndb/ndb/* ../app/ndb
+rm -fr ../app/ndb/ndb
+svn checkout http://appengine-mapreduce.googlecode.com/svn/trunk/python/src/mapreduce ../app/lib/mapreduce
+svn checkout http://appengine-pipeline.googlecode.com/svn/trunk/src/pipeline ../app/lib/pipeline
