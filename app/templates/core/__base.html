@@ -1,0 +1,60 @@
+<!doctype html>
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+
+<head>
+		
+	<title>{% block title %}{% if title %}{{ title }} - {% endif %}FatCatMap Labs{% endblock title %}</title>
+	
+	{% block north %}
+	<!-- North Element -->
+		{% block prenorth %}{% endblock %}
+		{% include "elements/__north.html" %}
+		{% block postnorth %}{% endblock %}
+	<!-- End North -->
+	{% endblock north %}
+	
+</head>
+
+<body class='{% block body_class %}fcm-beta{% endblock %}'>
+
+	{% block body %}
+	<div id="container">
+
+		{# Includes super navigation, currently logged in user, etc... #}
+		{% block superbar %}
+			<header class='momentumSuperbar'>
+				{% include 'snippets/superbar.html' %}
+			</header>
+		{% endblock %}
+
+		{# Main content div... content panes go in here. #}
+		<div id="main" role="main" class='rootContent'>
+			{% block content %}
+				<p>Welcome to FatCatMap!</p>
+			{% endblock %}
+		</div>
+
+		{# Superfooter is used for branding and copyright stuff... #}
+		{% block superfooter %}
+		<footer class='momentumSuperfooter'>
+			{% include 'snippets/superfooter.html' %}
+		</footer>
+		{% endblock %}
+	</div>
+	{% endblock %}
+
+
+	{% block south %}
+	<!-- South Element -->
+		{% block presouth %}{% endblock %}
+		{% include 'elements/__south.html' %}
+		{% block postsouth %}{% endblock %}
+	<!-- End South -->
+	{% endblock south %}
+	
+</body>
+</html>

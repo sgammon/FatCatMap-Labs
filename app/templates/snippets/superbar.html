@@ -3,40 +3,43 @@
 	<a href="{{ link('landing') }}"><img src='/assets/img/static/branding/fatcatmap-alpha-v1-10.png' alt='fatcatmap alpha' /></a>
 </div>
 
-<!-- Superbar Navigation -->
-<ul class='topNavigation floatleft'>
-	
-	<li id='dotSpacer'>&#183;</li>
-	
-	<li><a href="{{ link('landing') }}">Home</a></li>
-	
-	<li><a href='#' data-navref='browse' class='SupernavLink'>Browse</a></li>
-	
-	<li><a href='#' data-navref='map' class='SupernavLink'>Map</a></li>
-	
-	<li><a href='#' data-navref='visualize' class='SupernavLink'>Visualize</a></li>
-	
-	<li><a href='#' data-navref='interact' class='SupernavLink'>Interact</a></li>	
-	
-</ul>
+<div class='navbar'>
 
-<!-- Utility bar -->
-<ul class='utilNavigation floatright'>
+	<!-- Superbar Navigation -->
+	<ul class='topNavigation floatleft'>
 	
-	<li class='naventry'><a href='#'>{{ user.nickname() }}</a>
-		<ul class='subnav snapleft'>
-			<li class='subnav_entry'><a href="#">Settings</a></li>
-			<li class='subnav_entry'><a href="#">Log Out</a></li>
-		</ul>
-	</li>
-	<li class='naventry'><a href='#'>0 Notifications</a></li>
-	<li class='naventry'><a href='#'>momentum</a>
-		<ul class='subnav snapright'>
-			<li class='subnav_entry'><a href="{{ link('dev-index') }}">Development Console</a></li>
-			<li class='subnav_entry'><a href="#">Management Console</a></li>
-		</ul>
-	</li>
+		<li id='dotSpacer'>&#183;</li>
 	
-</ul>
+		<li><a href="{{ link('landing') }}">Home</a></li>
+	
+		<li><a href='#' data-navref='browse' class='SupernavLink'>Browse</a></li>
+	
+		<li><a href='#' data-navref='map' class='SupernavLink'>Map</a></li>
+	
+		<li><a href='#' data-navref='visualize' class='SupernavLink'>Visualize</a></li>
+	
+		<li><a href='#' data-navref='interact' class='SupernavLink'>Interact</a></li>	
+	
+	</ul>
 
+	<!-- Utility bar -->
+
+	<ul id='util_navigation' class='floatright'>
+	
+		<li class='navButton'><a href='#'>{{ user.nickname() }}</a>
+			<ul class='subnav rightsub'>
+				<li><a href="#">Settings</a></li>
+				<li class='last'><a href="#">Log Out</a></li>
+			</ul>
+		</li>
+		<li class='navButton'><a href='#'>0 Notifications</a></li>
+		<li class='navButton'><a href='#'>momentum</a>
+			<ul class='subnav rightsub'>
+				<li><a href="{{ link('dev-index') }}">Development Console</a></li>
+				<li class='last'><a href="#">Management Console</a></li>
+			</ul>
+		</li>
+	
+	</ul>
+</div>
 <div class='clearboth'></div>

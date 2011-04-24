@@ -407,7 +407,7 @@ def AND(*args):
 
 def OR(*args):
   assert args
-  assert all(isinstance(Node, arg) for arg in args)
+  assert all(isinstance(arg, Node) for arg in args)
   if len(args) == 1:
     return args[0]
   return DisjunctionNode(args)
@@ -548,8 +548,7 @@ class Query(object):
     orig_options = options
     if (post_filters and options is not None and
         (options.offset or options.limit is not None)):
-      options = datastore_query.QueryOptions(offset=None, limit=None,
-                                             config=orig_options)
+      options = QueryOptions(offset=None, limit=None, config=orig_options)
       assert options.limit is None and options.limit is None
     rpc = dsqry.run_async(conn, options)
     skipped = 0
@@ -795,7 +794,7 @@ class _SubQueryIteratorState(object):
           return flag
     # All considered properties are equal; compare by key (ascending).
     # TODO: Comparison between ints and strings is arbitrary.
-    return cmp(our_entity.key.pairs(), their_entity.key.pairs())
+    return cmp(our_entity._key.pairs(), their_entity._key.pairs())
 
 
 class MultiQuery(object):
@@ -856,8 +855,8 @@ class MultiQuery(object):
     while state:
       item = heapq.heappop(state)
       ent = item.entity
-      if ent.key not in keys_seen:
-        keys_seen.add(ent.key)
+      if ent._key not in keys_seen:
+        keys_seen.add(ent._key)
         queue.putq(ent)
       subit = item.iterator
       try:

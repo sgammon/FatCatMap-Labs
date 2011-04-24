@@ -463,7 +463,9 @@ class ModelTests(test_utils.DatastoreTest):
 
     # wrong key kind -- invalid
     k = model.Key('OtherModel', 'bar')
-    self.assertRaises(model.KindError, model.Model, key=k)
+    class MyModel(model.Model):
+      pass
+    self.assertRaises(model.KindError, MyModel, key=k)
 
     # incomplete parent -- invalid
     p2 = model.Key('ParentModel', None)
@@ -1430,7 +1432,7 @@ class ModelTests(test_utils.DatastoreTest):
     [m2] = self.conn.get([k])
     self.assertEqual(m2, m)
 
-  def testIdAndParent(self):
+  def testIdAndParentPut(self):
     # id
     m = model.Model(id='bar')
     self.assertEqual(m.put(), model.Key('Model', 'bar'))
@@ -1439,6 +1441,12 @@ class ModelTests(test_utils.DatastoreTest):
     p = model.Key('ParentModel', 'foo')
     m = model.Model(id='bar', parent=p)
     self.assertEqual(m.put(), model.Key('ParentModel', 'foo', 'Model', 'bar'))
+
+    # parent without id
+    p = model.Key('ParentModel', 'foo')
+    m = model.Model(parent=p)
+    m.put()
+    self.assertTrue(m.key.id())
 
   def testAllocateIds(self):
     class MyModel(model.Model):
@@ -1697,6 +1705,78 @@ class ModelTests(test_utils.DatastoreTest):
 
     finally:
       namespace_manager.set_namespace(save_namespace)
+
+  def testOverrideModelKey(self):
+    class MyModel(model.Model):
+      # key, overriden
+      key = model.StringProperty()
+      # aha, here it is!
+      real_key = model.ModelKey()
+
+    class MyExpando(model.Expando):
+      # key, overriden
+      key = model.StringProperty()
+      # aha, here it is!
+      real_key = model.ModelKey()
+
+    m = MyModel()
+    k = model.Key('MyModel', 'foo')
+    m.key = 'bar'
+    m.real_key = k
+    m.put()
+
+    res = k.get()
+    self.assertEqual(res, m)
+    self.assertEqual(res.key, 'bar')
+    self.assertEqual(res.real_key, k)
+
+    q = MyModel.query(MyModel.real_key == k)
+    res = q.get()
+    self.assertEqual(res, m)
+    self.assertEqual(res.key, 'bar')
+    self.assertEqual(res.real_key, k)
+
+    m = MyExpando()
+    k = model.Key('MyExpando', 'foo')
+    m.key = 'bar'
+    m.real_key = k
+    m.put()
+
+    res = k.get()
+    self.assertEqual(res, m)
+    self.assertEqual(res.key, 'bar')
+    self.assertEqual(res.real_key, k)
+
+    q = MyExpando.query(MyModel.real_key == k)
+    res = q.get()
+    self.assertEqual(res, m)
+    self.assertEqual(res.key, 'bar')
+    self.assertEqual(res.real_key, k)
+
+  def testTransactionalDecorator(self):
+    # This tests @model.transactional and model.in_transaction(), and
+    # indirectly context.Context.in_transaction().
+    logs = []
+    @model.transactional
+    def foo(a, b):
+      self.assertTrue(model.in_transaction())
+      logs.append(tasklets.get_context()._conn)  # White box
+      return a + b
+    @model.transactional
+    def bar(a):
+      self.assertTrue(model.in_transaction())
+      logs.append(tasklets.get_context()._conn)  # White box
+      return foo(a, 42)
+    before = tasklets.get_context()._conn
+    self.assertFalse(model.in_transaction())
+    x = bar(100)
+    self.assertFalse(model.in_transaction())
+    after = tasklets.get_context()._conn
+    self.assertEqual(before, after)
+    self.assertEqual(x, 142)
+    self.assertEqual(len(logs), 2)
+    self.assertEqual(logs[0], logs[1])
+    self.assertNotEqual(before, logs[0])
 
 
 def main():

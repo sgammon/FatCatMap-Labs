@@ -98,6 +98,32 @@ class QueryTests(test_utils.DatastoreTest):
     self.assertEqual(query.orders_to_orderings(q.orders),
                      [('name', query.ASC), ('Age', query.DESC)])
 
+  def testAndQuery(self):
+    class Employee(model.Model):
+      name = model.StringProperty()
+      age = model.IntegerProperty('Age')
+      rank = model.IntegerProperty()
+    q = Employee.query().filter(query.AND(Employee.age >= 42))
+    self.assertEqual(q.filters, query.FilterNode('Age', '>=', 42))
+    q = Employee.query(query.AND(Employee.age >= 42, Employee.rank <= 5))
+    self.assertEqual(q.filters,
+                     query.ConjunctionNode(
+                       [query.FilterNode('Age', '>=', 42),
+                        query.FilterNode('rank', '<=', 5)]))
+
+  def testOrQuery(self):
+    class Employee(model.Model):
+      name = model.StringProperty()
+      age = model.IntegerProperty('Age')
+      rank = model.IntegerProperty()
+    q = Employee.query().filter(query.OR(Employee.age >= 42))
+    self.assertEqual(q.filters, query.FilterNode('Age', '>=', 42))
+    q = Employee.query(query.OR(Employee.age < 42, Employee.rank > 5))
+    self.assertEqual(q.filters,
+                     query.DisjunctionNode(
+                       [query.FilterNode('Age', '<', 42),
+                        query.FilterNode('rank', '>', 5)]))
+
   def testQueryForStructuredProperty(self):
     class Bar(model.Model):
       name = model.StringProperty()
@@ -413,6 +439,29 @@ class QueryTests(test_utils.DatastoreTest):
     bindings[1].value = 'jill'
     self.assertEqual(list(qry), [self.jill])
 
+  def testKeyFilter(self):
+    class MyModel(model.Model):
+      number = model.IntegerProperty()
+
+    k1 = model.Key('MyModel', 'foo-1')
+    m1 = MyModel(key=k1)
+    m1.put()
+
+    k2 = model.Key('MyModel', 'foo-2')
+    m2 = MyModel(key=k2)
+    m2.put()
+
+    q = MyModel.query(MyModel.key == k1)
+    res = q.get()
+    self.assertEqual(res, m1)
+
+    q = MyModel.query(MyModel.key > k1)
+    res = q.get()
+    self.assertEqual(res, m2)
+
+    q = MyModel.query(MyModel.key < k2)
+    res = q.get()
+    self.assertEqual(res, m1)
 
 def main():
   unittest.main()
