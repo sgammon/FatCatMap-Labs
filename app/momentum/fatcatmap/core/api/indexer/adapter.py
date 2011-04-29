@@ -1,3 +1,5 @@
+from ndb import model as n
+
 from ProvidenceClarity.adapters import ProvidenceClarityAdapter
 
 
@@ -17,10 +19,8 @@ class IndexAdapter(ProvidenceClarityAdapter):
 	_entries = {}
 		
 	#### Util Methods ####
-	def __init__(self, value=None):
-		if value is None:
-			self._setInput(value)
-		super(Indexer, self).__init__(*args, **kwargs)
+	def __init__(self, *args, **kwargs):
+		super(IndexAdapter, self).__init__(*args, **kwargs)
 		
 	def _clear(self):
 		self._input = None
@@ -33,7 +33,7 @@ class IndexAdapter(ProvidenceClarityAdapter):
 		self._entries = entries
 	
 	def _getEntries(self):
-		return self._entries.items()
+		return self._entries
 		
 	def _encounterEntry(self, key, entry=None):
 		if key not in self._entries:
@@ -119,6 +119,9 @@ class IndexAdapter(ProvidenceClarityAdapter):
 		
 	#### High-Level Methods ####
 	def resolveIndexEntriesForValue(self, value=None):
+		
+		from momentum.fatcatmap.core.api.indexer import getModelImplClass
+		
 		if value is None:
 			if self._getInput() is None:
 				raise exceptions.EmptyInput()
@@ -137,10 +140,7 @@ class IndexAdapter(ProvidenceClarityAdapter):
 		for entry, index, values in self._getEntries():
 
 			if isinstance(entry, (n.Key, basestring)):
-				if isinstance(entry, n.Key):
-					yield (entry, values)
-				elif isinstance(entry, basestring):
-					yield (n.Key(_models.entry.kind(), entry), values)
+				yield getModelImplClass('entry', True)(entry, values)
 
 			elif isinstance(entry, q.Query):
 				pass

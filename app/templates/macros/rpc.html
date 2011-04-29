@@ -1,0 +1,26 @@
+{% macro async_rpc(module, service, method, tags=false) %}
+	{% if tags == true %}
+		<script type='text/javascript'>
+	{% endif %}
+
+	$.jsonRPC.setup({endPoint: "{{ link('api-call-rest', module='graph', service='draw', method='drawFromNode') }}"});
+	$.jsonRPC.request('drawFromNode', false, {},{
+
+			success: function(response)
+			{
+				_response = response;
+				_data = _response.result.data;
+				_graph = _response.result.graph;
+			},
+			error: function(response)
+			{
+				_error = response;
+				alert('rpc failure: '+response.error);
+			}
+
+	});
+
+	{% if tags == true %}
+		</script>
+	{% endif %}
+{% endmacro %}

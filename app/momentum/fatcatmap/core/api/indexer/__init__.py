@@ -58,7 +58,17 @@ _models = DictProxy({
 	'entry_type': (EntryType, IndexEntryType)
 
 })
-		
+
+def getModelImplClass(name, struct=False):
+	global _models
+	if name in _models:
+		struct, impl_class = _models[name]
+		if struct:
+			return struct
+		return impl_class
+	else:
+		raise KeyError
+				
 
 # ==== Programmatic Indexer Interface ==== #
 class IndexerAPI(MomentumCoreAPI, ConfigurableStruct):
@@ -95,11 +105,19 @@ class IndexerAPI(MomentumCoreAPI, ConfigurableStruct):
 		
 		super(IndexerAPI, self).__init__(*args, **kwargs)
 	
-	def _loadAdapter(self, _type):
+	def _loadAdapter(self, _type, force=False):
 		
 		''' Loads the appropriate IndexAdapter according to the type or value passed in. '''
 
 		global _types
+		if self._adapter is None or force is True:
+			logging.info('---Loading adapter for type: '+str(_type))
+			if _type in _types:
+				self._adapter = _types[_type]()
+			logging.info('---Loaded adapter: '+str(self._adapter))
+		return self._adapter
+		
+		
 	
 	@t.tasklet
 	def _commit(self):
@@ -130,6 +148,13 @@ class IndexerAPI(MomentumCoreAPI, ConfigurableStruct):
 		''' Find an index entry according to key, key name, value, or any other model property. '''
 		
 		pass
+		
+	def _tokensForValue(self, value):
+		
+		''' Processes a value with an Indexer class to resolve indexes the value should be mapped to. '''
+		
+		adapter = self.loadAdapter(type(value))
+		
 
 	def _createIndexEntry(self):
 		

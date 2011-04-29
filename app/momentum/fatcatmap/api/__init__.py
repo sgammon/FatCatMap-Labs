@@ -1,8 +1,5 @@
-
-
 class MomentumAPIService(object):
 	pass
-	
 	
 def CallResponder(func):
 
