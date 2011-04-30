@@ -16,7 +16,7 @@ class Entry(SimpleStruct):
 
 	''' Represents a value in an index that can be mapped to datastore keys. '''
 
-	value = list, str
+	value = str
 	artifacts = list, str
 	
 

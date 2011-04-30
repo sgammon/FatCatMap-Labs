@@ -35,7 +35,7 @@ class DictProxy(Struct):
 			raise AttributeError
 			
 	def __contains__(self, name):
-		return name in self._entries
+		return name in self.__dict__
 			
 	## Utiliy Methods
 	def items(self):

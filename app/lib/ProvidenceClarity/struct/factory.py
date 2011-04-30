@@ -1,9 +1,10 @@
+import logging
 from ProvidenceClarity.struct.core import Record
 from ProvidenceClarity.struct.core import NamedTuple
 
 
 ## == For the 'Simple' struct type
-class SimpleStructFactory(type):
+class StructFactory(type):
 	
 	'''
 	
@@ -20,21 +21,22 @@ class SimpleStructFactory(type):
 	
 	'''
 	
-	def __new__(cls, name, bases, _dict):
+	def __new__(cls, name, bases, _dict, _struct={}):
 
 		if object in bases and name == 'SimpleStruct':
 			return type.__new__(cls, name, bases, _dict)
 		
 		else:
+			## Compute fields
 			_fields = [(k, v) for k, v in filter(lambda x: x[0][0] != '_' and True or False, _dict.items())]
-			_dict['__slots__'] = [str(k) for k, v in _fields]
-			#_dict['__metaclass__'] = cls._spawnStruct
-			return type.__new__(cls, name, bases, _dict)
-			
-	@classmethod
-	def _spawnStruct(cls, name, bases, _dict):
-		pass
 
+			## Create slots and schema properties
+			_struct['__slots__'] = [str(k) for k, v in _fields]
+			_struct['_schema'] = dict(_fields)
+			
+			## Generate rewritten Struct
+			return type.__new__(cls, name, bases, _struct)
+			
 
 ## == For the 'Immutable' struct type
 class ImmutableStructFactory(type):
