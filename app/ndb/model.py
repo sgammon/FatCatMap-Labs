@@ -284,12 +284,17 @@ Key = ndb.key.Key  # For export.
 
 # NOTE: Property and Error classes are added later.
 __all__ = ['Key', 'ModelAdapter', 'ModelKey', 'MetaModel', 'Model', 'Expando',
+           'BlobKey', 'GeoPt',
            'transaction', 'transaction_async',
            'in_transaction', 'transactional',
            'get_multi', 'get_multi_async',
            'put_multi', 'put_multi_async',
            'delete_multi', 'delete_multi_async',
            ]
+
+
+BlobKey = datastore_types.BlobKey
+GeoPt = datastore_types.GeoPt
 
 
 class KindError(datastore_errors.BadValueError):
@@ -734,10 +739,7 @@ class Property(object):
           value = oldval
         else:
           value = [oldval, val]
-    try:
-      self._store_value(entity, value)
-    except ComputedPropertyError, e:
-      pass
+    self._store_value(entity, value)
 
 
 def _validate_key(value, entity=None):
@@ -916,42 +918,8 @@ class BlobProperty(Property):
     return v.stringvalue()
 
 
-class GeoPt(tuple):
-  """A geographical point.  This is a tuple subclass and immutable.
-
-  Fields:
-    lat: latitude, a float in degrees with abs() <= 90.
-    lon: longitude, a float in degrees with abs() <= 180.
-  """
-
-  # TODO: Use collections.namedtuple once we can drop Python 2.5 support.
-
-  __slots__ = []
-
-  def __new__(cls, lat=0.0, lon=0.0):
-    # TODO: assert abs(lat) <= 90 and abs(lon) <= 180 ?
-    # TODO: allow construction from a string of the form <float>, <float>?
-    return tuple.__new__(cls, (float(lat), float(lon)))
-
-  @property
-  def lat(self):
-    """The latitude (in degrees north of the equator, abs() <= 90)."""
-    return self[0]
-
-  @property
-  def lon(self):
-    """The longitude (in degrees west of Greenwich, abs() <= 180)."""
-    return self[1]
-
-  def __repr__(self):
-    return '%s(%.16g, %.16g)' % (self.__class__.__name__, self.lat, self.lon)
-
-
 class GeoPtProperty(Property):
   """A Property whose value is a GeoPt."""
-
-  def _datastore_type(self, value):
-    return datastore_types.GeoPt(value.lat, value.lon)
 
   def _validate(self, value):
     if not isinstance(value, GeoPt):
@@ -1056,7 +1024,24 @@ class KeyProperty(Property):
     return Key(reference=ref)
 
 
-# Todo: BlobKeyProperty.
+class BlobKeyProperty(Property):
+  """A Property whose value is a BlobKey object."""
+
+  def _validate(self, value):
+    if not isinstance(value, datastore_types.BlobKey):
+      raise datastore_errors.BadValueError('Expected BlobKey, got %r' %
+                                           (value,))
+    return value
+
+  def _db_set_value(self, v, p, value):
+    assert isinstance(value, datastore_types.BlobKey)
+    p.set_meaning(entity_pb.Property.BLOBKEY)
+    v.set_stringvalue(str(value))
+
+  def _db_get_value(self, v, p):
+    if not v.has_stringvalue():
+      return None
+    return datastore_types.BlobKey(v.stringvalue())
 
 
 # The Epoch (a zero POSIX timestamp).
@@ -1065,7 +1050,7 @@ _EPOCH = datetime.datetime.utcfromtimestamp(0)
 class DateTimeProperty(Property):
   """A Property whose value is a datetime object.
 
-  NOTE: Unlike Django, auto_now_add can be overridden by setting the
+  Note: Unlike Django, auto_now_add can be overridden by setting the
   value before writing the entity.  And unlike classic db, auto_now
   does not supply a default value.  Also unlike classic db, when the
   entity is written, the property values are updated to match what
@@ -1570,6 +1555,9 @@ class ComputedProperty(GenericProperty):
             a calculated value.
     """
     super(ComputedProperty, self).__init__(*args, **kwargs)
+    assert not self._required, 'ComputedProperty cannot be required'
+    assert not self._repeated, 'ComputedProperty cannot be repeated'
+    assert self._default is None, 'ComputedProperty cannot have a default'
     self._func = func
 
   def _has_value(self, entity):
@@ -1583,6 +1571,9 @@ class ComputedProperty(GenericProperty):
 
   def _retrieve_value(self, entity):
     return self._func(entity)
+
+  def _deserialize(self, entity, p, depth=1):
+    pass
 
 
 class MetaModel(type):

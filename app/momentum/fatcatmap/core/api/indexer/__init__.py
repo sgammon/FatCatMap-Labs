@@ -116,8 +116,6 @@ class IndexerAPI(MomentumCoreAPI, ConfigurableStruct):
 				self._adapter = _types[_type]()
 			logging.info('---Loaded adapter: '+str(self._adapter))
 		return self._adapter
-		
-		
 	
 	@t.tasklet
 	def _commit(self):
@@ -142,11 +140,11 @@ class IndexerAPI(MomentumCoreAPI, ConfigurableStruct):
 		return
 	
 	
-	### Low-Level Methods ###	
+	### Low-Level Methods ###
+	@tasklet.tasklet
 	def _findIndexEntry(self, key=None, key_name=None, value=None, **kwargs):
 		
 		''' Find an index entry according to key, key name, value, or any other model property. '''
-		
 		pass
 		
 	def _tokensForValue(self, value):
@@ -154,7 +152,8 @@ class IndexerAPI(MomentumCoreAPI, ConfigurableStruct):
 		''' Processes a value with an Indexer class to resolve indexes the value should be mapped to. '''
 		
 		adapter = self.loadAdapter(type(value))
-		
+		for entry in adapter.resolveIndexEntriesForValue():
+			yield entry
 
 	def _createIndexEntry(self):
 		

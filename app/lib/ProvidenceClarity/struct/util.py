@@ -1,5 +1,5 @@
-from ProvidenceClarity.struct.core import Struct
 from ProvidenceClarity.struct.config import Config
+from ProvidenceClarity.struct.core import UtilStruct as Struct
 
 
 class DictProxy(Struct):

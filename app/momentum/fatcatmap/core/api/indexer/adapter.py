@@ -1,3 +1,4 @@
+import logging
 from ndb import model as n
 
 from ProvidenceClarity.adapters import ProvidenceClarityAdapter
@@ -140,7 +141,7 @@ class IndexAdapter(ProvidenceClarityAdapter):
 		for entry, index, values in self._getEntries():
 
 			if isinstance(entry, (n.Key, basestring)):
-				yield getModelImplClass('entry', True)(entry, values)
+				yield getModelImplClass('entry', True)(value=entry, artifacts=values)
 
 			elif isinstance(entry, q.Query):
 				pass

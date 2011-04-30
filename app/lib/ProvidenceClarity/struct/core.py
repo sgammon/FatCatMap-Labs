@@ -4,7 +4,7 @@ class ProvidenceClarityStructure(object):
 	platform = 'Providence/Clarity-v2.2-EMBEDDED-ALPHA'
 
 
-class Struct(ProvidenceClarityStructure):
+class UtilStruct(ProvidenceClarityStructure):
 	
 	_type = None
 	
@@ -39,20 +39,3 @@ class Struct(ProvidenceClarityStructure):
 		if len(kwargs) > 0:
 			for k, v in kwargs.items():
 				self._entries[k] = v
-				
-				
-class Record(object):
-	
-	__slots__ = ()
-				
-				
-				
-class NamedTuple(tuple):
-
-	''' A utility class that adds mapping capabilities to tuples for a low-memory alternative to a full object with a __dict__. '''
-
-	_fields = []
-	__slots__ = ()
-
-	def __new__(cls, name, bases, _dict):
-		pass

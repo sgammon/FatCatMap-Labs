@@ -8,6 +8,7 @@ import re
 import unittest
 
 from google.appengine.api import datastore_errors
+from google.appengine.api import datastore_types
 from google.appengine.api import namespace_manager
 from google.appengine.api import users
 from google.appengine.datastore import entity_pb
@@ -686,6 +687,19 @@ class ModelTests(test_utils.DatastoreTest):
                         model.StringProperty,
                         repeated=True, required=True, default='')
 
+  def testBlobKeyProperty(self):
+    class MyModel(model.Model):
+      image = model.BlobKeyProperty()
+    test_blobkey = datastore_types.BlobKey('testkey123')
+    m = MyModel()
+    m.image = test_blobkey
+    m.put()
+
+    m = m.key.get()
+
+    self.assertTrue(isinstance(m.image, datastore_types.BlobKey))
+    self.assertEqual(str(m.image), str(test_blobkey))
+
   def testChoicesProperty(self):
     class MyModel(model.Model):
       a = model.StringProperty(choices=['a', 'b', 'c'])
@@ -734,13 +748,6 @@ class ModelTests(test_utils.DatastoreTest):
     self.assertEqual(ent.key, k)
     self.assertEqual(MyModel.t._get_value(ent), u'Hello world\u1234')
     self.assertEqual(MyModel.b._get_value(ent), '\x00\xff')
-
-  def testGeoPt(self):
-    # Test for the GeoPt type itself.
-    p = model.GeoPt(3.14, 42)
-    self.assertEqual(p.lat, 3.14)
-    self.assertEqual(p.lon, 42.0)
-    self.assertEqual(repr(p), 'GeoPt(3.14, 42)')
 
   def DateAndOrTimePropertyTest(self, propclass, t1, t2):
     class Person(model.Model):
@@ -1453,7 +1460,7 @@ class ModelTests(test_utils.DatastoreTest):
       name_lower = model.ComputedProperty(lambda self: self.name.lower())
 
       @model.ComputedProperty
-      def size(self):
+      def length(self):
         return len(self.name)
 
       def _compute_hash(self):
@@ -1473,7 +1480,7 @@ class ModelTests(test_utils.DatastoreTest):
     m = ComputedTest._from_pb(pb)
     self.assertEqual(m.name, 'Foobar')
     self.assertEqual(m.name_lower, 'foobar')
-    self.assertEqual(m.size, 6)
+    self.assertEqual(m.length, 6)
     self.assertEqual(m.hash, hash('Foobar'))
 
   def testLargeValues(self):
@@ -1871,8 +1878,6 @@ class ModelTests(test_utils.DatastoreTest):
       g = model.GeoPtProperty()
       @model.ComputedProperty
       def c(self):
-        if self.i is None:
-          return None
         return self.i + 1
       u = model.UserProperty()
 

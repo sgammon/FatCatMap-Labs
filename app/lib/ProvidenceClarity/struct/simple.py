@@ -1,6 +1,10 @@
 import logging
+
 from ProvidenceClarity.struct import ProvidenceClarityStructure
-from ProvidenceClarity.struct.factory import StructFactory as SimpleStructFactory
+
+from ProvidenceClarity.struct.factory import SimpleStructFactory
+from ProvidenceClarity.struct.factory import ComplexStructFactory
+from ProvidenceClarity.struct.factory import ImmutableStructFactory
 
 
 class SimpleStruct(object):
@@ -23,7 +27,7 @@ class SimpleStruct(object):
 				if isinstance(arg, self._schema[field]):
 					setattr(self, field, arg)
 				else:
-					raise AttributeError('Type error encountered assigning value "'+str(arg)+'" to param name "'+str(field)+'" on struct "'+self.__class__.__name__+'".')
+					raise AttributeError, 'Type error encountered assigning value "'+str(arg)+'" to param name "'+str(field)+'" on struct "'+self.__class__.__name__+'". Expected: "'+str(self._schema[field])+'".'
 					
 			for k, v in kwargs.items():
 				setattr(self, k, v)
@@ -39,7 +43,7 @@ class SimpleStruct(object):
 					if value is not None:
 						for i in value:
 							if not isinstance(i, self._schema[name][1]):
-								raise AttributeError, "The specified list cannot be set because not all of the list members (index: "+str(value.index(i))+", value: '"+str(i)+"') are of the schema-defined type."
+								raise AttributeError, "The specified list cannot be set because not all of the list members (index: "+str(value.index(i))+", value: '"+str(i)+"', type: '"+str(type(i).__name__)+"') are of the schema-defined type ('"+str(self._schema[name][1])+"')."
 					super(SimpleStruct, self).__setattr__(name, value)
 				else:
 					raise AttributeError, "The specified property ('"+str(name)+"') cannot be set to the value ('"+str(value)+"') because a list of type ('"+str(self._schema[name][1])+"') is expected."
@@ -63,3 +67,11 @@ class SimpleStruct(object):
 		''' Passthrough to attribute set to enable 'struct[key] = var' notation. '''
 		
 		setattr(self, name, value)
+		
+		
+class ImmutableStruct(tuple, ProvidenceClarityStructure):
+	pass
+	
+
+class ComplexStruct(dict, ProvidenceClarityStructure):
+	pass

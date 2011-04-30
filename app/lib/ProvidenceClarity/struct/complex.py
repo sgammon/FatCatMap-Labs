@@ -1,7 +1,7 @@
 from ProvidenceClarity.struct import ProvidenceClarityStructure
-from ProvidenceClarity.struct.factory import ComplexDictionaryFactory
+from ProvidenceClarity.struct.factory import ComplexStructFactory
 
 
 class ComplexStruct(ProvidenceClarityStructure):
 
-	__metaclass__ = ComplexDictionaryFactory
+	__metaclass__ = ComplexStructFactory

@@ -1,10 +1,8 @@
 import logging
-from ProvidenceClarity.struct.core import Record
-from ProvidenceClarity.struct.core import NamedTuple
 
 
 ## == For the 'Simple' struct type
-class StructFactory(type):
+class SimpleStructFactory(type):
 	
 	'''
 	
@@ -72,12 +70,12 @@ class ImmutableStructFactory(type):
 
 
 ## == For the 'Complex' struct type
-class ComplexDictionaryFactory(type):
+class ComplexStructFactory(type):
 
 	'''
 	
 		=====================================================
-		| Providence/Clarity Structures: Complex Dictionary |
+		| Providence/Clarity Structures: Complex Struct Factory |
 		=====================================================
 		This class creates a modified dictionary at runtime out of an easily-definable OOP-based 'Struct'
 		schema. The ComplexStruct class uses this as a factory for producing the dictionary at runtime.

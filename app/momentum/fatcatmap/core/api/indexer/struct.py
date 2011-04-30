@@ -7,17 +7,17 @@ class EntryType(SimpleStruct):
 
 	''' Represents a type of IndexEntry. '''
 
-	name = str
-	indexer = str
-	adapter = str
+	name = basestring
+	indexer = basestring
+	adapter = basestring
 	
 
 class Entry(SimpleStruct):
 
 	''' Represents a value in an index that can be mapped to datastore keys. '''
 
-	value = str
-	artifacts = list, str
+	value = basestring
+	artifacts = list, basestring
 	
 
 class Meta(SimpleStruct):
@@ -26,7 +26,7 @@ class Meta(SimpleStruct):
 
 	count = int
 	score = float
-	attribute = str
+	attribute = basestring
 	
 	
 class Mapping(SimpleStruct):
