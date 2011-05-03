@@ -1,5 +1,5 @@
 application: fatcatmap
-version: 4-dev
+version: 5-dev
 runtime: python
 api_version: 1
 
@@ -27,8 +27,8 @@ handlers:
   mime_type: text/css
 
 # Scripts (Static Only)
-- url: /assets/js
-  static_dir: assets/js
+- url: /assets/js/static
+  static_dir: assets/js/static
   mime_type: text/javascript
 
 # Generic (Static)

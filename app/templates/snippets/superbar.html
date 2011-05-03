@@ -1,6 +1,6 @@
 <!-- Top-right FCM branding -->
 <div id='fcmTopBranding'>
-	<a href="{{ link('landing') }}"><img src='/assets/img/static/branding/fatcatmap-alpha-v1-10.png' alt='fatcatmap alpha' /></a>
+	<a href="{{ link('landing') }}"><img src='/assets/img/static/branding/fatcatmap-alpha-v1-10.png' height='18' width='133' alt='fatcatmap alpha' /></a>
 </div>
 
 <div class='navbar'>
@@ -8,9 +8,11 @@
 	<!-- Superbar Navigation -->
 	<ul class='topNavigation floatleft'>
 	
-		<li id='dotSpacer'>&#183;</li>
+		<li class='dotSpacer'>&#183;</li>
 	
 		<li><a href="{{ link('landing') }}">Home</a></li>
+		
+		<li><a href="#" data-navref='search' class='SupernavLink'>Search</a></li>
 	
 		<li><a href='#' data-navref='browse' class='SupernavLink'>Browse</a></li>
 	
@@ -29,9 +31,12 @@
 		<li class='navButton'><a href='#'>{{ user.nickname() }}</a>
 			<ul class='subnav rightsub'>
 				<li><a href="#">Settings</a></li>
-				<li class='last'><a href="#">Log Out</a></li>
+				<li class='last'><a href="{{ api.users.create_logout_url('/') }}">Log Out</a></li>
 			</ul>
 		</li>
+		
+		<li id='utilDotSpacer'>&#183;</li>
+		
 		<li class='navButton'><a href='#'>0 Notifications</a></li>
 		<li class='navButton'><a href='#'>momentum</a>
 			<ul class='subnav rightsub'>
@@ -39,7 +44,6 @@
 				<li class='last'><a href="#">Management Console</a></li>
 			</ul>
 		</li>
-	
 	</ul>
 </div>
 <div class='clearboth'></div>

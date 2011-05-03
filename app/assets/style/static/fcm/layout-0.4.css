@@ -1,0 +1,360 @@
+html, body
+{
+	overflow:auto;
+	background-color:#222;
+}
+
+h1, h2, h3, h4, p, div
+{
+	font-family: 'Cabin', 'Lucida Grande', arial, sans-serif;
+}
+
+/* === Superbar === */
+.momentumSuperbar
+{
+	width:100%;
+	z-index:600;
+	height:25px;
+	background:#222;
+	position:absolute;
+	top:0;
+}
+li.dotSpacer
+{
+	font-size:12pt !important;
+	padding-right:0;
+	font-weight:bold;
+	color:#666 !important;
+}
+#utilDotSpacer
+{
+	font-size:12pt !important;
+	padding-right:0;
+	font-weight:bold;
+	color:#666 !important;
+	width:15px;
+}
+
+.momentumSuperbar #fcmTopBranding
+{
+	padding-top:4px;
+	padding-left:15px;
+	padding-right:5px;
+	width:165px;
+	text-align:center;
+	float:left;
+}
+.momentumSuperbar li a
+{
+	color:#555;
+	text-shadow: 1px 1px 0px #111;
+	text-decoration:none;
+}
+.momentumSuperbar li a:hover
+{
+	color:white;
+}
+.momentumSuperbar ul.topNavigation
+{
+	margin-left:0;
+	line-height:25px;
+	list-style:none;
+	display:inline;
+}
+.momentumSuperbar ul.topNavigation li
+{
+	list-style:none;
+	padding-left:10px;
+	padding-right:10px;
+	display:inline;
+	font-size:10pt;
+	color:#777;
+	float:left;
+	position:relative;
+}
+
+.navbar
+{
+	padding: 0;
+	margin: 0;
+}
+.navbar .spacer
+{
+	width:15px;
+	text-align:center;
+}
+.navbar ul
+{
+	padding: 0;
+	margin: 0;
+}
+.navbar li
+{
+	position: relative;
+	float: left;
+	list-style: none;
+	line-height:25px;
+	margin: 0;
+}
+.navbar li b
+{
+	height:25px;
+	display:inline;
+	line-height:25px;
+	font-weight:bold;
+	text-align:center;
+}
+.navbar li a
+{
+	height:25px;
+	line-height:25px;
+	display:inline;
+	text-decoration:none;
+	text-align:center;
+}
+.navbar ul ul.leftsub
+{
+	position:absolute;
+	top:20px;
+	left:0px;
+	margin-top:0px;
+	z-index:1000;
+	border-left:5px solid #222;
+	border-right:5px solid #222;	
+	background:#222;
+}
+.navbar ul ul.rightsub
+{
+	position:absolute;
+	top:20px;
+	right:0px;
+	margin-top:3px;
+	z-index:1000;
+	border-left:5px solid #222;
+	border-right:5px solid #222;
+	background:#222;
+}
+
+.navButton
+{
+	padding-left:6px;
+	height:25px;
+	padding-right:6px;
+}
+
+.navbar ul ul.rightsub li
+{
+	text-align:right !important;
+}
+
+.navbar ul li ul li
+{
+	width:160px;
+	text-align:left;
+	display:block;
+	border-top:1px solid #222;
+	padding:3px;
+}
+.navbar ul li ul li.last
+{
+	border-bottom:1px solid #222;
+}
+.navbar ul li ul li a
+{
+	text-align:left;
+}
+.navbar ul li ul.subnav
+{
+	visibility:hidden;
+}
+.navbar ul li:hover ul.subnav
+{
+	visibility:visible !important;
+}
+.navbar li.nolink
+{
+	padding-top:1px;
+}
+.navButton
+{	
+	padding-left:6px;
+	height:25px;
+	padding-right:6px;
+}
+li.navButton a span
+{
+	color:black !important;
+}
+div.navbar li.navButton:hover ul.subnav
+{	
+	visibility: visible !important;
+}
+
+/* === Header Nav === */
+.extendedNav
+{
+	overflow:hidden;
+	padding:5px;
+}
+
+/* === Superfooter === */
+.momentumSuperfooter
+{
+	width:100%;
+	height:55px;
+	bottom:0;
+	position:absolute;
+	background:#222;
+	overflow:hidden;
+	line-height:55px;
+	opacity:0.8;
+}
+.momentumSuperfooter div
+{
+	margin-left:10px;
+	margin-right:10px;
+	color:#666;
+}
+.momentumSuperfooter #bottomFcmBranding
+{
+	width:165px;
+	height:50px;
+	overflow:hidden;
+}
+.momentumSuperfooter #bottomFcmBranding a
+{
+	width:100%;
+	height:100%;
+}
+.momentumSuperfooter #bottomFcmBranding a #momentumBrand
+{
+	height:55px;
+	opacity:0.5;
+	background: no-repeat center transparent url('/assets/img/static/branding/momentum-gray-v1-25.png');	
+}
+.brandingHover
+{
+	opacity:1.0 !important;
+	background: no-repeat center transparent url('/assets/img/static/branding/momentum-v1-25.png') !important;
+}
+
+.rootContent
+{
+	top:25px;
+	bottom:55px;
+	width:100%;
+	background:#333;
+	position:absolute;
+}
+.content_header
+{
+	background:#222;
+	height:15%;
+	z-index:500;
+	position:absolute;
+	width:100%;
+	margin-top:0;
+	position:absolute;
+}
+.content_body
+{
+	top:0;
+	height: 100%;
+	width:100%;
+}
+
+.content_footer
+{
+	height:10%;
+	position:absolute;
+	width:100%;
+	bottom:0;
+}
+
+/* === Navigation === */
+.foldNavigation
+{
+	text-align:center;
+	font-size:9pt;
+	position:absolute;
+	bottom:0;
+	margin-bottom:-20px;
+	width:100%;
+}
+.foldNavigation a
+{
+	color:#666;
+}
+.foldNavigation a:hover
+{
+	color:white;
+}
+
+/* === Content Panel === */
+.panelHeader
+{
+	background:transparent url('/assets/img/static/layout/bg/light-gray-transparent-75.png');
+	opacity:0.7;
+	color:#DDD;
+	padding: 10px 0 10px 10px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+.panelHeader h1
+{
+	font-size:14pt;
+	color:#DDD;
+}
+.panelContent
+{
+	font-size:10pt;
+	padding:10px;
+	background:gray;
+	min-height:200px;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+/* === Sidebars === */
+.sidebar
+{
+	color: #999 !important;
+	width:200px;
+	position:absolute;
+	top:25px;
+	bottom:55px;
+	/*display:none;*/
+	background:#111;
+	opacity:0.6;
+}
+.sidebar:hover
+{
+	opacity:0.8;
+}
+.sb-right
+{
+	right:0;
+	margin-right:0;
+	margin-left:auto;
+	clear:right;	
+}
+.sb-left
+{
+	left:0;
+	clear:left;
+	margin-right:auto;
+	margin-left:0;
+}
+.sidebar .title
+{
+	font-weight:400;
+	padding: 10px 0 10px 10px;
+	font-size:150%;
+	color:#fff !important;
+}
+.sidebar .content
+{
+	font-weight:normal;
+	padding: 10px 0 10px 10px;	
+	color:#fff !important;
+}

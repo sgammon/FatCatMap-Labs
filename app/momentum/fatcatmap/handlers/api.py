@@ -80,3 +80,9 @@ class FatcatmapAPIDispatcher(WebHandler, JSONRPCMixin):
 		
 	def trace(self, module, service, method=None, format='json'):
 		return self.dispatchAPICall(module, service, method, format, 'TRACE')
+		
+
+class JavascriptAPIDispatcher(WebHandler):
+	
+	def get(self):
+		return self.render('snippets/page_object.js', content_type='text/javascript')

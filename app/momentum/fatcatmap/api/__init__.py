@@ -1,5 +1,12 @@
+
+
 class MomentumAPIService(object):
-	pass
+
+	state = {}
+
+	def initialize_request_state(self, state):
+		self.state = state
+		
 	
 def CallResponder(func):
 
@@ -59,4 +66,4 @@ def QueryResponder(func):
 		else:
 			self.result = result
 
-   	return decorated
+	return decorated
