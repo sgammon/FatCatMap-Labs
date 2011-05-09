@@ -4,12 +4,87 @@
 <meta name="author" content="Political Momentum, Inc.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+{% if not sys.output.assets.compiled %}
 <link rel="stylesheet" href="{{ style_url('reset', 'core') }}">
+<link rel="stylesheet" href="{{ style_url('fonts', 'core') }}">
 <link rel="stylesheet" href="{{ style_url('main', 'core') }}">
 <link rel="stylesheet" href="{{ style_url('layout', 'core') }}">
 <link rel="stylesheet" media="handheld" href="{{ style_url('mobile', 'core') }}">
-<link href='http://fonts.googleapis.com/css?family=Lekton:regular,italic,bold' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Cabin:regular,regularitalic,500,500italic,600,600italic,bold,bolditalic' rel='stylesheet' type='text/css'>
-
+{% else %}
+<link rel="stylesheet" media="screen" href="{{ style_url('fcm-styles', 'compiled') }}">
+{% endif %}
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<!-- jQuery & jQuery RPC -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+
+<!-- Modernizr & YepNope -->
+<script src="{{ script_url('modernizr') }}"></script>
+<script src="{{ script_url('yepnope') }}"></script>
+
+{% if sys.output.assets.optimize %}
+<script type="text/javascript">
+
+yepnope([
+	{
+		// Load core FCM
+		load: ["{{ script_url('init', 'core') }}", "{{ link('js-api') }}", "{{ script_url('rpc', 'core') }}", "{{ script_url('plugins', 'core') }}", "{{ script_url('layout', 'core') }}", "{{ script_url('rpc','jquery') }}", "{{ script_url('protovis') }}", "{{ script_url('graph','core') }}"],
+		complete: function _doPhaseOneInit() { _platformInit(); _initiateAPIFramework(fatcatmap); }
+	},
+	{
+		// Load visual plugins
+		test: typeof(window.jQuery) == 'function',
+		nope: "{{ script_url('core','jquery') }}",
+		load: ["{{ script_url('uniform', 'jquery') }}", "{{ script_url('tipsy', 'jquery') }}", "{{ script_url('masonry','jquery') }}"]
+	},
+	{
+		// Polyfill JSON Support
+		test : window.JSON && window.JSON.parse,
+		nope: "{{ script_url('json', 'polyfills') }}",
+		callback: function () {
+			console.log("JSON polyfill loaded.");
+		}
+	},
+	{
+		// Load IndexedDB
+		test: Modernizr.indexeddb,
+		yep: ["{{ script_url('indexeddb', 'jquery') }}", "{{ script_url('indexed', 'storage') }}"],
+		complete: function (url, result, key) { _indexedDBInit(); }
+	},
+	{
+		// Load WebSQL
+		test: Modernizr.websqldatabase,
+		yep: ["{{ script_url('websql', 'jquery') }}", "{{ script_url('sql', 'storage') }}"],
+		complete: function (url, result, key) { _webSQLInit(); }
+	},	
+	{
+		// Load LocalStorage
+		test: Modernizr.localstorage,
+		yep: ["{{ script_url('local', 'storage') }}"],
+		complete: function (url, result, key) { _localStorageInit(); }
+	},
+	{
+		// Load SessionStorage
+		test: Modernizr.sessionstorage,
+		yep: ["{{ script_url('session', 'storage') }}"],
+		complete: function (url, result, key) { _sessionStorageInit(); }
+	}
+]);
+
+</script>
+{% else %}
+
+<script src="{{ script_url('init', 'core') }}"></script>
+<script src="{{ link('js-api') }}"></script>
+<script src="{{ script_url('rpc', 'core') }}"></script>
+<script src="{{ script_url('plugins', 'core') }}"></script>
+<script src="{{ script_url('layout', 'core') }}"></script>
+<script src="{{ script_url('rpc','jquery') }}"></script>
+<script src="{{ script_url('protovis') }}"></script>
+<script src="{{ script_url('graph','core') }}"></script>
+<script src="{{ script_url('uniform', 'jquery') }}"></script>
+<script src="{{ script_url('tipsy', 'jquery') }}"></script>
+<script src="{{ script_url('masonry','jquery') }}"></script>
+
+{% endif %}

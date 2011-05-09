@@ -49,6 +49,7 @@ if sys_config.get('hooks', False) != False:
 
 def main():
 	# Run the app.
+	enable_jinja2_debugging()
 	app.run()
 
 if sys_config.get('hooks', False) != False:
@@ -57,6 +58,7 @@ if sys_config.get('hooks', False) != False:
 			import cProfile
 			def main():
 				logging.info('CORE: Profiling enabled.')
+				enable_jinja2_debugging()
 				cProfile.runctx("app.run()", globals(), locals(), filename="FatCatMap.profile")
 
 if __name__ == '__main__':

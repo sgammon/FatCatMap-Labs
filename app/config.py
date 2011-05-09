@@ -69,6 +69,16 @@ config['momentum.fatcatmap.system'] = {
 
 }
 
+config['momentum.fatcatmap.output'] = {
+
+	'minify': False,
+	'assets':{
+		'optimize': False,
+		'compiled': False, 
+	}
+
+}
+
 # Installed Assets
 config['momentum.fatcatmap.assets'] = {
 
@@ -81,7 +91,23 @@ config['momentum.fatcatmap.assets'] = {
 			'rpc': {'version': 0.2}, # Contains code to aid remote RPCs from javascript.
 			'graph': {'version': 0.2}, # Holds code used by the layout and Protovis to construct graph visualizations
 			'plugins': {'version': 0.2}, # Contains code to animate and fade the top navigation pulldown
-			'navigation': {'version': 0.2} # Contains code to animate and fade the top navigation pulldown
+			'layout': {'version': 0.2} # Contains code to animate and fade the top navigation pulldown
+		
+		},
+		
+		('storage', 'fcm'): { # FatCatMap Storage Drivers
+		
+			'sql': {'path': 'storage/sql-0.1.js'}, # Web SQL Database driver
+			'indexed': {'path': 'storage/indexed-0.1.js'}, # IndexedDB Database driver
+			'session': {'path': 'storage/session-0.1.js'}, # SessionStorage driver
+			'local': {'path': 'storage/local-0.1.js'} # LocalStorage driver
+		
+		},
+		
+		('polyfills', 'fcm'): {
+		
+			'json': {'path': 'polyfills/json2.js'}, # Adds JSON support to old IE and others that don't natively support it
+			'history': {'path': 'polyfills/history.js'}, # Adds support for history management to old browsers
 		
 		},
 		
@@ -90,13 +116,19 @@ config['momentum.fatcatmap.assets'] = {
 			'core': {'path': 'core/jquery.full.1.5.js'}, # jQuery Core
 			'rpc': {'path': 'rpc/jquery.rpc.2.0.js'}, # JSON RPC
 			'ui': {'path': 'ui/jquery.ui-1.8.9.full.js'}, # jQuery UI
-			'tools': {'path': 'tools/jquery.tools.min.js'}, # Giant jQuery swiss army knife
-			'indexeddb': {'path': 'core/jquery.indexeddb.1.1-full.js'}, # Indexed DB interface
+			'indexeddb': {'path': 'core/storage/jquery.indexeddb.1.1-full.js'}, # Indexed DB interface
+			'websql': {'path': 'core/storage/jquery.sql.0.8a.min.js'}, # WebSQL interface
 			'tipsy': {'path': 'ui/jquery.tipsy.js'}, # Effect for slick, animated tooltips
-			'meerkat': {'path': 'ui/jquery.meerkat.js'}, # Effect for smooth slide-in content zones
 			'uniform': {'path': 'ui/jquery.uniform.js'}, # Form styling
 			'masonry': {'path': 'ui/jquery.masonry.js'} # Special easy-on-the-eye layout styling
 			
+		},
+		
+		('compiled', 'min'): { # Compiled Scripts
+		
+			'core': {'version': 0.1}, # contains core, rpc, ui
+			'plugins': {'version': 0.1} # contains ui, storage adapters, tipsy, uniform, masonry
+		
 		},
 		
 		'protovis': {'path': 'protovis/protovis-d3.2.js'}, # Stanford Protovis: JS Visualization Library
@@ -113,10 +145,18 @@ config['momentum.fatcatmap.assets'] = {
 		
 			'main': {'version': 0.3}, # Boilerplate stuff and reusable, site-wide CSS classes.
 			'reset': {'version': 0.2}, # Standard CSS reset stylesheet.
+			'fonts': {'version': 0.1}, # Standard CSS reset stylesheet.			
 			'layout': {'version': 0.4}, # Styles for FCM's layouts. Not page-specific.
 			'forms': {'version': 0.2}, # Styles forms on FCM. Links to sprite skins.
 			'mobile': {'version': 0.3}, # HTML5 Boilerplate's stylesheet for mobile devices
 			'visualizer': {'version': 0.2} # Styles for the FCM visualizer
+		
+		},
+		
+		('compiled', 'min'): { # Compiled FCM Stylesheets
+		
+			'core': {'version': 0.1}, # reset, main, fonts, layout, forms, mobile + visualizer
+			'plugins': {'version': 0.1} # tipsy, uniform, masonry, jquery ui
 		
 		}
 	
@@ -125,7 +165,7 @@ config['momentum.fatcatmap.assets'] = {
 	# Other Assets
 	'ext': {
 	 },
-
+	
 }
 
 # Output 

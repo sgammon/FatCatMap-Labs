@@ -20,7 +20,7 @@ class WebHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 	''' Abstract parent-class to any handler that responds to a request from a web browser. '''
 		
 	response = Response
-
+	
 
 	def render(self, path, content_type='text/html', headers={}, **kwargs):
 	
@@ -36,20 +36,22 @@ class WebHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 			for k, v in kwargs.items():
 				template_context[k] = v
 		
-		params = self._bindTemplateFunctions(template_context)
+		params = self._bindTemplateFunctions(template_context, self._outputConfig())
 		
 		minify = unicode
-		if content_type == 'text/html':
-			minify = slimmer.html_slimmer
-		elif content_type == 'text/javascript':
-			minify = slimjs
-		elif content_type == 'text/css':
-			minify = slimmer.css_slimmer
+
+		if self._outputConfig()['minify'] is True:
+			if content_type == 'text/html':
+				minify = slimmer.html_slimmer
+			elif content_type == 'text/javascript':
+				minify = slimjs
+			elif content_type == 'text/css':
+				minify = slimmer.css_slimmer
 		
 		return self.response(response=minify(self.render_template(path, **template_context)), content_type=content_type, headers=headers)
 				
 
-	def _bindTemplateFunctions(self, params):
+	def _bindTemplateFunctions(self, params, output_cfg):
 
 		''' Bind utility functions to the template variable space. '''
 
@@ -61,6 +63,9 @@ class WebHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 		# System Config
 		sys_config = config.config.get('momentum.fatcatmap')
 		params['sys'] = {}
+		params['sys']['dev'] = config.debug
+		params['sys']['output'] = output_cfg		
+		params['sys']['environ'] = os.environ
 		params['sys']['version'] = str(sys_config['version']['major'])+'.'+str(sys_config['version']['minor'])+' '+str(sys_config['version']['release'])
 
 		# Bind AssetMixin functions
@@ -76,3 +81,7 @@ class WebHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 		params['api']['users']['create_logout_url'] = users.create_logout_url
 		
 		return params
+		
+
+	def _outputConfig(self):
+		return config.config.get('momentum.fatcatmap.output')

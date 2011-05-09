@@ -9,6 +9,7 @@ h1, h2, h3, h4, p, div
 	font-family: 'Cabin', 'Lucida Grande', arial, sans-serif;
 }
 
+
 /* === Superbar === */
 .momentumSuperbar
 {
@@ -32,7 +33,7 @@ li.dotSpacer
 	padding-right:0;
 	font-weight:bold;
 	color:#666 !important;
-	width:15px;
+	width:30px;
 }
 
 .momentumSuperbar #fcmTopBranding
@@ -217,7 +218,7 @@ div.navbar li.navButton:hover ul.subnav
 }
 .momentumSuperfooter #bottomFcmBranding
 {
-	width:165px;
+	width:180px;
 	height:50px;
 	overflow:hidden;
 }
@@ -319,11 +320,10 @@ div.navbar li.navButton:hover ul.subnav
 .sidebar
 {
 	color: #999 !important;
-	width:200px;
 	position:absolute;
 	top:25px;
-	bottom:55px;
-	/*display:none;*/
+	bottom:25px;
+	width:35px;
 	background:#111;
 	opacity:0.6;
 }
@@ -345,16 +345,54 @@ div.navbar li.navButton:hover ul.subnav
 	margin-right:auto;
 	margin-left:0;
 }
-.sidebar .title
+.sidebar .panelWrapper
+{
+	white-space:nowrap;
+	overflow:hidden;
+}
+.sidebar .panelWrapper .title
 {
 	font-weight:400;
 	padding: 10px 0 10px 10px;
 	font-size:150%;
 	color:#fff !important;
 }
-.sidebar .content
+.sb-right .panelWrapper .title
+{
+	text-align:right;
+	width:160px;
+}
+.sidebar .panelWrapper .content
 {
 	font-weight:normal;
 	padding: 10px 0 10px 10px;	
 	color:#fff !important;
 }
+.paneButton
+{
+	position:absolute;
+	top:10px;
+	opacity:0.2;
+}
+.enabled:hover
+{
+	opacity:0.8;
+}
+.cp-right { right:10px; }
+.cp-right2 { right:35px; }
+.cp-left { left:10px; }
+.cp-left2 { left:35px; }
+
+/* === Tipsy Stuff === */
+.tipsy { padding: 5px; font-size: 10px; position: absolute; z-index: 100000; }
+  .tipsy-inner { padding: 5px 8px 4px 8px; background-color: black; color: white; max-width: 200px; text-align: center; }
+  .tipsy-inner { border-radius: 3px; -moz-border-radius:3px; -webkit-border-radius:3px; }
+  .tipsy-arrow { position: absolute; background: url('/assets/img/static/sprites/tooltip.gif') no-repeat top left; width: 9px; height: 5px; }
+  .tipsy-n .tipsy-arrow { top: 0; left: 50%; margin-left: -4px; }
+    .tipsy-nw .tipsy-arrow { top: 0; left: 10px; }
+    .tipsy-ne .tipsy-arrow { top: 0; right: 10px; }
+  .tipsy-s .tipsy-arrow { bottom: 0; left: 50%; margin-left: -4px; background-position: bottom left; }
+    .tipsy-sw .tipsy-arrow { bottom: 0; left: 10px; background-position: bottom left; }
+    .tipsy-se .tipsy-arrow { bottom: 0; right: 10px; background-position: bottom left; }
+  .tipsy-e .tipsy-arrow { top: 50%; margin-top: -4px; right: 0; width: 5px; height: 9px; background-position: top right; }
+  .tipsy-w .tipsy-arrow { top: 50%; margin-top: -4px; left: 0; width: 5px; height: 9px; }

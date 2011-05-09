@@ -4,7 +4,8 @@
 
 <div id='grapher' class='fullheight fullwidth textcenter'>
 	<script type="text/javascript+protovis">
-
+	$(document).ready( function drawGraph() {
+		
 		_data = null;
 		_graph = null;
 		_response = null;
@@ -56,16 +57,18 @@
 
 		// 4: Render line
 		line = force.link.add(pv.Line);
-		line.strokeStyle(function() '#DDD');
+		line.strokeStyle(function() '#667788');
 
 		// 5: Add node box
 		box = force.node.add(pv.Bar);
 		box.fillStyle(function() 'white');
 		box.strokeStyle(function() '#DDD');
 		box.cursor(function() 'pointer');
+		box.text(function (d) d.label);
 		box.event('mousedown', pv.Behavior.drag());
+		box.event("mouseover", pv.Behavior.tipsy({gravity: "s", fade: true}));
 		box.event('drag', force);
-		box.event('click', function (d) {alert('node clicked: '+d.key);})
+		box.event('click', function (d) {loadContextPane(d, d.key);});
 		box.width(function(d) {return 90;});
 		box.height(function(d) {return 20;});
 
@@ -78,8 +81,13 @@
 		// 7: Render
 		vis.render();
 		
+	});
 	</script>
 </div>
+
+<!-- Sidebars -->
+{% include 'elements/pane/details-sidebar.html' %}
+{% include 'elements/pane/controls-sidebar.html' %}
 
 {% endblock %}
 

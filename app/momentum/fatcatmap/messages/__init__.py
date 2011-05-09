@@ -1,25 +1,41 @@
 from protorpc import messages as m
 
 
-class FCMClientStanza(m.Message):
+class APIMessage(m.Message):
+	pass
+
+
+class FCMClientStanza(APIMessage):
 	pass
 	
 
-class FCMRequestParam(m.Message):
+class FCMPlatformStanza(APIMessage):
+	
+
+class FCMRequestParam(APIMessage):
 
 	name = m.StringField(0)
 	value = m.StringField(0)
 
 
-class FCMRequest(m.Message):
+class FCMRequestEnvelope(APIMessage):
 
 	id = m.StringField(0)
-	jsonrpc = m.IntegerField(1)
-	version = m.IntegerField(2)
+	jsonrpc = m.FloatField(1)
+	version = m.FloatField(2)
 	client = m.MessageField(3, FCMClientStanza)
 	method = m.StringField(4)
 	params = m.MessageField(5, FCMRequestParam, repeated=True)
 	
 	
-class FCMResponse(m.Message):
+class FCMResponse(APIMessage):
 	pass
+	
+	
+class FCMResponseEnvelope(APIMessage):
+
+	id = m.StringField(0)
+	jsonrpc = m.FloatField(1)
+	version = m.FloatField(2)
+	platform = m.MessageField(3, FCMPlatformStanza)
+	response = m.MessageField(4, FCMResponse)

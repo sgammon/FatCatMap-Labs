@@ -1,6 +1,11 @@
 from config import config
 from momentum.fatcatmap.core.api.output import HandlerMixin
 
+## Exception Imports
+from momentum.fatcatmap.core.api.output.exceptions import AssetException
+from momentum.fatcatmap.core.api.output.exceptions import InvalidAssetType
+from momentum.fatcatmap.core.api.output.exceptions import InvalidAssetEntry
+
 
 class AssetsMixin(HandlerMixin):
 	
@@ -33,10 +38,12 @@ class AssetsMixin(HandlerMixin):
 		''' Return a URL for an asset, according to the current configuration. '''
 
 		asset = None
-		assert _type in ['style', 'js', 'ext'] # Only three modules right now...
+		c = self._getAssetConfig()		
+		
+		if _type not in c:
+			raise InvalidAssetType, "Asset type '"+str(_type)+"' is invalid for name '"+str(name)+"' in module '"+str(module)+"'."
 
 		# Grab config and find requested asset
-		c = self._getAssetConfig()
 		if _type in c:
 			if name in c[_type]:
 				asset = c[_type][name]
@@ -98,4 +105,5 @@ class AssetsMixin(HandlerMixin):
 			return '/'+'/'.join(asset_url)
 		
 		else:
-			raise KeyError
+			if module not in c[_type] and name not in c[_type]:
+				raise InvalidAssetEntry, "Could not resolve asset '"+str(name)+"' in module '"+str(module)+"'."

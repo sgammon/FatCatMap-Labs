@@ -1,7 +1,14 @@
 <div id='detailsPane' class='sidebar sb-left'>
+		
+	<div class='paneButtonBox'>
+		<a class='paneButton closeButton enabled cp-right2' href="javascript:closeSidebar('#detailsPane');"><img src="/assets/img/static/layout/sprites/close-x.png" /></a>
+
+		<a class='paneButton enabled expandButton cp-right' href="javascript:expandSidebar('#detailsPane');"><img src="/assets/img/static/layout/sprites/arrow-right.png" /></a>
+	</div>
 	
-	<div class='title'>Details Pane</div>
-	
-	<div class='content'>Here's some content.</div>
+	<div class='panelWrapper hidden'>
+		<div class='title'>Details Pane</div>
+		<div class='content'>Here's <a href="#" id='cool' title='cool'>some</a> content.</div>
+	</div>
 	
 </div>

@@ -78,7 +78,7 @@ a:hover { color: #036; }
 .clearleft { clear:left; }
 .clearright { clear:right; }
 .clearboth { clear:both; }
-.fullwidth { width:96%; }
+.fullwidth { width:100%; }
 .halfwidth { width:50%; }
 .fullheight { height:100%; }
 .halfheight { height:50%; }

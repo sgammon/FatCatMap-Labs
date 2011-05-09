@@ -1,0 +1,6 @@
+
+fatcatmap = {};
+function _platformInit()
+{
+	
+}

@@ -1,80 +1,25 @@
-<!-- Sidebars -->
-{% include 'elements/pane/details-sidebar.html' %}
-{% include 'elements/pane/controls-sidebar.html' %}
-
-<!-- jQuery Libraries -->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
-<script>!window.jQuery && document.write(unescape('%3Cscript src="{{ script_url('core', 'jquery') }}"%3E%3C/script%3E'))</script>
-<script src="{{ script_url('rpc', 'jquery') }}"></script>
-
-<script src="{{ script_url('init', 'core') }}"></script>
-<script src="{{ script_url('rpc', 'core') }}"></script>
-<script src="{{ link('js-api') }}"></script>
-
-<script src="{{ script_url('modernizr') }}"></script>
-<script src="{{ script_url('yepnope') }}"></script>
-
-<script src="{{ script_url('navigation', 'core') }}"></script>
-<script src="{{ script_url('graph', 'core') }}"></script>
-<script src="{{ script_url('plugins','core') }}"></script>
-
 <!--[if lt IE 7 ]>
 <script src="{{ script_url('belated_png') }}"></script>
 <script> DD_belatedPNG.fix('img, .png_bg');</script>
 <![endif]-->
 
+<script type='text/javascript'>
+
+// Init navigation
+$(document).ready(function fcmPageInit()
+{
+
+});
+
+</script>
 
 {% if not api.users.is_user_admin() %}
+
+<!-- Google Analytics: Track pageview -->
 <script>
-	var _gaq=[['_setAccount','UA-2908422-24'],['_setDomainName','{{ environ('SERVER_NAME') }}'],['_setAllowLinker', true], ['_trackPageview']]; // Change UA-XXXXX-X to be your site's ID
+	var _gaq=[['_setAccount','UA-2908422-24'],['_setDomainName','{{ environ('SERVER_NAME') }}'],['_setAllowLinker', true], ['_trackPageview']];
 	(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
 	g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
 	s.parentNode.insertBefore(g,s)}(document,'script'));
 </script>
 {% endif %}
-
-<script type='text/javascript'>
-
-// Protovis: HTML5 Graph + Chart Visualizations
-yepnope({
-	test: Modernizr.canvas,
-	yep: "{{ script_url('protovis') }}"
-});
-
-// IndexedDB Plugin for jQuery
-yepnope({
-	test: Modernizr.indexeddb,
-	yep: "{{ script_url('indexeddb', 'jquery') }}"
-});
-
-// Load jQuery effects
-yepnope({
-	
-	test: typeof($) == "function",
-	
-	yep: ["{{ script_url('tools', 'jquery') }}","{{ script_url('tipsy', 'jquery') }}", "{{ script_url('meerkat', 'jquery') }}", "{{ script_url('uniform', 'jquery') }}", "{{ script_url('masonry','jquery') }}"],
-	
-	callback: function bindEffects() {
-
-		$('div.sidebar#detailsPane').meerkat({
-			showMeerkatOnLoad: true,
-			background: 'url(http://meerkat.jarodtaylor.com/demo/images/meerkat-left-bg.png) repeat-y right top',
-			height: '100%',
-			width: '150px',
-			position: 'left',
-			close: '.close-meerkat',
-			dontShowAgain: '.dont-show',
-			animationIn: 'slide',
-			animationSpeed: 500 
-		});	
-	}
-});
-
-// Init navigation
-$(document).ready(function fcmPageInit(){
-
-	bindNavigation();
-
-});
-
-</script>
