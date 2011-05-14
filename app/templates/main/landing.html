@@ -60,23 +60,25 @@
 		line.strokeStyle(function() '#667788');
 
 		// 5: Add node box
-		box = force.node.add(pv.Bar);
-		box.fillStyle(function() 'white');
-		box.strokeStyle(function() '#DDD');
-		box.cursor(function() 'pointer');
-		box.text(function (d) d.label);
-		box.event('mousedown', pv.Behavior.drag());
-		box.event("mouseover", pv.Behavior.tipsy({gravity: "s", fade: true}));
-		box.event('drag', force);
-		box.event('click', function (d) {loadContextPane(d, d.key);});
-		box.width(function(d) {return 90;});
-		box.height(function(d) {return 20;});
+		dot = force.node.add(pv.Dot);
+		dot.size(function() 96);
+		//dot.fillStyle(function() 'white');
+		dot.strokeStyle(function() '#DDD');
+		dot.cursor(function() 'pointer');
+		dot.text(function (d) d.label);
+		dot.event('mousedown', pv.Behavior.drag());
+		dot.event("mouseover", pv.Behavior.tipsy({gravity: "s", fade: true}));
+		dot.event('click', function (d) {loadContextPane(d, d.key);});
+		dot.event('drag', force);
 
-		// 6: Add node label
-		anchor = box.anchor('bottom');
-		label = anchor.extend(box).add(pv.Label)
-		label.text(function (d) {return d.label;});
-		label.font(function(d) {return '12px "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif';});
+		// 6: Add node anchor
+		anchor = dot.anchor('center');
+		icon = anchor.add(pv.Image);
+		icon.text(function (d) d.label);
+		icon.width(16);
+		icon.height(16);
+		icon.url('/assets/img/static/icons/user_gray.png');
+		icon.event('click', function (d) {loadContextPane(d, d.key);});
 
 		// 7: Render
 		vis.render();

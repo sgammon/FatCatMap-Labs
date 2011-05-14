@@ -82,3 +82,8 @@ function expandSidebar(selector, direction)
 		$(selector+' a.multiButton img').attr('src', '/assets/img/static/layout/sprites/close-x.png');		
 	}
 }
+
+function loadContextPane(node, key)
+{
+	alert('ContextPane Load: '+key);
+}

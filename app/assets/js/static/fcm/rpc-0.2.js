@@ -1,6 +1,6 @@
 
 // Map response adapters for different API services
-var apiAdapters = {
+window.fatcatmap.rpc.adapters = {
 	
 	api: {
 		
@@ -15,7 +15,7 @@ var apiAdapters = {
 			{
 				if ('success' in callbacks)
 				{
-					apiAdapters.makeCallback(response, callbacks.success)
+					window.fatcatmap.rpc.adapters.makeCallback(response, callbacks.success);
 				}			
 			}
 			
@@ -32,7 +32,7 @@ var apiAdapters = {
 			{
 				if ('success' in callbacks)
 				{
-					apiAdapters.makeCallback(response, callbacks.success)					
+					window.fatcatmap.rpc.adapters.makeCallback(response, callbacks.success);
 				}			
 			},
 			
@@ -49,7 +49,7 @@ var apiAdapters = {
 			{
 				if ('success' in callbacks)
 				{
-					apiAdapters.makeCallback(response, callbacks.success)					
+					window.fatcatmap.rpc.adapters.makeCallback(response, callbacks.success);
 				}			
 			}
 			
@@ -66,7 +66,7 @@ var apiAdapters = {
 			{
 				if ('success' in callbacks)
 				{
-					apiAdapters.makeCallback(response, callbacks.success)					
+					window.fatcatmap.rpc.adapters.makeCallback(response, callbacks.success);
 				}			
 			}
 			
@@ -83,7 +83,7 @@ var apiAdapters = {
 			{
 				if ('success' in callbacks)
 				{
-					apiAdapters.makeCallback(response, callbacks.success);
+					window.fatcatmap.rpc.adapters.makeCallback(response, callbacks.success);
 				}
 			}
 			
@@ -100,7 +100,7 @@ var apiAdapters = {
 			{
 				if ('success' in callbacks)
 				{
-					apiAdapters.makeCallback(response, callbacks.success);
+					window.fatcatmap.rpc.adapters.makeCallback(response, callbacks.success);
 				}
 			}
 			
@@ -133,6 +133,7 @@ var apiAdapters = {
 // API constructor function
 function _initiateAPIFramework(page_object)
 {
+	
 	// If the page has loaded...
 	if(typeof(page_object) != 'undefined')
 	{
@@ -143,7 +144,7 @@ function _initiateAPIFramework(page_object)
 			if ('methods' in page_object['rpc']['api'][i])
 			{
 				// Link up the adapter (from above)
-				page_object['rpc']['api'][i]['adapter'] = apiAdapters['api'][i];
+				page_object['rpc']['api'][i]['adapter'] = page_object['rpc']['adapters']['api'][i];
 				
 				// Create a framework function for calling the method
 				for (method_i in page_object['rpc']['api'][i]['methods'])
@@ -163,7 +164,7 @@ function _initiateAPIFramework(page_object)
 									method: method,
 									params: args,
 									opts: {},
-									responder: function (response) {
+									success: function (response) {
 										page_object['rpc']['api'][i]['adapter']['response'](response, callbacks);
 									},
 									failure: function (failure) {
@@ -186,11 +187,11 @@ function _initiateAPIFramework(page_object)
 									method: method,
 									params: args,
 									opts: {},
-									responder: function (response) {
+									success: function (response) {
 										page_object['rpc']['api'][i]['adapter']['response'](response, callbacks);
 									},
 									failure: function (failure) {
-										apiAdapters.error(failure, callbacks);
+										page_object['rpc']['adapters'].error(failure, callbacks);
 									}
 								}));
 						};						

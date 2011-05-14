@@ -1,3 +1,4 @@
 
 
-class Struct
+class Struct:
+	pass

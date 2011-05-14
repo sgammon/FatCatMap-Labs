@@ -7,7 +7,7 @@ class StringIndexer(IndexAdapter):
 
 	def prepareInput(self, _input):
 		''' Receives input and sanitizes/prepares it to be tokenized and otherwise processed. '''
-		return str(_input).lower()
+		return unicode(_input).lower()
 	
 	def tokenizeInput(self, _input):
 		''' Receives prepared input and returns a list of tokens extracted. '''
@@ -19,7 +19,7 @@ class StringIndexer(IndexAdapter):
 	
 	def prepareToken(self, _token):
 		''' Receives one token at a time. Must return a prepared/sanitized version of the token appropriate for resolving an index. '''
-		return unicode(reduce(lambda x, y: x+y, [char for char in filter(lambda c: c not in string.punctuation, _token)]))
+		return reduce(lambda x, y: x+y, [char for char in filter(lambda c: c not in string.punctuation, _token)])
 		
 	def expandToken(self, _token):
 		''' Receives one token at a time. Must return a list of *additional items only* to be considered as values of the token. '''

@@ -75,16 +75,43 @@ yepnope([
 </script>
 {% else %}
 
+<script src="{{ script_url('protovis') }}"></script>
+<script src="{{ script_url('rpc','jquery') }}"></script>
+
 <script src="{{ script_url('init', 'core') }}"></script>
 <script src="{{ link('js-api') }}"></script>
 <script src="{{ script_url('rpc', 'core') }}"></script>
 <script src="{{ script_url('plugins', 'core') }}"></script>
 <script src="{{ script_url('layout', 'core') }}"></script>
-<script src="{{ script_url('rpc','jquery') }}"></script>
-<script src="{{ script_url('protovis') }}"></script>
 <script src="{{ script_url('graph','core') }}"></script>
 <script src="{{ script_url('uniform', 'jquery') }}"></script>
 <script src="{{ script_url('tipsy', 'jquery') }}"></script>
 <script src="{{ script_url('masonry','jquery') }}"></script>
 
+<!-- Load Storage Adapters -->
+<script src="{{ script_url('indexeddb', 'jquery') }}"></script>
+<script src="{{ script_url('indexed', 'storage') }}"></script>
+<script src="{{ script_url('websql', 'jquery') }}"></script>
+<script src="{{ script_url('sql', 'storage') }}"></script>
+<script src="{{ script_url('local', 'storage') }}"></script>
+<script src="{{ script_url('session', 'storage') }}"></script>
+
+<script type='text/javascript'>
+
+$(document).ready(function loadPlatform()
+{	
+	// Lay the piping for the internal JS API
+	_initiateAPIFramework(fatcatmap);
+
+	// Bind navigation so we can provide top-level menus
+	bindNavigation();
+	
+	// Load Storage Adapters
+	if(typeof(_indexedDBInit) == 'function') { _indexedDBInit(); }
+	if(typeof(_webSQLInit) == 'function') { _webSQLInit(); }
+	if(typeof(_localStorageInit) == 'function') { _localStorageInit(); }
+	if(typeof(_sessionStorageInit) == 'function') { _sessionStorageInit(); }
+});
+
+</script>
 {% endif %}

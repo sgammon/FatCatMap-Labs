@@ -12,6 +12,7 @@ class DictProxy(Struct):
 			if isinstance(struct, dict):
 				for k, v in struct.items():
 					setattr(self, k, v)
+					
 			elif isinstance(struct, list):
 				for k, v in struct:
 					setattr(self, k, v)

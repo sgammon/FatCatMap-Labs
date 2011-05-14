@@ -71,7 +71,7 @@ config['momentum.fatcatmap.system'] = {
 
 config['momentum.fatcatmap.output'] = {
 
-	'minify': False,
+	'minify': True,
 	'assets':{
 		'optimize': False,
 		'compiled': False, 

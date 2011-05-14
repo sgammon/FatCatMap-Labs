@@ -20,5 +20,7 @@ bin/tipfy
 etc/develop-eggs/*
 etc/downloads/*
 etc/parts/*
+var/downloads/*
+var/parts/*
 var/libs/*
 *.svn*

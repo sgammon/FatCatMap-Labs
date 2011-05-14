@@ -1,0 +1,16 @@
+backends:
+- name: crawler
+  class: B1
+  options: dynamic, public
+- name: analyzer
+  class: B1
+  options: dynamic
+- name: scheduler
+  class: B1
+  options: dynamic
+- name: storage
+  class: B1
+  options: dynamic
+- name: intake
+  class: B1
+  options: dynamic, public

@@ -2,14 +2,8 @@
 <script type="text/javascript">
 {% endif %}
 
-	// Initialize FCM object
-var fatcatmap = {page:{}, sys:{}, dev:{}, user:{}, rpc:{}};
-
-// Initialize Page object
-fatcatmap.page = {};
-
 // Initliaze user object
-fatcatmap.user = {
+window.fatcatmap.user = {
 	
 	current_user: "{{ api.users.current_user() }}",
 	is_user_admin: "{{ api.users.is_user_admin() }}",
@@ -19,7 +13,7 @@ fatcatmap.user = {
 };
 	
 // Initialize RPC object
-fatcatmap.rpc = {
+window.fatcatmap.rpc = {
 	
 	base_rpc_uri: '{{ link('rpc-api', mode='internal') }}',
 	api: {
@@ -68,7 +62,7 @@ fatcatmap.rpc = {
 		request.params['opts'] = request.opts;
 		fatcatmap.rpc.lastRequest = request;
 		$.jsonRPC.setup({endPoint: request.base_uri+'.'+request.method});
-		$.jsonRPC.request('drawFromNode', request.async, request.params,{
+		$.jsonRPC.request(request.method, request.async, request.params,{
 
 				success: function(response)
 				{
@@ -91,30 +85,12 @@ fatcatmap.rpc = {
 };
 
 // Initialize Sys Object
-fatcatmap.sys = {
-	version: "{{ sys.version }}",
-	drivers: {			
-		registry: {},
-		register: function _registerSystemDriver(module, name, initialized, callback)
-		{
-			if(typeof(fatcatmap.sys.drivers.registry[module]) == 'undefined')
-			{
-				fatcatmap.sys.drivers.registry[module] = {};
-			}
-			fatcatmap.sys.drivers.registry[module][name] = {
-				initialized: initialized,
-				registered: true,
-				init_callback: callback
-			};
-			callback();
-		}
-	}
-};
+_PLATFORM_VERSION = "{{ sys.version }}";
 
 {% if sys.dev %}
 // Initialize Dev Object
 fatcatmap.dev = {
-	environ: {
+	environment: {
 		{% for key, value in sys.environ.items() %}
 		{{ key }}: "{{ value }}",
 		{% endfor %}

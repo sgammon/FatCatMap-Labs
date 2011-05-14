@@ -52,31 +52,34 @@ handlers:
   script: lib/pipeline/handlers.py
   login: admin
 
-- url: /_pc/remote_api
+- url: /_ah/remote_api
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
   login: admin
 
-- url: /_pc/mapreduce(/.*)?
-  script: lib/mapreduce/main.py
-  login: admin
-
-- url: /_pc/manage/.*
+- url: /_pc/console/.*
   script: $PYTHON_LIB/google/appengine/ext/admin
   login: admin
   secure: always
 
 
-
 ###### Static Handlers
 
 # Root-level files
-- url: /(robots\.txt|favicon\.ico)
+- url: /(robots\.txt|favicon\.ico|crossdomain.xml)
   static_files: static/\1
   upload: static/(.*)
 
 # Static directory
 - url: /static
   static_dir: static
+
+###### Providence/Clarity Mappings
+- url: /_pc/manage/.*
+  script: momentum/platform/gateway/manage.py
+  login: admin
+
+#- url: /_pc/
+#
 
 ###### API Requests to the Gateway
 - url: /_api/rpc.*
