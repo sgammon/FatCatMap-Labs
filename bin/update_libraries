@@ -1,12 +1,6 @@
 mkdir ../var/libs
 rm -fr ../var/libs/*
-rm -fr ../app/ndb/*
 rm -fr ../app/lib/mapreduce
 rm -fr ../app/lib/pipeline
-rm -fr ../app/lib/protorpc/*
-hg clone https://appengine-ndb-experiment.googlecode.com/hg ../var/libs/ndb
-mv ../var/libs/ndb/ndb/* ../app/ndb
-hg clone https://google-protorpc.googlecode.com/hg ../var/libs/protorpc
-mv ../var/libs/protorpc/python/protorpc/* ../app/lib/protorpc
 svn checkout http://appengine-mapreduce.googlecode.com/svn/trunk/python/src/mapreduce ../app/lib/mapreduce
 svn checkout http://appengine-pipeline.googlecode.com/svn/trunk/src/pipeline ../app/lib/pipeline

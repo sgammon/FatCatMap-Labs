@@ -1,6 +1,6 @@
 (function($) {
   $.extend({
-    jsonRPC: {
+    FatCatMapRPC: {
       // RPC Version Number
       version: '2.0',
 
@@ -192,10 +192,10 @@
               json = eval ( '(' + json + ')' );
             }
 
-            if (($.isArray(json) && json.length > 0 && json[0].jsonrpc !== '2.0') || 
+            /*if (($.isArray(json) && json.length > 0 && json[0].jsonrpc !== '2.0') || 
                 (!$.isArray(json) && json.jsonrpc !== '2.0')) {
               throw 'Version error';
-            }
+            }*/
 
             return json;
           }

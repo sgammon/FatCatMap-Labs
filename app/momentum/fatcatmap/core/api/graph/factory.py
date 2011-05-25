@@ -14,6 +14,8 @@ from momentum.fatcatmap.models.core import relation as r
 
 from ProvidenceClarity.struct.util import ConfigurableStruct
 
+from momentum.fatcatmap.core.api.graph import GraphAPI
+
 from momentum.fatcatmap.core.api.graph.struct import Node as FCMNode
 from momentum.fatcatmap.core.api.graph.struct import Edge as FCMEdge
 from momentum.fatcatmap.core.api.graph.struct import Graph as FCMGraph
@@ -21,7 +23,7 @@ from momentum.fatcatmap.core.api.graph.struct import Graph as FCMGraph
 
 _graph_cache = None
 
-class GraphFactory(MomentumCoreAPI, ConfigurableStruct):
+class GraphFactory(GraphAPI, ConfigurableStruct):
 	
 	"""		
 			=====================================================
@@ -29,7 +31,7 @@ class GraphFactory(MomentumCoreAPI, ConfigurableStruct):
 			-----------------------------------------------------
 			| Information:										|
 			-----------------------------------------------------
-			| 	Version: 2.1									|
+			| 	Version: 2.2									|
 			| 	Author: Sam Gammon <sam@momentum.io>  			|
 			| 	Description: This library recursively builds an	|
 			| 		efficient in-memory graph data structure	|
@@ -37,6 +39,9 @@ class GraphFactory(MomentumCoreAPI, ConfigurableStruct):
 			-----------------------------------------------------
 			| Change Log:										|
 			-----------------------------------------------------
+			|	-Version 2.2 // 5-23-2010 // sam:				|
+			|		Adding compatibility with ProtoRPC, adding	|
+			|		ability to pull Objects and Natives.		|
 			|	-Version 2.1 // 3-19-2010 // sam:				|
 			|		First port from early prototypes of FCM,	|
 			|		converted algorithm to work with NDB		|
@@ -76,7 +81,7 @@ class GraphFactory(MomentumCoreAPI, ConfigurableStruct):
 	@t.tasklet
 	def fill_artifacts(self):
 		
-		''' Converts keys in the _artifacts property to models. '''
+		''' Converts keys in the _artifacts property to full models. '''
 		
 		logging.info('======Filling artifacts.')
 		
@@ -105,7 +110,7 @@ class GraphFactory(MomentumCoreAPI, ConfigurableStruct):
 		for key, value in self._artifacts.items():
 			if isinstance(value, m.NDBModel):
 				if isinstance(value, o.Node):
-					self._graph.set_node_data(value.key.urlsafe(), type=value.type, label=value.label, scope=value.scope, native=False)
+					self._graph.set_node_data(value.key, type=value.type, label=value.label, scope=value.scope, native=False)
 				
 		raise t.Return(self)
 
@@ -147,17 +152,17 @@ class GraphFactory(MomentumCoreAPI, ConfigurableStruct):
 		else:
 			node_key = node
 				
-		if node_key.urlsafe() not in self._artifacts:
+		if node_key not in self._artifacts:
 			
 			logging.info('=========Adding node to artifacts...')
 			
-			self._artifacts[node_key.urlsafe()] = node
+			self._artifacts[node_key] = node
 			if self._graph is None:
 				self.flush_graph()
 				
 			logging.info('=========Adding node to graph object...')
 				
-			self._graph.add_node(node_key.urlsafe(), native=None, type=None, label=None, scope=None)		
+			self._graph.add_node(node_key, native=None, type=None, label=None, scope=None)		
 	
 
 	def encounterHint(self, hint, **kwargs):
@@ -170,7 +175,7 @@ class GraphFactory(MomentumCoreAPI, ConfigurableStruct):
 		else:
 			hint_key = hint
 			
-		if hint_key.urlsafe() not in self._artifacts:
+		if hint_key not in self._artifacts:
 
 			logging.info('=========Adding hint to artifacts...')
 
@@ -181,19 +186,19 @@ class GraphFactory(MomentumCoreAPI, ConfigurableStruct):
 			logging.info('=========Source: '+str(source))
 			logging.info('=========Target: '+str(target))
 
-			self._artifacts[hint_key.urlsafe()] = (source, target)
+			self._artifacts[hint_key] = (source, target)
 			if self._graph is None:
 				self.flush_graph()
 						
 			logging.info('=========Adding hint to graph object...')
 							
 			## Add to graph
-			self._graph.add_edge(hint_key.urlsafe(), [source.urlsafe(), target.urlsafe()], native=None, type=None)
+			self._graph.add_edge(hint_key, [source.urlsafe(), target.urlsafe()], native=None, type=None)
 			
 			return source, target
 			
 		else:
-			return self._artifacts[hint_key.urlsafe()]	
+			return self._artifacts[hint_key]	
 	
 
 	@t.tasklet
@@ -251,7 +256,7 @@ class GraphFactory(MomentumCoreAPI, ConfigurableStruct):
 		yield self.traverseNode(node_key)
 		yield self.fill_artifacts()
 		
-		raise t.Return(self.export_graph())	
+		raise t.Return(self)
 
 
 	@c.toplevel

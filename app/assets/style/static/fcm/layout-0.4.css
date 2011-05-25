@@ -4,9 +4,15 @@ html, body
 	background-color:#222;
 }
 
-h1, h2, h3, h4, p, div
+h1, h2, h3, h4, p, div, td, button, input, b, li, span
 {
 	font-family: 'Cabin', 'Lucida Grande', arial, sans-serif;
+	color:#fff;
+}
+
+button
+{
+	padding:2px 4px 2px 4px;
 }
 
 
@@ -33,7 +39,8 @@ li.dotSpacer
 	padding-right:0;
 	font-weight:bold;
 	color:#666 !important;
-	width:30px;
+	width:20px;
+	text-align:center;
 }
 
 .momentumSuperbar #fcmTopBranding
@@ -357,6 +364,33 @@ div.navbar li.navButton:hover ul.subnav
 	font-size:150%;
 	color:#fff !important;
 }
+.sidebar .panelWrapper .panelBox
+{
+	padding-top:3px;
+	padding-bottom:3px;
+	border-bottom:1px solid #222;	
+	border-top:1px solid #222;
+	font-size:100%;
+	color:#fff !important;
+}
+.sidebar .panelWrapper .panelBox .subtitle
+{
+	text-align:left;
+	padding-top:3px;
+	padding-bottom:3px;
+	font-size:110%;
+	color:#ddd;
+}
+.sidebar .panelWrapper .panelBox .content
+{
+	font-size:80%;
+	padding-right:5px; 
+	color:#fff;
+}
+.sidebar .panelWrapper .panelBox .content div
+{
+	color:#fff;
+}
 .sb-right .panelWrapper .title
 {
 	text-align:right;
@@ -365,8 +399,9 @@ div.navbar li.navButton:hover ul.subnav
 .sidebar .panelWrapper .content
 {
 	font-weight:normal;
+	margin-right:10px;
 	padding: 10px 0 10px 10px;	
-	color:#fff !important;
+	color:#fff;
 }
 .paneButton
 {
@@ -396,3 +431,28 @@ div.navbar li.navButton:hover ul.subnav
     .tipsy-se .tipsy-arrow { bottom: 0; right: 10px; background-position: bottom left; }
   .tipsy-e .tipsy-arrow { top: 50%; margin-top: -4px; right: 0; width: 5px; height: 9px; background-position: top right; }
   .tipsy-w .tipsy-arrow { top: 50%; margin-top: -4px; left: 0; width: 5px; height: 9px; }
+
+/* === Graph Controls === */
+.panelLabels span
+{
+	width:40px;
+	height:13px;
+	color:#fff;
+}
+
+.graphPhysicsInput
+{
+	width:45px;
+	margin-right:0;
+}
+
+.graphSettings td
+{
+	padding:5px;
+}
+.graphButtons
+{
+	text-align:center;
+	margin-right:auto;
+	margin-left:auto;
+}

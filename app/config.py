@@ -34,6 +34,7 @@ config['tipfy'] = {
 	],
 
 	'apps_installed':[
+		'momentum.platform',
 		'momentum.fatcatmap'
 	],
 
@@ -45,6 +46,48 @@ config['tipfy.sessions'] = {
 }
 
 
+###### ===== System Config ===== #####
+config['momentum.system'] = {
+
+	'hooks': {
+		'appstats': {'enabled': False},
+		'profiler': {'enabled': False}
+	}
+
+}
+
+config['momentum.services'] = {
+
+	'logging': True
+
+}
+
+
+
+"""
+
+	########## Platform configuration. ##########
+
+
+"""
+config['momentum.platform'] = {
+
+	'version': {
+		'major': 0,
+		'minor': 1,
+		'micro': 20110523,
+		'release': 'DEV'
+	}
+
+}
+
+config['momentum.platform.output'] = { 
+
+}
+
+
+
+
 """ 
 
 	########## FatCatMap configuration. ##########
@@ -54,24 +97,16 @@ config['momentum.fatcatmap'] = {
 
 	'version': {
 		'major': 0,
-		'minor': 2,
-		'release': 'ALPHA',
+		'minor': 3,
+		'micro': 20110523,
+		'release': 'ALPHA'
 	}
 
 }
 
-config['momentum.fatcatmap.system'] = {
+config['momentum.fatcatmap.output'] = { 
 
-	'hooks': {
-		'appstats': {'enabled': False},
-		'profiler': {'enabled': False}
-	}
-
-}
-
-config['momentum.fatcatmap.output'] = {
-
-	'minify': True,
+	'minify': False,
 	'assets':{
 		'optimize': False,
 		'compiled': False, 
@@ -169,6 +204,14 @@ config['momentum.fatcatmap.assets'] = {
 }
 
 # Output 
+
+
+# Services
+config['momentum.fatcatmap.services'] = {
+
+	'logging': True,
+
+}
 
 
 # Pipelines Configuration

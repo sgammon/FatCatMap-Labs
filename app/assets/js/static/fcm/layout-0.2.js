@@ -68,6 +68,8 @@ function closeSidebar(selector, direction)
 		$(selector+' a.multiButton').attr('href', 'javascript:expandSidebar("'+selector+'", "'+direction+'")');
 		$(selector+' a.multiButton img').attr('src', '/assets/img/static/layout/sprites/arrow-'+direction+'.png');
 	}
+	$(selector).removeClass('unfolded');
+	$(selector).addClass('folded');
 }
 
 function expandSidebar(selector, direction)
@@ -81,9 +83,17 @@ function expandSidebar(selector, direction)
 		$(selector+' a.multiButton').attr('href', 'javascript:closeSidebar("'+selector+'", "'+direction+'")');
 		$(selector+' a.multiButton img').attr('src', '/assets/img/static/layout/sprites/close-x.png');		
 	}
+	$(selector).removeClass('folded');
+	$(selector).addClass('unfolded');
 }
 
 function loadContextPane(node, key)
 {
-	alert('ContextPane Load: '+key);
+	$('.nodeDetailsPane #nodekey').text(key.encoded);
+	$('.nodeDetailsPane #nodelabel').text(node.label);
+
+	if(!$('#detailsPane').hasClass('unfolded'))
+	{
+		expandSidebar('#detailsPane');
+	}
 }

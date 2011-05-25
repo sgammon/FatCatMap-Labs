@@ -1,10 +1,10 @@
 from protorpc import remote
 from protorpc import messages
 
-from momentum.fatcatmap.api import MomentumAPIService
+from momentum.fatcatmap.api import FatCatMapAPIService
 
 
-class FrameAPIService(MomentumAPIService):
+class FrameAPIService(FatCatMapAPIService):
 
 	#@remote.method()
 	def generateDetailView(self, request):

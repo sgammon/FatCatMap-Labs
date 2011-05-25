@@ -1,3 +1,4 @@
+import ndb as n
 from ndb import model as ndb
 from ProvidenceClarity.struct.simple import SimpleStruct
 from ProvidenceClarity.struct.complex import ComplexStruct
@@ -18,6 +19,7 @@ class Node(SimpleStruct):
 	label = str
 	scope = list, str
 	
+
 class Edge(SimpleStruct):
 	
 	''' Represents a connection between two Nodes scheduled to appear on a rendered (or otherwise constructed) Graph. '''
@@ -107,14 +109,14 @@ class Graph(ComplexStruct, SerializableStruct):
 		hints = []
 		seen_edges = []
 		for hint in self._edges:
-			node_0_key = self._objects[hint]['nodes'][0]
-			node_1_key = self._objects[hint]['nodes'][1]
+			node_0_key = n.key.Key(urlsafe=self._objects[hint]['nodes'][0])
+			node_1_key = n.key.Key(urlsafe=self._objects[hint]['nodes'][1])
 			if (self._objects[node_0_key]['index'], self._objects[node_1_key]['index']) in seen_edges:
 				continue
 			elif (self._objects[node_1_key]['index'], self._objects[node_0_key]['index']) in seen_edges:
 				continue
 			else:
-				edges.append({'source':self._objects[node_0_key]['index'], 'target':self._objects[node_1_key]['index'], 'value':1})
+				edges.append({'source':{'index':self._objects[node_0_key]['index'], 'key': node_0_key}, 'target':{'index':self._objects[node_1_key]['index'], 'key':node_1_key}, 'value':1})
 				hints.append({'hint':hint, 'nodes':[{'key':node_0_key, 'index':self._objects[node_0_key]['index']}, {'key':node_1_key, 'index':self._objects[node_1_key]['index']}]})
 				seen_edges.append((self._objects[node_0_key]['index'], self._objects[node_1_key]['index']))
 				seen_edges.append((self._objects[node_1_key]['index'], self._objects[node_0_key]['index']))

@@ -1,5 +1,5 @@
 application: fatcatmap
-version: 5-dev
+version: 6-dev
 runtime: python
 api_version: 1
 

@@ -8,6 +8,7 @@ window.fatcatmap.rpc.adapters = {
 			
 			request: function dataAPIRequest(request)
 			{
+				alert('adapter');
 				return request
 			},
 			
@@ -15,7 +16,7 @@ window.fatcatmap.rpc.adapters = {
 			{
 				if ('success' in callbacks)
 				{
-					window.fatcatmap.rpc.adapters.makeCallback(response, callbacks.success);
+					fatcatmap.rpc.adapters.makeCallback(response, callbacks.success);
 				}			
 			}
 			
@@ -152,52 +153,39 @@ function _initiateAPIFramework(page_object)
 					method = page_object['rpc']['api'][i]['methods'][method_i];
 					if ('failure' in page_object['rpc']['api'][i]['adapter'])
 					{
+						/*
 						page_object['rpc']['api'][i][method] = function (args, callbacks, async) {
 							if (typeof(async) == 'undefined')
 							{
 								async = false;
 							}
-							return page_object.rpc.makeRPCRequest(
-								page_object['rpc']['api'][i]['adapter']['request']({
+							return fatcatmap.rpc.makeRPCRequest(
+								fatcatmap.rpc.api[i]['adapter']['request']({
 									
-									base_uri: page_object['rpc']['api'][i]['base_uri'],
+									base_uri: fatcatmap.rpc.api[i]['base_uri'],
 									method: method,
 									params: args,
 									opts: {},
 									success: function (response) {
-										page_object['rpc']['api'][i]['adapter']['response'](response, callbacks);
+										fatcatmap.rpc.api[i]['adapter']['response'](response, callbacks);
 									},
 									failure: function (failure) {
-										page_object['rpc']['api'][i]['adapter']['failure'](failure, callbacks);
+										fatcatmap.rpc.api[i]['adapter']['failure'](failure, callbacks);
 									}
 									
-								}));
+								}));*/
+						page_object['rpc']['api'][i][method] = function (args, callbacks, async) {
+								
+							alert('API CALL: '+args+callbacks+async);
+						
 						};
 					}
 					else
 					{
-						page_object['rpc']['api'][i][method] = function (args, callbacks, async) {
-							if (typeof(async) == 'undefined')
-							{
-								async = false;
-							}	
-							return page_object.rpc.makeRPCRequest(
-								page_object['rpc']['api'][i]['adapter']['request']({
-									base_uri: page_object['rpc']['api'][i]['base_uri'],
-									method: method,
-									params: args,
-									opts: {},
-									success: function (response) {
-										page_object['rpc']['api'][i]['adapter']['response'](response, callbacks);
-									},
-									failure: function (failure) {
-										page_object['rpc']['adapters'].error(failure, callbacks);
-									}
-								}));
-						};						
+						page_object['rpc']['api'][i][method] = page_object.rpc.generateRPCHint(i, method, page_object['rpc']['api'][i]);
 					}
 				}
 			}
 		}
 	}
-}
+};

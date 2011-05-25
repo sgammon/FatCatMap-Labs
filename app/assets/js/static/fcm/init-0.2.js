@@ -184,7 +184,63 @@ function _platformInit()
 
 	// Initialize page state property
 	page_object.state = {
-		events: {},
+		events: {
+			hooks: [],
+			callchain: {},
+			history: [],
+			registerEvent: function (name)
+			{
+				this.hooks.push(name);
+				callchain[name] = [];
+				return true;
+			},
+			registerHook: function (_event, fn, once)
+			{
+				if (typeof(once) == 'undefined')
+				{
+					once = false;
+				}
+				if (_event in this.hooks)
+				{
+					callchain[_event].push({executed: false, callback:fn, runonce:once});
+				}
+				else
+				{
+					return false;
+				}
+				return true;
+			},
+			triggerEvent: function (_event, context)
+			{
+				if (_event in this.hooks)
+				{
+					if (this.callchain[_event].length() > 0)
+					{
+						for (calltask in this.callchain[_event])
+						{
+							if (calltask['executed'] == true && calltask['runonce'] == true)
+							{
+								continue
+							}
+							else
+							{
+								try
+								{
+									result = calltask.callback(context);
+									this.history.push({event:_event, context:context, task:callback, result:result});									
+								}
+								catch(error)
+								{
+									this.history.push({event:_event, context:context, task:calltask, error:error});
+								}
+							}
+						}
+					}
+				}
+				return null
+			}
+		},
+		
 		page: {}
 	};
 

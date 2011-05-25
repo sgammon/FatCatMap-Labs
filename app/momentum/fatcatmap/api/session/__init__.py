@@ -1,10 +1,10 @@
 from protorpc import remote
 from protorpc import messages
 
-from momentum.fatcatmap.api import MomentumAPIService
+from momentum.fatcatmap.api import FatCatMapAPIService
 
 
-class SessionAPIService(MomentumAPIService):
+class SessionAPIService(FatCatMapAPIService):
 
 	#@remote.method()
 	def authenticate(self, request):

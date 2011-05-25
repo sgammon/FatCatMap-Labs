@@ -1,14 +1,24 @@
 from protorpc import remote
 from protorpc import messages
 
-from momentum.fatcatmap.api import MomentumAPIService
+from momentum.fatcatmap.api import FatCatMapAPIService
 
 
-class DataAPIService(remote.Service):
+class TestDataRequest(messages.Message):
+	
+	key = messages.StringField(1)
 
-	#@remote.method()
+
+class TestDataResponse(messages.Message):
+	
+	response = messages.StringField(2)
+
+
+class DataAPIService(FatCatMapAPIService):
+
+	@remote.method(TestDataRequest, TestDataResponse)
 	def get(self, request):
-		pass
+		return TestDataResponse(response='Hello, JavaScript!')
 		
 	#@remote.method()
 	def retrieveGraphObject(self, request):

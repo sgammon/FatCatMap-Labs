@@ -1,8 +1,16 @@
 
+import config
+from protorpc import remote
+from momentum import MomentumService
 
-class MomentumAPIService(object):
+
+class FatCatMapAPIService(MomentumService):
 
 	state = {}
+	config = {}
+
+	def __init__(self):
+		self.config = config.config.get('momentum.fatcatmap.services')
 
 	def initialize_request_state(self, state):
 		self.state = state
@@ -52,7 +60,6 @@ def QueryResponder(func):
 
 			if 'keys_only' in query:
 				result.keys_only = True
-
 
 			## == Run Query
 			query_result = self.runQuery(result, limit=query.get('limit'), offset=query.get('offset'))

@@ -50,30 +50,57 @@ window.fatcatmap.rpc = {
 	lastFailure: null,
 	lastResponse: null,
 	
-	makeRPCRequest: function _generateFCMRPC(request, callbacks)
+	generateRPCHint: function (api, method, api_object) {
+			
+		return function (args, callbacks, async)
+		{	
+			if (typeof(async) == 'undefined')
+			{
+				async = false;
+			}
+			return fatcatmap.rpc.makeRPCRequest(api_object, {
+
+						// Request Object
+						method: method,
+						params: args,
+						opts: {},
+						async: async
+						
+					},
+
+					{
+						// Callbacks
+						success: function (response)
+						{
+							api_object.adapter.response(response, callbacks);
+						},
+						failure: function (failure)
+						{
+							fatcatmap.rpc.adapters.error(failure, callbacks);
+						}
+					}
+			);
+		}	
+	},
+	
+	
+	makeRPCRequest: function _generateFCMRPC(config, request, callbacks)
 	{
-		alert(request.base_uri);
-		alert(request.method);
-		alert(request.params);
-		alert(request.opts);
-		alert(request.success);
-		alert(request.failure);
-		
 		request.params['opts'] = request.opts;
 		fatcatmap.rpc.lastRequest = request;
-		$.jsonRPC.setup({endPoint: request.base_uri+'.'+request.method});
-		$.jsonRPC.request(request.method, request.async, request.params,{
+		$.FatCatMapRPC.setup({endPoint: config.base_uri+'.'+request.method});
+		$.FatCatMapRPC.request(request.method, request.async, request.params,{
 
-				success: function(response)
+				success: function internalRPCSuccessCallback(response)
 				{
-					fatcatmap.rpc.lastResponse(response);
+					fatcatmap.rpc.lastResponse = response;
 					fatcatmap.rpc.history.push({request: request, response: response});
 					callbacks.success(response);
 				},
 				
-				error: function(response)
+				error: function internalRPCFailureCallback(response)
 				{
-					fatcatmap.rpc.lastFailure(failure);
+					fatcatmap.rpc.lastFailure = response;
 					fatcatmap.rpc.history.push({request: request, failure: response});
 					callbacks.failure(response);
 				}

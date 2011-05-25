@@ -5,28 +5,26 @@
 <div id='grapher' class='fullheight fullwidth textcenter'>
 	<script type="text/javascript+protovis">
 	$(document).ready( function drawGraph() {
-		
-		_data = null;
+
+		// Define local context vars
 		_graph = null;
+		_error = null;
 		_response = null;
 
-		// Set up Graph API RPC
-		$.jsonRPC.setup({endPoint: "{{ link('api-call-rest', module='graph', service='draw', method='drawFromNode') }}"});
-		$.jsonRPC.request('drawFromNode', false, {},{
-
-				success: function(response)
-				{
-					_response = response;
-					_data = _response.result.data;
-					_graph = _response.result.graph;
-				},
-				error: function(response)
-				{
-					_error = response;
-					alert('rpc failure: '+response.error);
-				}
-	
-		});
+		fatcatmap.rpc.api.graph.construct({}, {
+			
+			success: function graphResponse(response)
+			{
+				_graph = response.graph;
+				_response = response;
+			},
+			failure: function graphFailure(response)
+			{
+				_error = response;
+				alert('rpc failure: '+response.error)
+			}
+			
+		}, false);
 		
 		// Render Graph
 		var w = $("#grapher").width(),
@@ -61,24 +59,31 @@
 
 		// 5: Add node box
 		dot = force.node.add(pv.Dot);
-		dot.size(function() 96);
-		//dot.fillStyle(function() 'white');
-		dot.strokeStyle(function() '#DDD');
+		dot.size(function() 150);
+		dot.fillStyle(function() 'white');
+		dot.strokeStyle(function() 'blue');
 		dot.cursor(function() 'pointer');
 		dot.text(function (d) d.label);
 		dot.event('mousedown', pv.Behavior.drag());
-		dot.event("mouseover", pv.Behavior.tipsy({gravity: "s", fade: true}));
+		//dot.event("mouseover", pv.Behavior.tipsy({gravity: "s", fade: true}));
 		dot.event('click', function (d) {loadContextPane(d, d.key);});
 		dot.event('drag', force);
 
 		// 6: Add node anchor
-		anchor = dot.anchor('center');
+
+		center = dot.anchor('center');
+		label = center.add(pv.Label);
+		label.text(function (d) d.index+1);
+		label.font(function () '16px Cabin');
+		
+		
+		/*anchor = dot.anchor('center');
 		icon = anchor.add(pv.Image);
 		icon.text(function (d) d.label);
 		icon.width(16);
 		icon.height(16);
 		icon.url('/assets/img/static/icons/user_gray.png');
-		icon.event('click', function (d) {loadContextPane(d, d.key);});
+		icon.event('click', function (d) {loadContextPane(d, d.key);});*/
 
 		// 7: Render
 		vis.render();

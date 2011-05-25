@@ -12,6 +12,8 @@ if 'lib' not in sys.path:
 from tipfy import Tipfy
 from urls import get_rules
 
+from protorpc import service_handlers
+
 
 def enable_appstats(app):
 	
@@ -34,7 +36,7 @@ def enable_jinja2_debugging():
 	HardenedModulesHook._WHITE_LIST_C_MODULES += ['_ctypes', 'gestalt']
 
 debug = config.debug
-sys_config = config.config.get('momentum.fatcatmap.system')
+sys_config = config.config.get('momentum.system')
 
 app = Tipfy(rules=get_rules(), config=config.config, debug=debug)
 

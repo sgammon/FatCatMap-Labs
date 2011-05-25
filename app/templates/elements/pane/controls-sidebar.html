@@ -1,4 +1,4 @@
-<div id='controlsPane' class='sidebar sb-right'>
+<div id='controlsPane' class='sidebar sb-right folded'>
 	
 	<div class='paneButtonBox'>
 		<a class='paneButton closeButton multiButton cp-left enabled' href="javascript:expandSidebar('#controlsPane', 'left');"><img src="/assets/img/static/layout/sprites/arrow-left.png" width="18" height="18" /></a>
@@ -6,7 +6,55 @@
 	
 	<div class='panelWrapper hidden'>
 		<div class='title'>Controls Pane</div>	
-		<div class='content'>Here's some content.</div>
+		<div class='content'>
+
+			<div class='panelBox'>
+				<div class='subtitle'>View Options</div>
+				<div class='content'>
+					Sup123
+				</div>
+			</div>
+
+			
+			<div class='panelBox'>
+				<div class='subtitle'>Graph Options</div>
+				<div class='content'>
+					
+					<table class='graphSettings'>
+						<tbody>
+							<tr><td>Charge Constant</td><td><input type='text' value='-110' class='graphPhysicsInput' name='chargeConstant' /></td></tr>
+							<tr><td>Charge Max Distance</td><td><input type='text' value='500' class='graphPhysicsInput' name='chargeMaxDistance' /></td></tr>
+							<tr><td>Charge Min Distance</td><td><input type='text' value='2' class='graphPhysicsInput' name='chargeMinDistance' /></td></tr>
+							<tr><td>Charge Theta</td><td><input type='text' value='0.9' class='graphPhysicsInput' name='chargeTheta' /></td></tr>
+							<tr><td>Drag Constant</td><td><input type='text' value='0.1' class='graphPhysicsInput' name='dragConstant' /></td></tr>
+							<tr><td>Spring Constant</td><td><input type='text' value='0.1' class='graphPhysicsInput' name='springConstant' /></td></tr>
+							<tr><td>Spring Damping</td><td><input type='text' value='0.3' class='graphPhysicsInput' name='springDamping' /></td></tr>
+							<tr><td>Spring Length</td><td><input type='text' value='140' class='graphPhysicsInput' name='springLength' /></td></tr>
+						</tbody>
+					</table>
+					<br />
+					<div class='graphButtons'>
+						<button>Reset</button> <button>Default</button> <button>Render</button>
+					</div>
+				</div>
+			</div>
+
+			<div class='panelBox'>
+				<div class='subtitle'>Node Options</div>
+				<div class='content'>
+					Sup
+				</div>
+			</div>
+			
+			<div class='panelBox'>
+				<div class='subtitle'>Edge Options</div>
+				<div class='content'>
+					Sup
+				</div>
+			</div>
+			
+
+		</div>
 	</div>
 	
 </div>
