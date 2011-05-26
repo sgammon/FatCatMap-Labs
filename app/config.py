@@ -44,6 +44,21 @@ config['tipfy.sessions'] = {
 	'secret_key':'ASKLdjOF)H#*@G@)*GCJDBUVF(!&Gouhf981g27gd2G@H)'
 
 }
+config['tipfyext.jinja2'] = {
+
+	'templates_dir': 'templates', ## Root directory for template storage
+	'templates_compiled_target': None, ##  Compiled templates directory
+	'force_use_compiled': False, ## Force Jinja to use compiled templates, even on the Dev server
+
+	'environment_args': { ## Jinja constructor arguments
+		'optimized': False,	
+	    'autoescape': True,
+	    'extensions': ['jinja2.ext.autoescape', 'jinja2.ext.with_'],
+	},
+
+	'after_environment_created': 'momentum.fatcatmap.core.output.fcmOutputEnvironmentFactory',
+
+}
 
 
 ###### ===== System Config ===== #####
@@ -97,10 +112,14 @@ config['momentum.fatcatmap'] = {
 
 	'version': {
 		'major': 0,
-		'minor': 3,
-		'micro': 20110523,
+		'minor': 4,
+		'micro': 20110526,
 		'release': 'ALPHA'
 	}
+
+}
+
+config['momentum.fatcatmap.dev'] = {
 
 }
 
@@ -111,6 +130,15 @@ config['momentum.fatcatmap.output'] = {
 		'optimize': False,
 		'compiled': False, 
 	}
+
+}
+
+config['momentum.fatcatmap.output.template_loader'] = {
+
+	'force': True, ## Force enable template loader even on Dev server
+	'debug': True,  ## Enable dev logging
+	'use_memory_cache': False, ## Use handler in-memory cache for template bytecode
+	'use_memcache': False, ## Use Memcache API for template bytecode
 
 }
 

@@ -1,5 +1,5 @@
 application: fatcatmap
-version: 6-dev
+version: 8-dev
 runtime: python
 api_version: 1
 
@@ -83,7 +83,7 @@ handlers:
 
 ###### API Requests to the Gateway
 - url: /_api/rpc.*
-  script: momentum/fatcatmap/api/gateway.py
+  script: services.py
 
 ###### Send to Tipfy
 - url: /.*

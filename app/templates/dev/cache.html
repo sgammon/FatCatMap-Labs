@@ -1,0 +1,48 @@
+{% extends 'layouts/main.html' %}
+
+{% block content_body %}
+
+<div class='padding-20 halfwidth fullheight'>
+
+	<div class='contentPanel'>
+
+		<div class='panelHeader'>
+			<h1>Cache Management</h1>
+		</div>
+		<div class='panelContent'>
+			
+			{% if message %}
+				<div class='notice'><p>{{ message }}</p></div>
+			{% endif %}
+
+			<h2>Memcache Stats:</h2><br />
+
+			<ul>
+				<li>Hits: {{ stats.hits }}</li>
+				<li>Misses: {{ stats.misses }}</li>
+				<li>Byte Hits: {{ stats.byte_hits }}</li>
+				<li>Item Count: {{ stats.__getitem__('items') }}</li>
+				<li>Byte Count: {{ stats.bytes }}</li>
+				<li>Oldest Item: {{ stats.oldest_item_age }}</li>
+			</ul>
+
+			<br />
+			<br />
+			
+			<h2>Flush Memcache:</h2><br />
+
+			<form action="{{ link('dev-cache') }}" method='post'>
+				<input type='hidden' name='action' value='clear' />
+				<input type='submit' value='Clear Memcache of All Values'>
+			</form>
+			
+			<br />
+			<br />
+
+		</div>
+
+	</div>
+	
+</div>
+
+{% endblock %}

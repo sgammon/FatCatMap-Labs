@@ -8,7 +8,6 @@ window.fatcatmap.rpc.adapters = {
 			
 			request: function dataAPIRequest(request)
 			{
-				alert('adapter');
 				return request
 			},
 			

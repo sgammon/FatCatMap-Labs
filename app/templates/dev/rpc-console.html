@@ -2,7 +2,7 @@
 
 {% block content_body %}
 
-<div class='padding-20 fullwidth fullheight'>
+<div class='padding-20 fullheight'>
 
 	<div class='contentPanel'>
 
@@ -19,14 +19,20 @@
 			<br />
 			<hr />
 			<br />
+			
+			<p>
+				<b>Request ID: </b><input type='text' value='' id='api_request_id' style='width:50px; margin-left:15px; text-align:right;' /><br />
+				<b>Asynchronous: </b><input type='text' value='' id='api_request_async' style='width:50px; margin-left:15px; text-align:right;' />
+			</p><br />
+			
 			<div class='floatleft'>
 				<b>API Request:<b><br />
-				<textarea id='api_request_content' style='width:400px; height:300px; background:white;'></textarea>
+				<textarea id='api_request_content' style='width:550px; padding:5px; height:300px; background:white;'></textarea>
 			</div>
 			
 			<div class='floatleft'>
 				<b>API Response:<b><br />
-				<textarea id='api_response_content' style='width:400px; height:300px; background:white;'></textarea>
+				<textarea id='api_response_content' style='width:550px; padding:5px; height:300px; background:white;'></textarea>
 			</div>
 			
 			<div class='clearboth'></div>
@@ -45,22 +51,29 @@
 _error = null;
 	$('#drawGraph').click(function doGrpahRPC()
 		{
-			alert('making graph RPC request...');
-			$.jsonRPC.setup({endPoint: "{{ link('api-call-rest', module='graph', service='draw', method='drawFromNode') }}"});
-			$.jsonRPC.request('drawFromNode', {node:'ag1tb21lbnR1bS1sYWJzchYLEgZPYmplY3QYAQwLEgROb2RlGAEM'},{
 
-					success: function(response)
-					{
+			request = fatcatmap.rpc.api.graph.construct({},
+				{
+					success: function (response) {
+						
+						console.log('RPC Success: ', response);
 						$('#api_response_content').val(JSON.stringify(response));
+						
 					},
-					error: function(response)
-					{
-						_error = response;
-						alert('rpc failure: '+response.error);
-					}
+					
+					failure: function (response) {
 			
-				}
-			);
+						console.log('RPC Failure: ', response);
+						alert('RPC failure. Response logged to console.');
+						$('#api_response_content').val(JSON.stringify(response));						
+						
+					},
+
+			}, false);
+			
+			$('#api_request_id').val(request.id);
+			$('#api_request_async').val(request.async);
+			$('#api_request_content').val(JSON.stringify(request.request));			
 		}
 	);
 </script>

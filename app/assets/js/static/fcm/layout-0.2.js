@@ -62,6 +62,8 @@ function closeSidebar(selector, direction)
 	$(selector).animate({width:'35px'});
 	$(selector+' div.panelWrapper').fadeOut();
 	$(selector+' a.expandButton').addClass('enabled');
+	$(selector+' a.expandButton').attr('href', 'javascript:expandSidebar("'+selector+'", "'+direction+'")');
+	$(selector+' a.expandButton img').attr('src', '/assets/img/static/layout/sprites/arrow-'+direction+'.png');	
 	if (typeof(direction) != 'undefined')
 	{
 		$(selector+' a.multiButton').addClass('enabled');
@@ -73,10 +75,10 @@ function closeSidebar(selector, direction)
 }
 
 function expandSidebar(selector, direction)
-{
+{	
 	$(selector).animate({width:'200px'});
 	$(selector+' div.panelWrapper').hide().removeClass('hidden').fadeIn();
-	$(selector+' a.expandButton').removeClass('enabled');
+	$(selector+' a.expandButton').attr('href', 'javascript:maximizeSidebar("'+selector+'", "'+direction+'")');
 	if (typeof(direction) != 'undefined')
 	{
 		$(selector+' a.multiButton').addClass('enabled');
@@ -87,13 +89,46 @@ function expandSidebar(selector, direction)
 	$(selector).addClass('unfolded');
 }
 
+function maximizeSidebar(selector, direction)
+{
+	$(selector).animate({width:'80%'});
+	$(selector+' a.expandButton').attr('href', 'javascript:minimizeSidebar("'+selector+'", "'+direction+'")');
+	if(direction == 'right')
+	{
+		arrow = 'left';
+	}
+	else
+	{
+		arrow = 'right';
+	}
+	$(selector+' a.expandButton img').attr('src', '/assets/img/static/layout/sprites/arrow-'+arrow+'.png');
+	$(selector).removeClass('folded'); // Just in case...
+	$(selector).removeClass('unfolded');
+	$(selector).addClass('maximized');
+}
+
+function minimizeSidebar(selector, direction)
+{
+	$(selector).animate({width:'200px'});
+	$(selector+' a.expandButton').attr('href', 'javascript:maximizeSidebar("'+selector+'", "'+direction+'")');
+	$(selector+' a.expandButton img').attr('src', '/assets/img/static/layout/sprites/arrow-'+direction+'.png');	
+	$(selector).removeClass('folded'); // Just in case...
+	$(selector).removeClass('maximized');
+	$(selector).addClass('unfolded');
+}
+
 function loadContextPane(node, key)
 {
 	$('.nodeDetailsPane #nodekey').text(key.encoded);
 	$('.nodeDetailsPane #nodelabel').text(node.label);
+	
 
-	if(!$('#detailsPane').hasClass('unfolded'))
+	if(!$('#detailsPane').hasClass('unfolded') || !$('#detailsPane').hasClass('maximized'))
 	{
-		expandSidebar('#detailsPane');
+		expandSidebar('#detailsPane', 'right');
+		if(!$('#detailsPane a.expandButton').hasClass('enabled'))
+		{
+			$('#detailsPane a.expandButton').addClass('enabled');
+		}
 	}
 }

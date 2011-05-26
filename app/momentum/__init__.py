@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import config
-import slimmer
-from slimmer.js_function_slimmer import slim as slimjs
+import simplejson
 
 # Tipfy Imports
 from tipfy import RequestHandler, Response
@@ -44,9 +43,11 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 		minify = unicode
 
 		if self._outputConfig()['minify'] is True:
+			import slimmer
 			if content_type == 'text/html':
 				minify = slimmer.html_slimmer
 			elif content_type == 'text/javascript':
+				from slimmer.js_function_slimmer import slim as slimjs
 				minify = slimjs
 			elif content_type == 'text/css':
 				minify = slimmer.css_slimmer

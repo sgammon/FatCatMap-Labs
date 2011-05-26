@@ -1,4 +1,6 @@
 import logging
+
+from google.appengine.api import memcache
 from momentum.fatcatmap.handlers import WebHandler
 
 from momentum.fatcatmap.forms.graph import NewObjectRelationForm
@@ -17,7 +19,16 @@ class Index(WebHandler):
 class CacheManagement(WebHandler):
 	
 	def get(self):
-		pass
+		if 'message' in self.request.args:
+			return self.render('dev/cache.html', stats=memcache.get_stats(), message=self.request.args.get('message'))
+		else:
+			return self.render('dev/cache.html', stats=memcache.get_stats())
+
+		
+	def post(self):
+		if 'action' in self.request.form and self.request.form.get('action') == 'clear':
+			memcache.flush_all()
+			return self.redirect(self.url_for('dev-cache', message='Memcache successfully reset.'))
 		
 		
 class RPCConsole(WebHandler):

@@ -111,15 +111,19 @@ class Graph(ComplexStruct, SerializableStruct):
 		for hint in self._edges:
 			node_0_key = n.key.Key(urlsafe=self._objects[hint]['nodes'][0])
 			node_1_key = n.key.Key(urlsafe=self._objects[hint]['nodes'][1])
-			if (self._objects[node_0_key]['index'], self._objects[node_1_key]['index']) in seen_edges:
+			
+			try:
+				if (self._objects[node_0_key]['index'], self._objects[node_1_key]['index']) in seen_edges:
+					continue
+				elif (self._objects[node_1_key]['index'], self._objects[node_0_key]['index']) in seen_edges:
+					continue
+				else:
+					edges.append({'source':{'index':self._objects[node_0_key]['index'], 'key': node_0_key}, 'target':{'index':self._objects[node_1_key]['index'], 'key':node_1_key}, 'value':1})
+					hints.append({'hint':hint, 'nodes':[{'key':node_0_key, 'index':self._objects[node_0_key]['index']}, {'key':node_1_key, 'index':self._objects[node_1_key]['index']}]})
+					seen_edges.append((self._objects[node_0_key]['index'], self._objects[node_1_key]['index']))
+					seen_edges.append((self._objects[node_1_key]['index'], self._objects[node_0_key]['index']))
+			except:
 				continue
-			elif (self._objects[node_1_key]['index'], self._objects[node_0_key]['index']) in seen_edges:
-				continue
-			else:
-				edges.append({'source':{'index':self._objects[node_0_key]['index'], 'key': node_0_key}, 'target':{'index':self._objects[node_1_key]['index'], 'key':node_1_key}, 'value':1})
-				hints.append({'hint':hint, 'nodes':[{'key':node_0_key, 'index':self._objects[node_0_key]['index']}, {'key':node_1_key, 'index':self._objects[node_1_key]['index']}]})
-				seen_edges.append((self._objects[node_0_key]['index'], self._objects[node_1_key]['index']))
-				seen_edges.append((self._objects[node_1_key]['index'], self._objects[node_0_key]['index']))
 		return edges, hints
 		
 	

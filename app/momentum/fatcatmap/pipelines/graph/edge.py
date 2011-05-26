@@ -19,8 +19,8 @@ class GraphEdge(FCMGraphPipeline):
 		target = self.ndb.model.Key(urlsafe=node_target)
 		
 		## Create source + target edges
-		source_edge = Edge(key=self.ndb.model.Key(pairs=source.pairs() + [(Edge.GetKind(), 1)]), source=source, target=target).put()
-		target_edge = Edge(key=self.ndb.model.Key(pairs=target.pairs() + [(Edge.GetKind(), 1)]), source=target, target=source).put()
+		source_edge = Edge(key=self.ndb.model.Key(pairs=source.pairs() + [(Edge._get_kind(), 1)]), source=source, target=target).put()
+		target_edge = Edge(key=self.ndb.model.Key(pairs=target.pairs() + [(Edge._get_kind(), 1)]), source=target, target=source).put()
 		
 		self.log.info('===== SOURCE EDGE KEY: '+str(source_edge.urlsafe())+' =====')
 		self.log.info('===== TARGET EDGE KEY: '+str(target_edge.urlsafe())+' =====')
@@ -36,8 +36,8 @@ class GraphEdgeHint(FCMGraphPipeline):
 		source = self.ndb.model.Key(urlsafe=node_source)
 		target = self.ndb.model.Key(urlsafe=node_target)
 		
-		source_hint_key = self.ndb.model.Key(pairs=source.pairs() + [(EdgeHint.GetKind(), target.urlsafe())])
-		target_hint_key = self.ndb.model.Key(pairs=target.pairs() + [(EdgeHint.GetKind(), source.urlsafe())])
+		source_hint_key = self.ndb.model.Key(pairs=source.pairs() + [(EdgeHint._get_kind(), target.urlsafe())])
+		target_hint_key = self.ndb.model.Key(pairs=target.pairs() + [(EdgeHint._get_kind(), source.urlsafe())])
 		
 		## Check existence
 		source_hint = source_hint_key.get_async().get_result()

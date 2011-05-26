@@ -5,6 +5,12 @@ from tipfy import HandlerPrefix
 
 rules = [
 
+	HandlerPrefix('momentum.platform.handlers.core.', [
+	
+		Rule('/_ah/start', endpoint='backend-start', handler='ifx.backends.StartHook'),
+	
+	]),
+
 	HandlerPrefix('momentum.platform.handlers.console.', [
 	
 		Rule('/_pc/ifx/platform/console', endpoint='console-home', handler='main.Landing'),

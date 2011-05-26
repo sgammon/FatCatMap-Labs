@@ -1,0 +1,82 @@
+{% macro grapher(selector, fn=none, tags=false) %}
+{% if tags %}
+<script type='text/javascript+protovis'>
+{% endif %}
+
+{% if fn != none %}
+{{ fn }} = function (nodes, edges)
+{
+{% endif %}
+	// Render Graph
+	var w = $("{{ selector }}").width(),
+	    h = $("{{ selector }}").height(),
+	    colors = pv.Colors.category19();
+
+	// 1: Create viz panel
+	var vis = new pv.Panel($('{{ selector }}'))
+	    .width(w)
+	    .height(h)
+	    .fillStyle("transparent")
+	    .event("mousedown", pv.Behavior.pan())
+	    .event("mousewheel", pv.Behavior.zoom());
+
+	// 2: Add force-driven layout to visualizer panel
+	var force = vis.add(pv.Layout.Force).nodes(nodes).links(edges);
+	force.bound = function() true;
+
+	// 3: Adjust force constants for layout
+	force.chargeConstant(function() -110);
+	force.chargeMaxDistance(function() 500);
+	force.chargeMinDistance(function() 2);
+	force.chargeTheta(function() 0.9);
+	force.dragConstant(function() 0.1);
+	force.springConstant(function() 0.1);
+	force.springDamping(function() 0.3);
+	force.springLength(function() 140);
+
+	// 4: Render line
+	line = force.link.add(pv.Line);
+	line.strokeStyle(function() '#667788');
+
+	// 5: Add node box
+	dot = force.node.add(pv.Dot);
+	dot.size(function() 150);
+	dot.fillStyle(function() 'white');
+	dot.strokeStyle(function() 'blue');
+	dot.cursor(function() 'pointer');
+	dot.text(function (d) d.label);
+	dot.event('mousedown', pv.Behavior.drag());
+
+
+	// 6: Add Node Events
+	dot.event('click', function (d) {
+	
+		loadContextPane(d, d.key);
+	
+	});
+	dot.event('dblclick', function (d) {
+	
+		browseToNode(d.key);
+	
+	});
+	dot.event('drag', force);
+	//dot.event("mouseover", pv.Behavior.tipsy({gravity: "s", fade: true}));			
+
+	// 7: Add node anchor
+	center = dot.anchor('center');
+	label = center.add(pv.Label);
+	label.text(function (d) d.index+1);
+	label.font(function () '16px Cabin');
+
+	// 8: Render
+	vis.render();
+	
+	return {panel: vis, force: force}
+{% if fn != none %}
+}
+{% endif %}
+
+{% if tags %}
+</script>
+{% endif %}
+{% endmacro %}

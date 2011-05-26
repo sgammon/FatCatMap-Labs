@@ -1,3 +1,27 @@
+function browseToNode(node_key)
+{
+	fatcatmap.rpc.api.graph.construct({origin: node_key}, {
+		
+		success: function graphResponse(response)
+		{
+			_graph = response.graph;
+			_response = response;
+		},
+		failure: function graphFailure(response)
+		{
+			_error = response;
+			alert('rpc failure: '+response.error)
+		}
+		
+	}, false);
+	
+	_visualizer.force.reset();
+	_visualizer = makeGrapher(_graph.nodes, _graph.edges);
+	
+}
+
+
+// Protovis behavior for Tipsy
 pv.Behavior.tipsy = function(opts) {
   var tip;
 

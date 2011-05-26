@@ -71,7 +71,7 @@ button {  width: auto; overflow: visible; }
 body, select, input, textarea {  color: #444; }
 h1, h2, h3, h4, h5, h6 { font-weight: bold; color:#fff; }
 a, a:active, a:visited { color: #607890; color:#8CA552; }
-a:hover { color: #036; color:#B4B955; }
+a:hover { color:#B4B955; }
 
 .floatleft { float:left; }
 .floatright { float:right; }
@@ -94,7 +94,7 @@ a:hover { color: #036; color:#B4B955; }
 .padding-30 { padding:30px; }
 .snapright { right:0px; }
 .snapleft { left:0px; }
-.notice { min-width:500px;min-height:20px;background:yellow;color:black;border-radius:3px;-moz-border-radius:3px;opacity:0.8;padding:5px;margin:5px; }
+.notice { min-width:300px;min-height:20px;background:#B4B955;color:black;border-radius:3px;-moz-border-radius:3px;opacity:0.8;padding:5px;margin:10px; }
 
 .ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
 .hidden { display: none; visibility: hidden; }

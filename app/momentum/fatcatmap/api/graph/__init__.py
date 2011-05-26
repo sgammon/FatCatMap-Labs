@@ -24,6 +24,12 @@ class GraphAPIService(remote.Service):
 
 	@remote.method(GraphRequest, GraphResponse)
 	def construct(self, request):
+		
+		logging.info('====== GRAPH API SERVICE =====')
+		logging.info('Request origin: '+str(request.origin))
+		logging.info('Request degree: '+str(request.degree))
+		logging.info('Request limit: '+str(request.limit))
+		
 		if request.origin is not None:
 			origin_key = n.key.Key(urlsafe=request.origin)
 		else:

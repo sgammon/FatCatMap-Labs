@@ -225,3 +225,6 @@ class FCMPipeline(pipeline.Pipeline):
 			
 			## Return path & resolved type
 			return type_refx, type_ref
+			
+	def finalized(self):
+		return None

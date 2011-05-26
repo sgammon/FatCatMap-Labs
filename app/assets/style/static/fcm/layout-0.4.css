@@ -4,7 +4,7 @@ html, body
 	background-color:#222;
 }
 
-h1, h2, h3, h4, p, div, td, button, input, b, li, span
+h1, h2, h3, h4, p, div, td, button, input, b, li, span, select
 {
 	font-family: 'Cabin', 'Lucida Grande', arial, sans-serif;
 	color:#fff;
@@ -13,6 +13,11 @@ h1, h2, h3, h4, p, div, td, button, input, b, li, span
 button
 {
 	padding:2px 4px 2px 4px;
+}
+
+input[type='submit']
+{
+	padding:3px;
 }
 
 
@@ -46,7 +51,7 @@ li.dotSpacer
 .momentumSuperbar #fcmTopBranding
 {
 	padding-top:4px;
-	padding-left:15px;
+	padding-left:5px;
 	padding-right:5px;
 	width:165px;
 	text-align:center;
@@ -80,7 +85,10 @@ li.dotSpacer
 	float:left;
 	position:relative;
 }
-
+.momentumSuperbar #util_navigation
+{
+	padding-right:5px;
+}
 .navbar
 {
 	padding: 0;
@@ -317,7 +325,7 @@ div.navbar li.navButton:hover ul.subnav
 {
 	font-size:10pt;
 	padding:10px;
-	background:gray;
+	background:#222;
 	min-height:200px;
 	border-bottom-left-radius: 5px;
 	border-bottom-right-radius: 5px;

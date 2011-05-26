@@ -1,0 +1,47 @@
+{% extends "layouts/main.html" %}
+
+{% block content_body %}
+
+<div id='grapher' class='fullheight fullwidth textcenter'>
+	<script type="text/javascript+protovis">
+
+	// Define local context vars
+	_graph = null;
+	_visualizer = null;	
+	makeGrapher = null;
+
+	$(document).ready( function drawGraph() {		
+
+		{{ grapher("#grapher", "makeGrapher") }}
+		
+		// Graph init callback
+		function initGrapher(response)
+		{
+			_graph = response.graph;
+			_visualizer = makeGrapher(_graph.nodes, _graph.edges);
+		}
+		
+		// Graph failure callback
+		function graphFailure(error)
+		{
+			alert("Woops!\nSomething went wrong. Please try your request again.\n\nGRAPHER: "+error.toString());
+			console.log('Grapher Failure: ', error);
+		}
+		
+		{% if rpc_params %}
+			{{ jsapi_rpc('graph', 'construct', 'initGrapher', 'graphFailure', rpc_params) }}
+		{% else %}
+			{{ jsapi_rpc('graph', 'construct', 'initGrapher', 'graphFailure') }}
+		{% endif %}
+		
+	});
+	</script>
+</div>
+
+<!-- Sidebars -->
+{% include 'elements/pane/details-sidebar.html' %}
+{% include 'elements/pane/controls-sidebar.html' %}
+
+{% endblock %}
+
+{% block content_footer %}{% endblock %}
