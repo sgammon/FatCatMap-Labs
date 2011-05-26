@@ -36,6 +36,17 @@
 	<div id='contentBody' class='{% block content_body_class %}content_body{% endblock %}'>
 		{% block content_body %}
 		{% endblock %}
+		
+		<div id='devNotice'>
+			<a href='http://labs.momentum.io/fatcatmap'>FATCATMAP LABS</a> - WORK IN PROGRESS<br />
+			&copy; 2008-2011, POLITICAL <a href='http://momentum.io'>MOMENTUM</a><br />
+			<hr />
+			<b>BUILD:</b> {{ util.config.fcm.version.major }}.{{ util.config.fcm.version.minor }}.{{ util.config.fcm.version.minor }}-{{ util.config.fcm.version.release }} // <b>APP:<b> {{ util.env.get('CURRENT_VERSION_ID') }}
+			<br />
+			<b>DATACENTER:</b> {{ util.env.get('DATACENTER') }}, R(hash): {{ util.env.get('REQUEST_ID_HASH') }}<br />
+			<b>BACKEND:</b> None // <b>INSTANCE:</b> None
+		</div>
+		
 	</div>
 	
 	<div id='contentFooter' class='{% block content_footer_class %}content_footer{% endblock %} hidden'>

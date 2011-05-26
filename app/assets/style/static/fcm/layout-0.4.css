@@ -464,3 +464,40 @@ div.navbar li.navButton:hover ul.subnav
 	margin-right:auto;
 	margin-left:auto;
 }
+
+/* === Development Notice === */
+#devNotice
+{
+	position:absolute;
+	text-align:right;
+	right:55px;
+	bottom:25px;
+	font-size:7pt;
+	color:#111 !important;
+}
+#devNotice b
+{
+	color:#111;
+	
+}
+#devNotice hr
+{
+	border-top:1px solid #222;
+}
+#devNotice a
+{
+	color:#111 !important;
+	text-decoration:underline;
+}
+
+
+/* === Inbox & Alerts === */
+#inboxCount
+{
+	background:#666;
+	padding:1px 3px 1px 2px;
+	margin-right:3px;
+	border-radius:3px;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size:8pt;
+}
