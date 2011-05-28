@@ -40,7 +40,6 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 		params = self._bindTemplateFunctions(template_context, self._outputConfig())
 		
 		minify = unicode
-		minify = unicode
 
 		if self._outputConfig()['minify'] is True:
 			import slimmer

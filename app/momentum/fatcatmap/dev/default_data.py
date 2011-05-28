@@ -1,5 +1,8 @@
 import logging
 import inspect
+import ndb
+from ndb import model
+from ndb import key as k
 from google.appengine.ext import db
 
 
@@ -7,7 +10,64 @@ def add_prototypes():
 	return []
 
 def add_graph_artifact_types():
-	return []
+
+	from momentum.fatcatmap.models.core.schema import Schema
+	from momentum.fatcatmap.models.core.schema import Property
+
+	from momentum.fatcatmap.models.core.object import NodeType
+	from momentum.fatcatmap.models.core.object import ObjectType
+
+	from momentum.fatcatmap.models.core.relation import EdgeType
+
+	## Models to put
+	schemas = []
+	properties = []
+	node_types = []
+	edge_types = []
+	object_types = []
+
+
+	########## Object Types ##########
+	
+	##### Person
+
+	## Schema
+	person = Schema(key=k.Key('Schema','object.natural.Person'), path=['object', 'natural', 'Person'], type='object')
+	person.put()
+
+	## Properties
+	properties.append(Property(key=k.Key('Property', 'firstname', parent=person.key), type='StringProperty'))
+	properties.append(Property(key=k.Key('Property', 'lastname', parent=person.key), type='StringProperty'))
+	properties.append(Property(key=k.Key('Property', 'gender', parent=person.key), type='StringProperty'))
+	properties.append(Property(key=k.Key('Property', 'date_of_birth', parent=person.key), type='DateProperty'))
+	properties.append(Property(key=k.Key('Property', 'date_of_death', parent=person.key), type='DateProperty'))
+	person.put()
+		
+	## Object Type
+	person_object = ObjectType(key=k.Key('ObjectType', 'natural.Person'), name='Person', schema=k.Key('Schema', 'object.natural.Person'))
+	person_object.put()
+	
+	## Node Types
+	node_types.append(NodeType(key=k.Key('NodeType', 'natural.Person', parent=person_object.key), name='Person', schema=person.key, object_type=k.Key('ObjectType', 'object.natural.Person'), scope=['natural']))
+	
+
+	########## Relation Types ##########
+	
+	##### Friendship
+	
+	## Schema
+	friendship = Schema(key=k.Key('Schema', 'relation.social.Friendship'), path=['relation', 'social', 'Friendship'], type='edge')
+	friendship.put()
+	
+	## Edge Type
+	edge_types.append(EdgeType(key=k.Key('EdgeType', 'social.Friendship'), name='Friendship', schema=friendship.key))
+	
+
+	keys = []
+	batches_to_put = [schemas, properties, node_types, edge_types, object_types]
+	for batch in batches_to_put:
+		keys.extend(model.put_multi(batch))
+	return keys
 
 def add_services():
 

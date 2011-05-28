@@ -16,6 +16,7 @@ class Edge(m.NDBModel):
 	source = m.ndb.KeyProperty()
 	target = m.ndb.KeyProperty()
 	score = m.ndb.FloatProperty()
+	type = m.ndb.KeyProperty()
 	
 
 class EdgeItem(m.NDBModel):

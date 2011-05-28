@@ -53,6 +53,7 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 	_query = {}
 	_cache = {}
 	_graph = None
+	_schema = {}
 	_artifacts = {}
 	_current_depth = 0
 
@@ -75,6 +76,16 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 			
 
 	def load_cache(self):
+
+		''' Load cached Graph items. '''
+		
+		return None
+		
+		
+	def send_to_cache(self):
+		
+		''' Save Graph items on the current object to the local instance cache. '''
+		
 		return None
 			
 
@@ -90,8 +101,12 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 			logging.info('=========Examining artifact \''+str(key)+'\'...')
 			
 			if key not in self._cache:
+				
+				## If the artifact is a Node (only one key)...
 				if isinstance(value, n.Key):
 					self._cache[key] = value.get_async()
+					
+				## If the artifact is an Edge (tuple of two keys)...
 				elif isinstance(value, tuple):
 					source, target = self._artifacts[key]
 					self._cache[key] = source.get_async(), target.get_async()
@@ -102,7 +117,7 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 				
 			elif isinstance(value, n.Key):
 				if key in self._cache:
-					self._artifacts[key] = self._cache[key].get_result()
+					self._artifacts[key] = self._cache[key].get_result()  
 				
 			elif isinstance(value, tuple):
 				self._artifacts[key] = self._cache[key][0].get_result(), self._cache[key][1].get_result()
@@ -247,6 +262,7 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 		logging.info('===Flushing graph...')
 		
 		self.flush_graph()
+		self._graph.set_origin(node_key)
 		
 		logging.info('Graph: '+str(self._graph))
 		

@@ -40,7 +40,13 @@ class Graph(ComplexStruct, SerializableStruct):
 	_nodes = []
 	_edges = []
 	_objects = {}
+	_origin = None	
 	
+	def set_origin(self, key):
+		self._origin = key
+		
+	def origin(self):
+		return self._origin
 	
 	def add_node(self, key, **kwargs):
 		

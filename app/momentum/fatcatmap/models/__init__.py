@@ -16,15 +16,21 @@ from ProvidenceClarity.data.core.polymodel import PolyPro as ProvidenceClarityPo
 
 ## NDB/New Style
 ndb = DictProxy({
-		'IntegerProperty' : model.IntegerProperty,
-		'FloatProperty' : model.FloatProperty,
 		'StringProperty' : model.StringProperty,
 		'TextProperty' : model.TextProperty,
 		'BlobProperty' : model.BlobProperty,
+		'IntegerProperty' : model.IntegerProperty,
+		'FloatProperty' : model.FloatProperty,
+		'BooleanProperty': model.BooleanProperty,
+		'DateTimeProperty': model.DateTimeProperty,
+		'TimeProperty': model.TimeProperty,
+		'GeoPtProperty': model.GeoPtProperty,
 		'KeyProperty' : model.KeyProperty,
+		'UserProperty': model.UserProperty,
 		'StructuredProperty' : model.StructuredProperty,
 		'LocalStructuredProperty' : model.LocalStructuredProperty,
-		'ComputedProperty' : model.ComputedProperty
+		'ComputedProperty' : model.ComputedProperty,
+		'GenericProperty': model.GenericProperty
 })
 
 ## DB/Old Style
@@ -53,6 +59,7 @@ db = DictProxy({
 		'PostalAddressProperty' : ldb.PostalAddressProperty,
 		'RatingProperty' : ldb.RatingProperty
 })
+
 
 def property_classes(flatten=False):
 	class_lists = [db, ndb]

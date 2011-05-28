@@ -7,6 +7,6 @@ class Property(m.NDBModel):
 
 
 class Schema(m.NDBModel):
-	type = m.ndb.KeyProperty(choices=['node','edge'])
+	type = m.ndb.KeyProperty(choices=['node', 'edge', 'object'])
 	path = m.ndb.StringProperty(repeated=True)
 	properties = m.ndb.StructuredProperty(Property, repeated=True)

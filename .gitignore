@@ -22,5 +22,6 @@ etc/downloads/*
 etc/parts/*
 var/downloads/*
 var/parts/*
+var/parts/google_appengine/*
 var/libs/*
 *.svn*

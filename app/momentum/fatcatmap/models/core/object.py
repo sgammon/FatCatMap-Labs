@@ -15,6 +15,7 @@ class Object(m.NDBModel):
 class NodeType(m.NDBModel):
 	name = m.ndb.StringProperty()
 	schema = m.ndb.KeyProperty()
+	scope = m.ndb.StringProperty(repeated=True)
 	object_type = m.ndb.KeyProperty()
 	
 	

@@ -41,6 +41,7 @@ class Graph(messages.Message):
 	nodes = messages.MessageField(GraphNode, 1, repeated=True)
 	edges = messages.MessageField(GraphEdge, 2, repeated=True)
 	hints = messages.MessageField(GraphHint, 3, repeated=True)
+	origin = messages.MessageField(GraphNodeStub, 4)
 
 
 # ==== Graph RPC Message Structures ==== #
@@ -56,5 +57,5 @@ class GraphResponse(messages.Message):
 	graph = messages.MessageField(Graph, 1)
 	limit = messages.IntegerField(2, default=5)
 	degree = messages.IntegerField(3, default=1)
-	origin = messages.MessageField(GraphNode, 4)
+	origin = messages.MessageField(GraphNodeStub, 4)
 	schema = messages.MessageField(GraphSchemaItem, 5, repeated=True)	
