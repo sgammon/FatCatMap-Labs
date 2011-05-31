@@ -30,7 +30,7 @@
 yepnope([
 	{
 		// Load core FCM
-		load: ["{{ script_url('init', 'core') }}", "{{ link('js-api') }}", "{{ script_url('rpc', 'core') }}", "{{ script_url('plugins', 'core') }}", "{{ script_url('layout', 'core') }}", "{{ script_url('rpc','jquery') }}", "{{ script_url('protovis') }}", "{{ script_url('graph','core') }}"],
+		load: ["{{ script_url('init', 'core') }}", "{{ link('js-api') }}", "{{ script_url('rpc', 'core') }}", "{{ script_url('plugins', 'core') }}", "{{ script_url('layout', 'core') }}", "{{ script_url('protovis') }}", "{{ script_url('graph','core') }}"],
 		complete: function _doPhaseOneInit() { _platformInit(); _initiateAPIFramework(fatcatmap); }
 	},
 	{
@@ -77,7 +77,6 @@ yepnope([
 {% else %}
 
 <script src="{{ script_url('protovis') }}"></script>
-<script src="{{ script_url('rpc','jquery') }}"></script>
 
 <script src="{{ script_url('init', 'core') }}"></script>
 <script src="{{ link('js-api') }}"></script>

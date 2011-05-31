@@ -17,12 +17,15 @@ rules = [
 		Rule('/register', name='auth/register', handler='security.Register'),
 		
 		## === Dev URLs === ##
-		Rule('/dev', name='dev-index', handler='dev.Index'),
-		Rule('/dev/cache', name='dev-cache', handler='dev.CacheManagement'),
-		Rule('/dev/add-data', name='dev-add-data', handler='dev.AddData'),
-		Rule('/dev/default-data', name='dev-default-data', handler='dev.DefaultData'),
-		Rule('/dev/rpc-console', name='dev-rpc-console', handler='dev.RPCConsole'),
-		Rule('/dev/shell', name='dev-shell', handler='dev.WebShell'),
+		Rule('/_fcm/dev', name='dev-index', handler='dev.Index'),
+		Rule('/_fcm/dev/cache', name='dev-cache', handler='dev.CacheManagement'),
+		Rule('/_fcm/dev/add-data', name='dev-add-data', handler='dev.AddData'),
+		Rule('/_fcm/dev/default-data', name='dev-default-data', handler='dev.DefaultData'),
+		Rule('/_fcm/dev/rpc-console', name='dev-rpc-console', handler='dev.RPCConsole'),
+		Rule('/_fcm/dev/shell', name='dev-shell', handler='dev.WebShell'),
+		
+		## === Management URLs === ##
+		Rule('/_fcm/manage', name='admin-index', handler='admin.Index'),
 		
 		## === API Services === ##
 		Rule('/_api/js', endpoint='js-api', handler='api.JavascriptAPIDispatcher'),

@@ -80,8 +80,12 @@ a:hover { color:#B4B955; }
 .clearboth { clear:both; }
 .fullwidth { width:100%; }
 .halfwidth { width:50%; }
+.quarterwidth { width:25%; }
+.tenthwidth { width:10%; }
 .fullheight { height:100%; }
 .halfheight { height:50%; }
+.quarterheight { height:25%; }
+.tenthheight { height:10%; }
 .textcenter { text-align:center; }
 .textleft { text-align:left; }
 .textright { text-align:right; }

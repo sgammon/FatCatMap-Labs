@@ -17,6 +17,7 @@ import os
 import base64
 import pprint
 import config
+import random
 import logging
 import datetime
 import timesince
@@ -167,6 +168,11 @@ def fcmOutputEnvironmentFactory(environment):
 			'timesince':timesince.timesince,
 			'byteconvert':byteconvert.humanize_bytes,
 			'json':simplejson
+		},
+		'random':{
+			'random': random.random,		
+			'randint': random.randint,
+			'randrange': random.randrange
 		},
 		'getattr':getattr,
 		'setattr':setattr,

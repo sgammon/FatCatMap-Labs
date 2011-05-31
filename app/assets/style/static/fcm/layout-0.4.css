@@ -473,20 +473,25 @@ div.navbar li.navButton:hover ul.subnav
 	right:55px;
 	bottom:25px;
 	font-size:7pt;
-	color:#111 !important;
+	color:#666 !important;
+	padding:5px;
+	border-radius:5px;
+	border: 1px solid #111;
+	background:#222;
+	opacity:0.95;
 }
 #devNotice b
 {
-	color:#111;
+	color:#666;
 	
 }
 #devNotice hr
 {
-	border-top:1px solid #222;
+	border-top:1px solid #666;
 }
 #devNotice a
 {
-	color:#111 !important;
+	color:#666 !important;
 	text-decoration:underline;
 }
 

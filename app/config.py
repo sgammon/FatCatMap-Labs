@@ -112,8 +112,8 @@ config['momentum.fatcatmap'] = {
 
 	'version': {
 		'major': 0,
-		'minor': 4,
-		'micro': 20110526,
+		'minor': 5,
+		'micro': 20110530,
 		'release': 'ALPHA'
 	}
 
@@ -188,7 +188,7 @@ config['momentum.fatcatmap.assets'] = {
 		},
 		
 		('compiled', 'min'): { # Compiled Scripts
-		
+			
 			'core': {'version': 0.1}, # contains core, rpc, ui
 			'plugins': {'version': 0.1} # contains ui, storage adapters, tipsy, uniform, masonry
 		
@@ -208,7 +208,7 @@ config['momentum.fatcatmap.assets'] = {
 		
 			'main': {'version': 0.3}, # Boilerplate stuff and reusable, site-wide CSS classes.
 			'reset': {'version': 0.2}, # Standard CSS reset stylesheet.
-			'fonts': {'version': 0.1}, # Standard CSS reset stylesheet.			
+			'fonts': {'version': 0.2}, # Standard CSS reset stylesheet.			
 			'layout': {'version': 0.4}, # Styles for FCM's layouts. Not page-specific.
 			'forms': {'version': 0.2}, # Styles forms on FCM. Links to sprite skins.
 			'mobile': {'version': 0.3}, # HTML5 Boilerplate's stylesheet for mobile devices

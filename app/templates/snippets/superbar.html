@@ -12,9 +12,9 @@
 	
 		<li><a href="{{ link('landing') }}">Home</a></li>
 		
-		<li><a href="#" data-navref='search' class='SupernavLink'>Browse</a></li>
+		<li><a href="#" data-navref='browse' class='SupernavLink'>Browse</a></li>
 	
-		<li><a href='#' data-navref='browse' class='SupernavLink'>Search</a></li>
+		<li><a href='#' data-navref='search' class='SupernavLink'>Search</a></li>
 	
 		<li><a href='#' data-navref='map' class='SupernavLink'>Map</a></li>
 	
@@ -30,7 +30,7 @@
 	
 		<li class='navButton'><a href='#'>{{ user.nickname() }}</a>
 			<ul class='subnav rightsub'>
-				<li><a href="#">Settings</a></li>
+				<li><a href="#settings">Settings</a></li>
 				<li class='last'><a href="{{ api.users.create_logout_url('/') }}">Log Out</a></li>
 			</ul>
 		</li>
@@ -44,7 +44,7 @@
 		<li class='navButton'><a href='#'>momentum</a>
 			<ul class='subnav rightsub'>
 				<li><a href="{{ link('dev-index') }}">Development Console</a></li>
-				<li class='last'><a href="#">Management Console</a></li>
+				<li class='last'><a href="{{ link('admin-index') }}">Management Console</a></li>
 			</ul>
 		</li>
 	</ul>
