@@ -23,6 +23,14 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 	minify = False
 	response = Response
 	
+	baseHeaders = {
+		
+		'X-Platform': 'Providence/Clarity-Embedded', # Indicate the platform that is serving this request
+		'X-Powered-By': 'Google App Engine/1.5.0', # Indicate the SDK version
+		'X-UA-Compatible': 'IE=edge,chrome=1' # Enable compatibility with Chrome Frame, and force IE to render with the latest engine
+
+	}
+	
 	def render(self, path, content_type='text/html', headers={}, **kwargs):
 
 		''' Return a response containing a rendered Jinja template. '''
@@ -31,6 +39,13 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 			## Create empty template context...
 			'user': users.get_current_user()
 		}
+		
+		response_headers = {}
+		for key, value in self.baseHeaders.items():
+			response_headers[key] = value
+		if len(headers) > 0:
+			for key, value in headers.items():
+				response_headers[key] = value
 		
 		# Consider kwargs
 		if len(kwargs) > 0:
@@ -51,7 +66,7 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 			elif content_type == 'text/css':
 				minify = slimmer.css_slimmer
 		
-		return self.response(response=minify(self.render_template(path, **template_context)), content_type=content_type, headers=headers)
+		return self.response(response=minify(self.render_template(path, **template_context)), content_type=content_type, headers=[(key, value) for key, value in response_headers.items()])
 				
 
 	def _bindTemplateFunctions(self, params, output_cfg):

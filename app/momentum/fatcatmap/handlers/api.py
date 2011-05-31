@@ -85,4 +85,4 @@ class FatcatmapAPIDispatcher(WebHandler, JSONRPCMixin):
 class JavascriptAPIDispatcher(WebHandler):
 	
 	def get(self):
-		return self.render('snippets/page_object.js', content_type='text/javascript')
+		return self.render('snippets/page_object.js', content_type='text/javascript', script_tag=False)

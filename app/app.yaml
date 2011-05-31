@@ -3,13 +3,32 @@ version: 8-dev
 runtime: python
 api_version: 1
 
+#### ===== Files to Skip
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?tests$
+
+#### ===== Builtin SDK Includes
 builtins:
 - appstats: on
 - datastore_admin: on
 - remote_api: on
 
-handlers:
+### ===== Custom Admin Pages
+admin_console:
+  pages:
+  - name: Appstats
+    url: /_perfstats
 
+handlers:
 
 ###### Asset Handlers
 
@@ -40,6 +59,9 @@ handlers:
   script: assets/ext/static/retrieve.py
   
 # Library/system mappings
+- url: /_perfstats.*
+  script: $PYTHON_LIB/google/appengine/ext/appstats/ui.py
+
 - url: /_ah/datastore_admin.*
   script: $PYTHON_LIB/google/appengine/ext/datastore_admin/main.py
   login: admin
@@ -65,9 +87,35 @@ handlers:
 ###### Static Handlers
 
 # Root-level files
-- url: /(robots\.txt|favicon\.ico|crossdomain.xml)
+- url: /apple-touch-icon\.png
+  mime_type: image/png
+  static_files: static/apple-touch-icon.png
+  upload: static/apple-touch-icon.png
+
+- url: /favicon\.ico
+  mime_type: image/png
+  static_files: static/favicon.ico
+  upload: static/favicon.ico
+  
+- url: /(robots\.txt|humans\.txt|crossdomain\.xml)
   static_files: static/\1
   upload: static/(.*)
+  
+- url: /(.*\.(appcache|manifest))
+  mime_type: text/cache-manifest
+  static_files: static/\1
+  upload: static/(.*\.(appcache|manifest))
+  expiration: "0m"
+  
+- url: /(.*\.crx)
+  mime_type: application/x-chrome-extension
+  static_files: static/\1
+  upload: static/(.*\.crx)
+  
+- url: /(.*\.woff)
+  mime_type: application/x-font-woff
+  static_files: static/\1
+  upload: static/(.*\.woff)
 
 # Static directory
 - url: /static

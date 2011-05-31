@@ -25,8 +25,8 @@ config['tipfy'] = {
 	    #'tipfy.ext.i18n.I18nMiddleware',  ## Enables automatic string translations based on locale of user
 
 	    # Debugging Middleware
-	    #'tipfy.ext.debugger.DebuggerMiddleware',  ## Enable debugger. It will be loaded only when executed from the dev environment.
-	    #'tipfy.ext.appstats.AppstatsMiddleware',  ## Enable for good code profiling information
+	    'tipfy.ext.debugger.DebuggerMiddleware',  ## Enable debugger. It will be loaded only when executed from the dev environment.
+	    'tipfy.ext.appstats.AppstatsMiddleware',  ## Enable for good code profiling information
     
 	    # FCM Middleware
 	    'momentum.fatcatmap.core.middleware.multitenancy.AppVersionNamespacingMiddleware',  ## Restricts the app to accessing services in the appropriate namespace.
@@ -73,7 +73,11 @@ config['momentum.system'] = {
 
 config['momentum.services'] = {
 
-	'logging': True
+	'logging': True,
+	'hooks': {
+		'appstats': {'enabled': True},
+		'profiler': {'enabled': True}
+	}
 
 }
 

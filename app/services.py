@@ -1,9 +1,11 @@
 import sys
+import config
 import logging
 
 ## Add to sys.path
 if 'lib' not in sys.path:
-	logging.debug('Adding LIB and LIB/DIST to syspath...')
+	if config.debug:
+		logging.debug('Adding LIB and LIB/DIST to syspath...')
 	# Add lib as primary libraries directory, with fallback to lib/dist
 	# and optionally to lib/dist.zip, loaded using zipimport.
 	sys.path[0:0] = ['lib', 'lib/dist', 'lib/dist.zip']
@@ -22,6 +24,14 @@ from momentum.fatcatmap.api.query import QueryAPIService
 from momentum.fatcatmap.api.charts import ChartsAPIService
 from momentum.fatcatmap.api.session import SessionAPIService
 
+def enable_appstats(app):
+	
+	""" Utility function that enables appstats middleware."""
+	
+	from google.appengine.ext.appstats import recording
+	app = recording.appstats_wsgi_middleware(app)
+	return app
+
 
 def main():
 	
@@ -38,6 +48,12 @@ def main():
 	])
 	
 	application = webapp.WSGIApplication(service_mappings)
+	
+	## Consider services config
+	services_cfg = config.config.get('momentum.services')
+	if services_cfg['hooks']['appstats']['enabled'] == True:
+		application = enable_appstats(application)
+	
 	util.run_wsgi_app(application)
 
 if __name__ == '__main__':
