@@ -181,6 +181,7 @@ def fcmOutputEnvironmentFactory(environment):
 			'get': config.config.get,
 			'fcm': config.config.get('momentum.fatcatmap'),
 			'platform': config.config.get('momentum.platform'),
+			'all': config.config,
 		},
 		'env': os.environ,
 		'len': len,

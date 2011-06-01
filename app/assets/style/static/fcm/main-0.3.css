@@ -73,6 +73,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: bold; color:#fff; }
 a, a:active, a:visited { color: #607890; color:#8CA552; }
 a:hover { color:#B4B955; }
 
+.absolute { position:absolute; }
 .floatleft { float:left; }
 .floatright { float:right; }
 .clearleft { clear:left; }
@@ -86,6 +87,7 @@ a:hover { color:#B4B955; }
 .halfheight { height:50%; }
 .quarterheight { height:25%; }
 .tenthheight { height:10%; }
+.hideoverflow { overflow:hidden; }
 .textcenter { text-align:center; }
 .textleft { text-align:left; }
 .textright { text-align:right; }
@@ -98,10 +100,13 @@ a:hover { color:#B4B955; }
 .padding-30 { padding:30px; }
 .snapright { right:0px; }
 .snapleft { left:0px; }
+.snaptop { top:0px; }
+.bigtext { font-size: 28pt; }
+.snapbottom { bottom:0px; }
 .notice { min-width:300px;min-height:20px;background:#B4B955;color:black;border-radius:3px;-moz-border-radius:3px;opacity:0.8;padding:5px;margin:10px; }
-
 .ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
 .hidden { display: none; visibility: hidden; }
+.displaynone {display: none;}
 .visuallyhidden { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
 .visuallyhidden.focusable:active,
 .visuallyhidden.focusable:focus { clip: auto; height: auto; margin: 0; overflow: visible; position: static; width: auto; }

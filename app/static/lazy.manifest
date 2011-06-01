@@ -1,0 +1,7 @@
+CACHE MANIFEST
+
+FALLBACK:
+/ /offline
+
+NETWORK:
+*

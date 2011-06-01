@@ -91,6 +91,11 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 		params['style_url'] = self.style_url
 		params['asset_url'] = self.style_url
 		
+		# Page Parameters
+		params['page'] = {}
+		#params['page']['manifest'] = 'lazy.manifest'
+		params['page']['manifest'] = False
+		
 		# Bind App Engine functions
 		params['api'] = {'users':{}}
 		params['api']['users']['current_user'] = users.get_current_user

@@ -76,7 +76,7 @@ function closeSidebar(selector, direction)
 
 function expandSidebar(selector, direction)
 {	
-	$(selector).animate({width:'200px'});
+	$(selector).animate({width:'19%'});
 	$(selector+' div.panelWrapper').hide().removeClass('hidden').fadeIn();
 	$(selector+' a.expandButton').attr('href', 'javascript:maximizeSidebar("'+selector+'", "'+direction+'")');
 	if (typeof(direction) != 'undefined')
@@ -91,7 +91,7 @@ function expandSidebar(selector, direction)
 
 function maximizeSidebar(selector, direction)
 {
-	$(selector).animate({width:'80%'});
+	$(selector).animate({width:'79%'});
 	$(selector+' a.expandButton').attr('href', 'javascript:minimizeSidebar("'+selector+'", "'+direction+'")');
 	if(direction == 'right')
 	{
@@ -109,7 +109,7 @@ function maximizeSidebar(selector, direction)
 
 function minimizeSidebar(selector, direction)
 {
-	$(selector).animate({width:'200px'});
+	$(selector).animate({width:'19%'});
 	$(selector+' a.expandButton').attr('href', 'javascript:maximizeSidebar("'+selector+'", "'+direction+'")');
 	$(selector+' a.expandButton img').attr('src', '/assets/img/static/layout/sprites/arrow-'+direction+'.png');	
 	$(selector).removeClass('folded'); // Just in case...

@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="{{ style_url('fonts', 'core') }}">
 <link rel="stylesheet" href="{{ style_url('main', 'core') }}">
 <link rel="stylesheet" href="{{ style_url('layout', 'core') }}">
+<link rel="stylesheet" href="{{ style_url('plugins', 'core') }}">
 <link rel="stylesheet" media="handheld" href="{{ style_url('mobile', 'core') }}">
 {% else %}
 <link rel="stylesheet" media="screen" href="{{ style_url('fcm-styles', 'compiled') }}">
@@ -28,13 +29,13 @@ yepnope([
 	{
 		// Load core FCM
 		load: ["{{ script_url('init', 'core') }}", "{{ link('js-api') }}", "{{ script_url('rpc', 'core') }}", "{{ script_url('plugins', 'core') }}", "{{ script_url('layout', 'core') }}", "{{ script_url('protovis') }}", "{{ script_url('graph','core') }}"],
-		complete: function _doPhaseOneInit() { _platformInit(); _initiateAPIFramework(fatcatmap); }
+		complete: function _doPhaseOneInit() { _initiateAPIFramework(fatcatmap); }
 	},
 	{
 		// Load visual plugins
 		test: typeof(window.jQuery) == 'function',
 		nope: "{{ script_url('core','jquery') }}",
-		load: ["{{ script_url('uniform', 'jquery') }}", "{{ script_url('tipsy', 'jquery') }}", "{{ script_url('masonry','jquery') }}"]
+		load: ["{{ script_url('uniform', 'jquery') }}", "{{ script_url('tipsy', 'jquery') }}", "{{ script_url('masonry','jquery') }}", "{{ script_url('fancybox', 'jquery') }}", "{{ script_url('easing', 'jquery') }}", "{{ script_url('mousewheel','jquery') }}"]
 	},
 	{
 		// Polyfill JSON Support
@@ -73,17 +74,24 @@ yepnope([
 </script>
 {% else %}
 
+<!-- Visualization Dependencies -->
 <script src="{{ script_url('protovis') }}"></script>
 
+<!-- FCM Platform -->
 <script src="{{ script_url('init', 'core') }}"></script>
 <script src="{{ link('js-api') }}"></script>
 <script src="{{ script_url('rpc', 'core') }}"></script>
 <script src="{{ script_url('plugins', 'core') }}"></script>
 <script src="{{ script_url('layout', 'core') }}"></script>
 <script src="{{ script_url('graph','core') }}"></script>
+
+<!-- jQuery Plugins -->
 <script src="{{ script_url('uniform', 'jquery') }}"></script>
 <script src="{{ script_url('tipsy', 'jquery') }}"></script>
 <script src="{{ script_url('masonry','jquery') }}"></script>
+<script src="{{ script_url('fancybox','jquery') }}"></script>
+<script src="{{ script_url('easing','jquery') }}"></script>
+<script src="{{ script_url('mousewheel','jquery') }}"></script>
 
 <!-- Load Storage Adapters -->
 <script src="{{ script_url('indexeddb', 'jquery') }}"></script>

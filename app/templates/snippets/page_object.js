@@ -301,13 +301,11 @@ window.fatcatmap.rpc = {
 _PLATFORM_VERSION = "{{ sys.version }}";
 
 {% if sys.dev %}
-// Initialize Dev Object
-fatcatmap.dev = {
-	environment: {
-		{% for key, value in sys.environ.items() %}
-		{{ key }}: "{{ value }}",
-		{% endfor %}
-	}
+// Drop in server environment (DEV ONLY)
+fatcatmap.dev.environment = {
+	{% for key, value in sys.environ.items() %}
+	{{ key }}: "{{ value }}",
+	{% endfor %}
 };
 {% endif %}
 

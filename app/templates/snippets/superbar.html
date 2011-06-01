@@ -43,8 +43,12 @@
 		
 		<li class='navButton'><a href='#'>momentum</a>
 			<ul class='subnav rightsub'>
-				<li><a href="{{ link('dev-index') }}">Development Console</a></li>
-				<li class='last'><a href="{{ link('admin-index') }}">Management Console</a></li>
+				{% if api.users.is_user_admin() %}
+					<li><a href="{{ link('dev-index') }}">Developer Console</a></li>
+					<li><a href="{{ link('admin-index') }}">Management Console</a></li>
+					<li><a href="/_pc/console/">Infrastructure Console</a></li>
+					<li class='last'><a href="/_pc/ifx/platform/console">Platform Console</a></li>
+				{% endif %}
 			</ul>
 		</li>
 	</ul>

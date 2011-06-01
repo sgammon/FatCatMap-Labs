@@ -9,7 +9,44 @@ rules = [
 	
 		## === Main URLs === ##
 		Rule('/', name='landing', handler='main.Landing'),
-		Rule('/map', name='map', handler='main.Map'),
+		Rule('/offline', name='offline', handler='main.Offline'),
+
+		## === Content Sections == ##
+		Rule('/map', name='map:landing', handler='content.map.MapLanding'),
+		Rule('/browse', name='browse:landing', handler='content.browse.BrowseLanding'),
+		Rule('/search', name='search:landing', handler='content.search.SearchLanding'),
+		Rule('/interact', name='interact:landing', handler='content.interact.InteractLanding'),
+		Rule('/visualize', name='visualize:landing', handler='content.visualize.VisualizeLanding'),
+		
+		## === Site: About FCM === ##
+		Rule('/about', name='about:landing', handler='site.about.Landing'),
+		Rule('/about/bias', name='about:bias', handler='site.about.Bias'),
+		Rule('/about/mission', name='about:mission', handler='site.about.Mission'),
+		Rule('/about/technology', name='about:poweredby', handler='site.about.PoweredBy'),
+
+		## === Site: Help (bug reporter, help topics, 'ask a question') === ##
+		Rule('/help', name='help:landing', handler='site.help.Landing'),
+		Rule('/help/ask', name='help:ask', handler='site.help.AskQuestion'),
+		Rule('/help/faq', name='help:faq', handler='site.help.FAQ'),
+		Rule('/help/topics', name='help:topics:list', handler='site.help.ListTopics'),		
+		Rule('/help/topic/<string:key>', name='help:topic', handler='site.help.ViewTopic'),		
+		Rule('/help/terminology', name='help:terminology', handler='site.help.Terminology'),
+		Rule('/help/something-broke', name='help:bugreporter', handler='site.help.ReportBug'),
+		
+		## === Site: Legal (privacy policy, source data, terms of service) === ##
+		Rule('/legal', name='legal:landing', handler='site.legal.Landing'),
+		Rule('/legal/data', name='legal:sourcedata', handler='site.legal.Data'),
+		Rule('/legal/terms', name='legal:terms', handler='site.legal.Terms'),
+		Rule('/legal/privacy', name='legal:privacy', handler='site.legal.Privacy'),
+		
+		## === User URLs === ##
+		Rule('/me', name='user:landing', handler='user.Landing'),
+		Rule('/me/inbox', name='user:inbox', handler='user.Inbox'),
+		Rule('/me/stats', name='user:stats', handler='user.Stats'),
+		Rule('/me/profile', name='user:profile', handler='user.Profile'),
+		Rule('/me/history', name='user:history', handler='user.History'),
+		Rule('/me/account', name='user:account', handler='user.Account'),
+		Rule('/me/settings', name='settings:landing', handler='user.Settings'),
 		
 		## === Security URLs === ##
 		Rule('/login', name='auth/login', handler='security.Login'),

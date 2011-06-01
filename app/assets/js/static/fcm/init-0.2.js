@@ -150,15 +150,120 @@ function _platformInit()
 			// Local Storage - persistent storage across sessions
 			local: {
 				
+				_driver: null,
+				_resolveDriver: function () { this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'local'); },
+				
+				getValue: function (key)
+				{
+					if(this._driver != null)
+					{
+						return this._driver.getValueByKey(key);
+					}
+				},
+				
+				setValue: function (key, value)
+				{
+					if(this._driver != null)
+					{
+						return this._driver.getValueByKey(key);
+					}					
+				},
+				
+				clearValues: function ()
+				{
+					if(this._driver != null)
+					{
+						return this._driver.getValueByKey(key);
+					}					
+				},
+				
+				allValues: function ()
+				{
+					if(this._driver != null)
+					{
+						return this._driver.getValueByKey(key);
+					}					
+				}
+				
 			},
 			
 			// Session Storage - volatile storage for top-level session values
 			session: {
 				
+				_driver: null,
+				_resolveDriver: function () { this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'session'); },
+				
+				getValue: function (key)
+				{
+					if(this._driver != null)
+					{
+						return this._driver.getValueByKey(key);
+					}
+				},
+				
+				setValue: function (key, value)
+				{
+					if(this._driver != null)
+					{
+						return this._driver.getValueByKey(key);
+					}					
+				},
+				
+				clearValues: function ()
+				{
+					if(this._driver != null)
+					{
+						return this._driver.getValueByKey(key);
+					}					
+				},
+				
+				allValues: function ()
+				{
+					if(this._driver != null)
+					{
+						return this._driver.getValueByKey(key);
+					}					
+				}				
+				
 			},
 			
 			// IndexedDB - full, transactional object store
 			object: {
+				
+				_driver: null,
+				_resolveDriver: function () { this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'object'); },
+				
+				getValue: function (key)
+				{
+					if(this._driver != null)
+					{
+						return this._driver.getValueByKey(key);
+					}
+				},
+				
+				setValue: function (key, value)
+				{
+					if(this._driver != null)
+					{
+						return this._driver.getValueByKey(key);
+					}					
+				},
+				
+				clearValues: function ()
+				{
+					if(this._driver != null)
+					{
+						return this._driver.getValueByKey(key);
+					}					
+				},
+				
+				allValues: function ()
+				{
+					if(this._driver != null)
+					{
+						return this._driver.getValueByKey(key);
+					}					
+				}				
 				
 			},
 			
@@ -223,16 +328,16 @@ function _platformInit()
 		// Registers FCM-level events, hooks on events, and manages triggering those events
 		events: {
 
-			hooks: [],
+			registry: [],
 			callchain: {},
 			history: [],
 
 			// Register an event - the first step to an event-based callback
 			registerEvent: function (name)
 			{
-				this.hooks.push(name);
-				callchain[name] = [];
-				return true;
+				this.registry.push(name); // Register as an event
+				this.callchain[name] = []; // Add an entry to the callchain so we can add hooks
+				return this;
 			},
 
 			// Register a hook on an event - used when registering a callback function to be run when an event is triggered
@@ -242,46 +347,45 @@ function _platformInit()
 				{
 					once = false;
 				}
-				if (_event in this.hooks)
+				try
 				{
-					callchain[_event].push({executed: false, callback:fn, runonce:once});
+					this.callchain[_event].push({executed: false, callback:function (context) { return fn(context); }, runonce:once});
 				}
-				else
+				catch (error)
 				{
 					return false;
 				}
-				return true;
+				return this;
 			},
 
 			// Trigger an event, and run the callbacks in the callchain. Stores returned data in the history property for debugging
 			triggerEvent: function (_event, context)
 			{
-				if (_event in this.hooks)
+				if (this.callchain[_event].length > 0)
 				{
-					if (this.callchain[_event].length() > 0)
+					for (calltask in this.callchain[_event])
 					{
-						for (calltask in this.callchain[_event])
+						if (this.callchain[_event][calltask].executed == true && this.callchain[_event][calltask].runonce == true)
 						{
-							if (calltask['executed'] == true && calltask['runonce'] == true)
+							continue;
+						}
+						else
+						{
+							try
 							{
-								continue
+								console.log('calltask: ', this.callchain[_event][calltask]);								
+								result = this.callchain[_event][calltask].callback(context);
+								this.history.push({event:_event, context:context, task:this.callchain[_event][calltask].callback, result:result});		
+								this.callchain[_event][calltask].executed = true;							
 							}
-							else
+							catch(error)
 							{
-								try
-								{
-									result = calltask.callback(context);
-									this.history.push({event:_event, context:context, task:callback, result:result});									
-								}
-								catch(error)
-								{
-									this.history.push({event:_event, context:context, task:calltask, error:error});
-								}
+								this.history.push({event:_event, context:context, task:calltask, error:error});
 							}
 						}
 					}
 				}
-				return null
+				return this;
 			}
 
 		},
@@ -378,7 +482,7 @@ function _platformInit()
 			registry: {},
 
 			// Register a system driver, and indicate its state
-			register: function _registerSystemDriver(module, name, initialized, callback)
+			register: function _registerSystemDriver(module, name, fn, initialized, callback)
 			{
 				if(typeof(window.fatcatmap.sys.drivers.registry[module]) == 'undefined')
 				{
@@ -387,9 +491,30 @@ function _platformInit()
 				window.fatcatmap.sys.drivers.registry[module][name] = {
 					initialized: initialized,
 					registered: true,
+					hook_point: fn,
 					init_callback: callback
 				};
 				callback();
+			},
+			
+			// Find a system driver from it's module and name
+			resolve: function _resolveSystemDriver(module, name)
+			{
+				if(typeof(window.fatcatmap.sys.drivers.registry[module]) == 'undefined')
+				{
+					return false;
+				}
+				else
+				{
+					if(typeof(window.fatcatmap.sys.drivers.registry[module][name]) == 'undefined')
+					{
+						return false;
+					}
+					else
+					{
+						return window.fatcatmap.sys.drivers.registry[module][name].hook_point;
+					}
+				}
 			}
 			
 		}
@@ -402,9 +527,31 @@ function _platformInit()
 		config: {}, // Stores server-side configuration (for reference)
 		environment: {}, // Stores server-side OS environment
 		performance: {}, // Stores metrics describing site performance
-		debug: {} // Stores flags and other data useful for debugging
+
+		debug: { // Stores flags and other data/config useful for debugging
+
+			logging: true, // Turn on/off javascript logging
+			eventlog: true, // Log when events are triggered
+			verbose: true // Log when LOTS of stuff happens
+
+		} 
 
 	};
+	
+	// Register core events
+	page_object.state.events.registerEvent('CORE_INIT'); // Fired off when this function is done executing
+	page_object.state.events.registerEvent('RPC_INIT'); // Fired off when the RPC framework starts to initialize
+	page_object.state.events.registerEvent('API_INIT'); // Fired off when the API/plugin framework starts to initialize
+	page_object.state.events.registerEvent('DRIVER_REGISTERED'); // Fired off when a driver registers itself in the driver registry
+	
+	page_object.state.events.registerEvent('REGISTER_ELEMENT'); // Fired off each time an element is registered on the page
+	page_object.state.events.registerEvent('BIND_NAVIGATION'); // Fired off when navigaiton is bound to its interaction code
+	page_object.state.events.registerEvent('VISUALIZER_INIT'); // Fired off when a visualizer is initializing
+	page_object.state.events.registerEvent('VISUALIZER_READY');	// Fired off when a visualizer is ready
+	page_object.state.events.registerEvent('REMOTE_RPC_INIT'); // Fired off when an remote RPC is initiated/requested for fulfillment
+	page_object.state.events.registerEvent('REMOTE_RPC_ERROR'); // Fired off when an RPC results in an error
+	page_object.state.events.registerEvent('REMOTE_RPC_SUCCESS'); // Fired off when an RPC results in success
+	page_object.state.events.registerEvent('PLATFORM_READY'); // Fired off when the platform is ready and has reached stasis
 	
 	return page_object
 }

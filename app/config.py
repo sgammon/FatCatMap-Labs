@@ -34,8 +34,8 @@ config['tipfy'] = {
 	],
 
 	'apps_installed':[
-		'momentum.platform',
-		'momentum.fatcatmap'
+		'momentum.platform', ## The Momentum backend behind the data analysis and magic that powers FatCatMap
+		'momentum.fatcatmap' ## The FCM frontend responsible for making that data accessible and useful
 	],
 
 }
@@ -187,7 +187,10 @@ config['momentum.fatcatmap.assets'] = {
 			'websql': {'path': 'core/storage/jquery.sql.0.8a.min.js'}, # WebSQL interface
 			'tipsy': {'path': 'ui/jquery.tipsy.js'}, # Effect for slick, animated tooltips
 			'uniform': {'path': 'ui/jquery.uniform.js'}, # Form styling
-			'masonry': {'path': 'ui/jquery.masonry.js'} # Special easy-on-the-eye layout styling
+			'masonry': {'path': 'ui/jquery.masonry.js'}, # Special easy-on-the-eye layout styling
+			'fancybox': {'path': 'ui/jquery.fancybox.js'}, # Quick + clean lightbox-style dialogs
+			'easing': {'path': 'core/interaction/jquery.easing-1.3.pack.js'}, # Easing transitions for smoother animations
+			'mousewheel': {'path': 'core/interaction/jquery.mousewheel-3.0.4.pack.js'} # jQuery plugin for mousewheel events + interactions
 			
 		},
 		
@@ -214,8 +217,9 @@ config['momentum.fatcatmap.assets'] = {
 			'reset': {'version': 0.2}, # Standard CSS reset stylesheet.
 			'fonts': {'version': 0.2}, # Standard CSS reset stylesheet.			
 			'layout': {'version': 0.4}, # Styles for FCM's layouts. Not page-specific.
-			'forms': {'version': 0.2}, # Styles forms on FCM. Links to sprite skins.
+			'forms': {'version': 0.2}, # Styles forms on FCM. Links to sprite skins.			
 			'mobile': {'version': 0.3}, # HTML5 Boilerplate's stylesheet for mobile devices
+			'plugins': {'version': 0.1}, # Styles for JS plugins that FCM uses
 			'visualizer': {'version': 0.2} # Styles for the FCM visualizer
 		
 		},
