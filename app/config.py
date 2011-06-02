@@ -126,9 +126,9 @@ config['momentum.platform.output'] = {
 config['momentum.fatcatmap'] = {
 
 	'version': {
-		'major': 0,
-		'minor': 6,
-		'micro': 20110601,
+		'major': 1,
+		'minor': 0,
+		'micro': 20110602,
 		'release': 'ALPHA'
 	}
 
