@@ -1,7 +1,10 @@
-{% extends "core/__base.html" %}
+{% if not page.standalone %} {# Not a standalone frame #}
+	{% extends "core/__base.html" %}
+{% endif %}
 
 {% block content %}
 
+{% if not page.standalone %}
 	<div id='contentHeader' class='{% block content_header_class %}content_header{% endblock %} hidden'>
 		{% block content_header %}
 			<div class='extendedNav'>
@@ -11,7 +14,7 @@
 					<div class='floatleft fullheight tenthwidth'>		
 						<a href="{{ link('browse:landing') }}" title='browse raw data, in context and with easy connections to related information'><img src='/assets/img/static/layout/headers/browse.png' alt='fatcatmap: browse' /></a>
 					</div>
-					
+				
 					<div class='floatleft fullheight halfwidth'>
 						sup
 					</div>
@@ -23,7 +26,7 @@
 					<div class='floatleft fullheight tenthwidth'>
 						<a href="{{ link('search:landing') }}" title='search our enourmous database of american political transparency data'><img src='/assets/img/static/layout/headers/search.png' alt='fatcatmap: search' /></a>
 					</div>
-					
+				
 					<div class='floatleft fullheight halfwidth'>
 						sup
 					</div>
@@ -31,50 +34,50 @@
 				</div>
 
 				<div id='mapPane' class='navPane hidden' data-navref='map'>
-					
+				
 					<div class='floatleft fullheight tenthwidth'>
-						
+					
 						<a href="{{ link('map:landing') }}" title='interactively explore data as a map of connected nodes and edges'><img src='/assets/img/static/layout/headers/map.png' alt='fatcatmap: graph' /></a>
-						
-					</div>
 					
+					</div>
+				
 					<div class='floatleft fullheight halfwidth'>
-						
-						sup
-						
-					</div>
 					
+						sup
+					
+					</div>
+				
 				</div>
 
 				<div id='visualizePane' class='navPane hidden' data-navref='visualize'>
 
 					<div class='floatleft fullheight tenthwidth'>
-						
-						<a href="{{ link('visualize:landing') }}" title='mash up, compare, and analyze data in real time with our dynamic charting tools'><img src='/assets/img/static/layout/headers/visualize.png' alt='fatcatmap: visualize' /></a>
-						
-					</div>
 					
+						<a href="{{ link('visualize:landing') }}" title='mash up, compare, and analyze data in real time with our dynamic charting tools'><img src='/assets/img/static/layout/headers/visualize.png' alt='fatcatmap: visualize' /></a>
+					
+					</div>
+				
 					<div class='floatleft fullheight halfwidth'>
-						
+					
 						sup
-						
+					
 					</div>
 
 
 				</div>
-				
+			
 				<div id='interactPane' class='navPane hidden' data-navref='interact'>
 
 					<div class='floatleft fullheight tenthwidth'>
-						
-						<a href="{{ link('interact:landing') }}" title="share interesting data you've found or visualizations you've made with friends and the world"><img src='/assets/img/static/layout/headers/interact.png' alt='fatcatmap: interact' />
-						
-					</div>
 					
+						<a href="{{ link('interact:landing') }}" title="share interesting data you've found or visualizations you've made with friends and the world"><img src='/assets/img/static/layout/headers/interact.png' alt='fatcatmap: interact' />
+					
+					</div>
+				
 					<div class='floatleft fullheight halfwidth'>
-						
+					
 						sup
-						
+					
 					</div>
 
 				</div>				
@@ -85,26 +88,38 @@
 			<a href='#'>close menu</a>
 		</div>
 	</div>
-	
-	<div id='contentBody' class='{% block content_body_class %}content_body{% endblock %}'>
+{% endif %}
+
+	{% if not page.standalone %}
+		<div id='contentBody' class='{% block content_body_class %}content_body{% endblock %}'>
+	{% else %}
+		<div id='frameContent'>
+	{% endif %}
+
 		{% block content_body %}
 		{% endblock %}
-		
-		<div id='devNotice'>
-			<a href='http://labs.momentum.io/fatcatmap'>FATCATMAP LABS</a> - WORK IN PROGRESS<br />
-			&copy; 2008-2011, POLITICAL <a href='http://momentum.io'>MOMENTUM</a><br />
-			<hr />
-			<b>BUILD:</b> {{ util.config.fcm.version.major }}.{{ util.config.fcm.version.minor }}.{{ util.config.fcm.version.minor }}.{{ util.config.fcm.version.micro }}-{{ util.config.fcm.version.release }}<br /><b>APP:<b> {{ util.env.get('CURRENT_VERSION_ID') }} // <b>NAMESPACE:</b> {% if api.multitenancy.get_namespace() == '' %}None{% else %}{{ api.multitenancy.get_namespace() }}{% endif %}
-			<br />
-			<b>DATACENTER:</b> {{ util.env.get('DATACENTER') }} // <b>R(hash):</b> {{ util.env.get('REQUEST_ID_HASH') }} // <b>S(hash):</b> None<br />
-			<b>LAYER:</b> {% if api.backends.get_backend() == none %}Frontend{% else %}Backend{% endif %} // <b>BACKEND:</b> {{ api.backends.get_backend() }} // <b>INSTANCE:</b> {{ api.backends.get_instance() }}
-		</div>
-		
-	</div>
+
+		{% if not page.standalone %}
+			{% if page.watermark %}
+			<div id='devNotice'>
+				<a href='http://labs.momentum.io/fatcatmap'>FATCATMAP LABS</a> - WORK IN PROGRESS<br />
+				&copy; 2008-2011, POLITICAL <a href='http://momentum.io'>MOMENTUM</a><br />
+				<hr />
+				<b>BUILD:</b> {{ util.config.fcm.version.major }}.{{ util.config.fcm.version.minor }}.{{ util.config.fcm.version.minor }}.{{ util.config.fcm.version.micro }}-{{ util.config.fcm.version.release }}<br /><b>APP:<b> {{ util.env.get('CURRENT_VERSION_ID') }} // <b>NAMESPACE:</b> {% if api.multitenancy.get_namespace() == '' %}None{% else %}{{ api.multitenancy.get_namespace() }}{% endif %}
+				<br />
+				<b>DATACENTER:</b> {{ util.env.get('DATACENTER') }} // <b>R(hash):</b> {{ util.env.get('REQUEST_ID_HASH') }} // <b>S(hash):</b> None<br />
+				<b>LAYER:</b> {% if api.backends.get_backend() == none %}Frontend{% else %}Backend{% endif %} // <b>BACKEND:</b> {{ api.backends.get_backend() }} // <b>INSTANCE:</b> {{ api.backends.get_instance() }}
+			</div>
+			{% endif %}
+		{% endif %}
 	
-	<div id='contentFooter' class='{% block content_footer_class %}content_footer{% endblock %} hidden'>
-		{% block content_footer %}
-		{% endblock %}
 	</div>
+
+	{% if not page.standalone %}
+		<div id='contentFooter' class='{% block content_footer_class %}content_footer{% endblock %} hidden'>
+			{% block content_footer %}
+			{% endblock %}
+		</div>
+	{% endif %}
 
 {% endblock %}

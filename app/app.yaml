@@ -175,6 +175,9 @@ handlers:
 - url: /static
   static_dir: static
 
+- url: /errors
+  static_dir: errors
+
 ###### Providence/Clarity Mappings
 - url: /_pc/manage/.*
   script: momentum/platform/gateway/manage.py

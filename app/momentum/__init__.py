@@ -99,6 +99,7 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 		# Page Parameters
 		params['page'] = {}
 		params['page']['manifest'] = False
+		params['page']['standalone'] = False
 			
 		# Appcaching
 		if self._outputConfig()['appcache']['enable'] == True:
