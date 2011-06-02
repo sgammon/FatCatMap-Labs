@@ -1,28 +1,15 @@
 import sys
 import config
 import logging
+import bootstrap
 
-## Add to sys.path
-if 'lib' not in sys.path:
-	if config.debug:
-		logging.debug('Adding LIB and LIB/DIST to syspath...')
-	# Add lib as primary libraries directory, with fallback to lib/dist
-	# and optionally to lib/dist.zip, loaded using zipimport.
-	sys.path[0:0] = ['lib', 'lib/dist', 'lib/dist.zip']
-
-from protorpc import service_handlers
+bootstrap.MomentumBootstrapper.prepareImports()
 
 ## App Engine Imports
-from google.appengine.ext import webapp
+import webapp2 as webapp
+from webapp2_extras import protorpc
 from google.appengine.ext.webapp import util
 
-## Service Imports
-from momentum.fatcatmap.api.data import DataAPIService
-from momentum.fatcatmap.api.graph import GraphAPIService
-from momentum.fatcatmap.api.frame import FrameAPIService
-from momentum.fatcatmap.api.query import QueryAPIService
-from momentum.fatcatmap.api.charts import ChartsAPIService
-from momentum.fatcatmap.api.session import SessionAPIService
 
 def enable_appstats(app):
 	
@@ -33,28 +20,39 @@ def enable_appstats(app):
 	return app
 
 
+def generateServiceMappings(svc_cfg):
+	
+	service_mappings = []
+	
+	## Generate service mappings in tuple(<invocation_url>, <classpath>) format
+	for service, cfg in svc_cfg['services'].items():
+		if cfg['enabled'] == True:
+			service_mappings.append(('/'.join(svc_cfg['config']['url_prefix'].split('/')+[service]), cfg['service']))
+			
+	if len(service_mappings) > 0:
+		return service_mappings
+	else:
+		return None
+
+
 def main():
 	
-	## Map URL's to services
-	service_mappings = service_handlers.service_mapping([
+	services_config = config.config.get('momentum.fatcatmap.services')
+	if services_config['enabled'] == True:
+		service_mappings = generateServiceMappings(services_config)
+		if service_mappings is not None:
+			## Map URL's to services
+			service_mappings = protorpc.service_mapping(service_mappings)
+	
+			application = webapp.WSGIApplication(service_mappings)
+	
+			## Consider services config
+			services_cfg = config.config.get('momentum.services')
+			if services_cfg['hooks']['appstats']['enabled'] == True:
+				application = enable_appstats(application)
+	
+			util.run_wsgi_app(application)
 
-		('/_api/rpc/data', DataAPIService), ## For creating/updating/retrieving userspace data
-		('/_api/rpc/graph', GraphAPIService), ## Recursively generates structures suitable for graphing
-		('/_api/rpc/frame', FrameAPIService), ## Assembles full HTML or JSON template views for natives/other data
-		('/_api/rpc/query', QueryAPIService), ## Exposes methods to query and search userland data
-		('/_api/rpc/chart', ChartsAPIService), ## Assembles data structures suitable for visualizations.	
-		('/_api/rpc/session', SessionAPIService) ## Allows a user to establish and manage a persistent session
-
-	])
-	
-	application = webapp.WSGIApplication(service_mappings)
-	
-	## Consider services config
-	services_cfg = config.config.get('momentum.services')
-	if services_cfg['hooks']['appstats']['enabled'] == True:
-		application = enable_appstats(application)
-	
-	util.run_wsgi_app(application)
 
 if __name__ == '__main__':
 	main()

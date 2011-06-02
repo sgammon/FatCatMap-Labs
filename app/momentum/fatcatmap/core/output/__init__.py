@@ -178,10 +178,15 @@ def fcmOutputEnvironmentFactory(environment):
 		'setattr':setattr,
 		'pprint':pprint.pprint,
 		'config':{
+			'debug': config.debug,
 			'get': config.config.get,
 			'fcm': config.config.get('momentum.fatcatmap'),
 			'platform': config.config.get('momentum.platform'),
 			'all': config.config,
+			'hooks':{
+				'appstats': (config.config.get('momentum.system')['hooks']['appstats']['enabled'] == True or config.config.get('momentum.services')['hooks']['appstats']['enabled'] == True),
+				'apptrace': (config.config.get('momentum.system')['hooks']['apptrace']['enabled'] == True or config.config.get('momentum.services')['hooks']['apptrace']['enabled'] == True)
+			}
 		},
 		'env': os.environ,
 		'len': len,

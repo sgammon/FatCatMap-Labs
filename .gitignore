@@ -1,6 +1,7 @@
 *.pyc
 .installed.cfg
 app/lib/dist/*
+app/lib/dist
 var/data.store
 eggs/*
 bin/appcfg
@@ -21,7 +22,10 @@ etc/develop-eggs/*
 etc/downloads/*
 etc/parts/*
 var/downloads/*
+var/downloads
 var/parts/*
 var/parts/google_appengine/*
+var/parts
 var/libs/*
+var/libs
 *.svn*

@@ -10,7 +10,7 @@ debug = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
 
 """ 
 
-	########## Tipfy configuration. ##########
+	######################################## Tipfy configuration. ########################################
 
 """
 config['tipfy'] = {
@@ -51,32 +51,40 @@ config['tipfyext.jinja2'] = {
 	'force_use_compiled': False, ## Force Jinja to use compiled templates, even on the Dev server
 
 	'environment_args': { ## Jinja constructor arguments
-		'optimized': False,	
-	    'autoescape': True,
+		'optimized': False,	## 
+	    'autoescape': True, ## Global Autoescape. BE CAREFUL WITH THIS.
 	    'extensions': ['jinja2.ext.autoescape', 'jinja2.ext.with_'],
 	},
 
-	'after_environment_created': 'momentum.fatcatmap.core.output.fcmOutputEnvironmentFactory',
+	'after_environment_created': 'momentum.fatcatmap.core.output.fcmOutputEnvironmentFactory', ## Map to the core output factory
 
 }
 
 
-###### ===== System Config ===== #####
+""" 
+
+	######################################## Core configuration. ########################################
+
+"""
+## System Config
 config['momentum.system'] = {
 
 	'hooks': {
 		'appstats': {'enabled': False},
+		'apptrace': {'enabled': False},
 		'profiler': {'enabled': False}
 	}
 
 }
 
+## Global Services Cfg
 config['momentum.services'] = {
 
 	'logging': True,
 	'hooks': {
-		'appstats': {'enabled': True},
-		'profiler': {'enabled': True}
+		'appstats': {'enabled': False},
+		'apptrace': {'enabled': False},
+		'profiler': {'enabled': False}
 	}
 
 }
@@ -85,10 +93,11 @@ config['momentum.services'] = {
 
 """
 
-	########## Platform configuration. ##########
+	###################################### Platform configuration. ######################################
 
 
 """
+
 config['momentum.platform'] = {
 
 	'version': {
@@ -109,27 +118,37 @@ config['momentum.platform.output'] = {
 
 """ 
 
-	########## FatCatMap configuration. ##########
+	######################################## FatCatMap configuration. ########################################
 
 """
+
+## App settings
 config['momentum.fatcatmap'] = {
 
 	'version': {
 		'major': 0,
-		'minor': 5,
-		'micro': 20110530,
+		'minor': 6,
+		'micro': 20110601,
 		'release': 'ALPHA'
 	}
 
 }
 
+## Development/debug settings
 config['momentum.fatcatmap.dev'] = {
 
 }
 
+## Output layer settings
 config['momentum.fatcatmap.output'] = { 
 
 	'minify': False,
+
+	'appcache': {
+		'enable': False,
+		'manifest': 'lazy.manifest'
+	},
+
 	'assets':{
 		'optimize': False,
 		'compiled': False, 
@@ -140,9 +159,126 @@ config['momentum.fatcatmap.output'] = {
 config['momentum.fatcatmap.output.template_loader'] = {
 
 	'force': True, ## Force enable template loader even on Dev server
-	'debug': True,  ## Enable dev logging
-	'use_memory_cache': False, ## Use handler in-memory cache for template bytecode
-	'use_memcache': False, ## Use Memcache API for template bytecode
+	'debug': False,  ## Enable dev logging
+	'use_memory_cache': False, ## Use handler in-memory cache for template source
+	'use_memcache': False, ## Use Memcache API for template source
+
+}
+
+
+# FCM Services
+config['momentum.fatcatmap.services'] = {
+
+	'enabled': True, ## Disable API services system wide
+	'logging': True, ## Logging for service request handling
+
+	# Module-level (default) config
+	'config': {
+	
+		'url_prefix': '/_api/rpc', ## Prefix for all service invocation URLs
+	
+		## Response + data caching middleware
+		'caching': {
+		
+			'profiles': {
+			
+				'lazy': {},
+				'safe': {},
+				'aggressive': {}
+			
+			},
+			'default_profile': 'safe'
+		
+		},
+		
+		## Security and permissions enforcement middleware
+		'security': {
+			
+			'profiles': {
+			
+				'public': {},
+				'private': {}
+			
+			},
+			'default_profile': 'public'
+		
+		},
+		
+		## Recording and logging middleware
+		'recording': {
+		},
+	
+	},
+
+	# Installed API's
+	'services': {
+	
+		## For creating/updating/retrieving userspace data
+		'data': {
+			'enabled': True,
+			'service': 'momentum.fatcatmap.api.data.DataAPIService',
+			'methods': ['get', 'sync', 'preload', 'getObject', 'getNative', 'getAsset', 'putAsset'],
+			'config': {
+				'caching': 'safe',
+				'security': 'public'
+			}
+		},
+		
+		## Recursively generates structures suitable for graphing
+		'graph': {
+			'enabled': True,
+			'service': 'momentum.fatcatmap.api.graph.GraphAPIService',
+			'methods': ['construct', 'constructFromNode', 'constructFromObject'],
+			'config': {
+				'caching': 'safe',
+				'security': 'public'
+			}
+		},
+		
+		## Assembles full HTML or JSON template views for natives/other data
+		'frame': {
+			'enabled': True,
+			'service': 'momentum.fatcatmap.api.frame.FrameAPIService',
+			'methods': ['render', 'renderWidget', 'renderDialog'],
+			'config': {
+				'caching': 'safe',
+				'security': 'public'
+			}
+		},
+		
+		## Exposes methods to query and search userland data
+		'query': {
+			'enabled': True,
+			'service': 'momentum.fatcatmap.api.query.QueryAPIService',
+			'methods': ['search', 'gql', 'quickSearch'],
+			'config': {
+				'caching': 'safe',
+				'security': 'public'
+			}
+		},
+		
+		## Assembles data structures suitable for visualizations.
+		'charts': {
+			'enabled': True,
+			'service': 'momentum.fatcatmap.api.charts.ChartsAPIService',
+			'methods': ['generate', 'generateFromSeries'],		
+			'config': {
+				'caching': 'safe',
+				'security': 'public'
+			}
+		},
+		
+		## Allows a user to establish and manage a persistent session
+		'session': {
+			'enabled': True,
+			'service': 'momentum.fatcatmap.api.session.SessionAPIService',
+			'methods': ['init', 'authenticate', 'checkin'],
+			'config': {
+				'caching': 'safe',
+				'security': 'public'
+			}
+		}	
+	}
 
 }
 
@@ -154,11 +290,11 @@ config['momentum.fatcatmap.assets'] = {
 	
 		('core', 'fcm'): { # FatCatMap Scripts
 		
-			'init': {'version': 0.2}, # Contains code to animate and fade the top navigation pulldown		
-			'rpc': {'version': 0.2}, # Contains code to aid remote RPCs from javascript.
+			'init': {'version': 0.2}, # Contains code to initiate and prepare the fatcatmap object
+			'rpc': {'version': 0.2}, # Contains code to integrate remote RPCs with the fatcatmap object
 			'graph': {'version': 0.2}, # Holds code used by the layout and Protovis to construct graph visualizations
-			'plugins': {'version': 0.2}, # Contains code to animate and fade the top navigation pulldown
-			'layout': {'version': 0.2} # Contains code to animate and fade the top navigation pulldown
+			'plugins': {'version': 0.2}, # Contains code for miscellaneous jQuery plugins
+			'layout': {'version': 0.2} # Contains code to animate and fade the top navigation pulldown, and sidebars, etc
 		
 		},
 		
@@ -181,7 +317,6 @@ config['momentum.fatcatmap.assets'] = {
 		('jquery', 'jquery'): { # jQuery Core & Plugins
 		
 			'core': {'path': 'core/jquery.full.1.5.js'}, # jQuery Core
-			'rpc': {'path': 'rpc/jquery.rpc.2.0.js'}, # JSON RPC
 			'ui': {'path': 'ui/jquery.ui-1.8.9.full.js'}, # jQuery UI
 			'indexeddb': {'path': 'core/storage/jquery.indexeddb.1.1-full.js'}, # Indexed DB interface
 			'websql': {'path': 'core/storage/jquery.sql.0.8a.min.js'}, # WebSQL interface
@@ -227,7 +362,7 @@ config['momentum.fatcatmap.assets'] = {
 		('compiled', 'min'): { # Compiled FCM Stylesheets
 		
 			'core': {'version': 0.1}, # reset, main, fonts, layout, forms, mobile + visualizer
-			'plugins': {'version': 0.1} # tipsy, uniform, masonry, jquery ui
+			'plugins': {'version': 0.1} # tipsy, uniform, masonry, jquery ui, etc
 		
 		}
 	
@@ -239,18 +374,8 @@ config['momentum.fatcatmap.assets'] = {
 	
 }
 
-# Output 
 
-
-# Services
-config['momentum.fatcatmap.services'] = {
-
-	'logging': True,
-
-}
-
-
-# Pipelines Configuration
+# FCM Pipelines Configuration
 config['momentum.fatcatmap.pipelines'] = {
 
     'debug': True

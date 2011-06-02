@@ -1,7 +1,8 @@
 application: fatcatmap
-version: 8-dev
+version: 9-dev
 runtime: python
 api_version: 1
+
 
 #### ===== Files to Skip
 skip_files:
@@ -16,18 +17,59 @@ skip_files:
 - ^(.*/)?\..*
 - ^(.*/)?tests$
 
+
 #### ===== Builtin SDK Includes
 builtins:
 - appstats: on
-- datastore_admin: on
+- deferred: on
 - remote_api: on
+- admin_redirect: on
+- datastore_admin: on
 
-### ===== Custom Admin Pages
+
+#### ===== Incoming Services
+inbound_services:
+- mail
+- xmpp_message
+- xmpp_presence
+- xmpp_subscribe
+- warmup
+
+
+#### ===== Force precompilation
+derived_file_type:
+- python_precompiled
+
+
+#### ===== Custom Admin Pages
 admin_console:
   pages:
-  - name: Appstats
-    url: /_perfstats
+  - name: Developer's Console
+    url: /_fcm/dev
+  - name: Management Console
+    url: /_fcm/manage
+  - name: Platform Console
+    url: /_pc/console
+  - name: Map/Reduce
+    url: /_ah/mapreduce/
+  - name: Pipelines
+    url: /_ah/pipeline/status
+  - name: AppStats
+    url: /_ah/appstats
 
+
+#### ===== Error Handlers
+error_handlers:
+  - file: errors/default_error.html
+  - error_code: over_quota
+    file: errors/over_quota.html
+  - error_code: dos_api_denial
+    file: errors/dos_denial.html
+  - error_code: timeout
+    file: errors/timeout.html
+
+
+#### ===== Site Handlers
 handlers:
 
 ###### Asset Handlers
@@ -59,29 +101,36 @@ handlers:
   script: assets/ext/static/retrieve.py
   
 # Library/system mappings
-- url: /_perfstats.*
-  script: $PYTHON_LIB/google/appengine/ext/appstats/ui.py
-
-- url: /_ah/datastore_admin.*
-  script: $PYTHON_LIB/google/appengine/ext/datastore_admin/main.py
+- url: /_ah/apptrace.*
+  script: lib/dist/apptrace/overview.py
   login: admin
+  auth_fail_action: unauthorized
+  
+- url: /_ah/appstats.*
+  script: $PYTHON_LIB/google/appengine/ext/appstats/ui.py
+  login: admin
+  auth_fail_action: unauthorized
 
 - url: /_ah/mapreduce.*
   script: $PYTHON_LIB/google/appengine/ext/mapreduce/main.py
   login: admin
+  auth_fail_action: unauthorized
 
 - url: /_ah/pipeline(/.*)?
-  script: lib/pipeline/handlers.py
+  script: pipeline/handlers.py
   login: admin
-
-- url: /_ah/remote_api
-  script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
+  auth_fail_action: unauthorized
+  
+- url: /_ah/warmup.*
+  script: warmup.py
   login: admin
+  auth_fail_action: unauthorized
 
 - url: /_pc/console/.*
   script: $PYTHON_LIB/google/appengine/ext/admin
   login: admin
   secure: always
+  auth_fail_action: redirect  
 
 
 ###### Static Handlers
@@ -96,28 +145,33 @@ handlers:
   mime_type: image/png
   static_files: static/favicon.ico
   upload: static/favicon.ico
+  expiration: "0m"
   
 - url: /(robots\.txt|humans\.txt|crossdomain\.xml)
   static_files: static/\1
   upload: static/(.*)
-  
+  expiration: "0m"
+ 
+# HTML5 Appcache Manifest
 - url: /(.*\.(appcache|manifest))
   mime_type: text/cache-manifest
-  static_files: static/\1
+  static_files: static/appcache/\1
   upload: static/(.*\.(appcache|manifest))
   expiration: "0m"
-  
+
+# Chrome Extensions
 - url: /(.*\.crx)
   mime_type: application/x-chrome-extension
   static_files: static/\1
   upload: static/(.*\.crx)
-  
+
+# Fonts
 - url: /(.*\.woff)
   mime_type: application/x-font-woff
-  static_files: static/\1
+  static_files: static/fonts/\1
   upload: static/(.*\.woff)
 
-# Static directory
+###### Static directory
 - url: /static
   static_dir: static
 
@@ -125,15 +179,17 @@ handlers:
 - url: /_pc/manage/.*
   script: momentum/platform/gateway/manage.py
   login: admin
-
-#- url: /_pc/
-#
+  auth_fail_action: redirect
 
 ###### API Requests to the Gateway
 - url: /_api/rpc.*
   script: services.py
+  login: admin
+  auth_fail_action: unauthorized
 
 ###### Send to Tipfy
 - url: /.*
   script: main.py
   login: admin
+  secure: optional
+  auth_fail_action: redirect

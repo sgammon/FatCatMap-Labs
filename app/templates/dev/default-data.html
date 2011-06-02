@@ -1,25 +1,13 @@
-{% extends 'layouts/main.html' %}
-{% from 'macros/form.html' import renderForm %}
+{% extends 'layouts/dev.html' %}
 
-{% block content_body %}
+{% block page_title %}Add Default Data{% endblock %}
+{% block panel_header %}Add Default Data{% endblock %}
+{% block panel_backnav %}<a href="{{ link('dev-index') }}">Development Console</a>{% endblock %}
 
-<div class='padding-20 halfwidth fullheight'>
+{% block panel_content %}
 
-	<div class='contentPanel'>
-
-		<div class='panelHeader'>
-			<h1>Default Data</h1>
-		</div>
-		<div class='panelContent'>
-						
-			{% for msg in msgs %}
-				<p>{{ msg }}</p>
-			{% endfor %}
-			
-		</div>
-
-	</div>
-	
-</div>
+{% for msg in msgs %}
+	<p>{{ msg }}</p>
+{% endfor %}
 
 {% endblock %}

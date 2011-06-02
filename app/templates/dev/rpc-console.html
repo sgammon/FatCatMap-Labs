@@ -1,47 +1,36 @@
-{% extends 'layouts/main.html' %}
+{% extends 'layouts/dev.html' %}
 
-{% block content_body %}
+{% block page_title %}RPC Playground{% endblock %}
+{% block panel_header %}RPC Playground{% endblock %}
+{% block panel_backnav %}<a href="{{ link('dev-index') }}">Development Console</a>{% endblock %}
 
-<div class='padding-20 fullheight'>
+{% block panel_content %}
 
-	<div class='contentPanel'>
+<h2>Operations:</h2><br />
 
-		<div class='panelHeader'>
-			<h1>RPC Console</h1>
-		</div>
-		<div class='panelContent'>
+<a href='#' id='drawGraph'>Draw Graph</a>
 
-			<h2>Operations:</h2><br />
+<br />
+<br />
+<hr />
+<br />
 
-			<a href='#' id='drawGraph'>Draw Graph</a>
+<p>
+	<b>Request ID: </b><input type='text' value='' id='api_request_id' style='width:50px; margin-left:15px; text-align:right;' /><br />
+	<b>Asynchronous: </b><input type='text' value='' id='api_request_async' style='width:50px; margin-left:15px; text-align:right;' />
+</p><br />
 
-			<br />
-			<br />
-			<hr />
-			<br />
-			
-			<p>
-				<b>Request ID: </b><input type='text' value='' id='api_request_id' style='width:50px; margin-left:15px; text-align:right;' /><br />
-				<b>Asynchronous: </b><input type='text' value='' id='api_request_async' style='width:50px; margin-left:15px; text-align:right;' />
-			</p><br />
-			
-			<div class='floatleft'>
-				<b>API Request:<b><br />
-				<textarea id='api_request_content' style='width:550px; padding:5px; height:300px; background:white;'></textarea>
-			</div>
-			
-			<div class='floatleft'>
-				<b>API Response:<b><br />
-				<textarea id='api_response_content' style='width:550px; padding:5px; height:300px; background:white;'></textarea>
-			</div>
-			
-			<div class='clearboth'></div>
-
-		</div>
-
-	</div>
-	
+<div class='floatleft'>
+	<b>API Request:<b><br />
+	<textarea id='api_request_content' style='width:550px; padding:5px; height:300px; background:white;'></textarea>
 </div>
+
+<div class='floatleft'>
+	<b>API Response:<b><br />
+	<textarea id='api_response_content' style='width:550px; padding:5px; height:300px; background:white;'></textarea>
+</div>
+
+<div class='clearboth'></div>
 
 {% endblock %}
 

@@ -11,13 +11,18 @@ from tipfyext.jinja2 import Jinja2Mixin
 from protorpc import remote
 
 # App Engine Imports
+from google.appengine.api import oauth
 from google.appengine.api import users
+from google.appengine.api import backends
+from google.appengine.api import namespace_manager
 
 # Output Mixin Imports
 from momentum.fatcatmap.core.api.output.assets import AssetsMixin
 
 
 class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
+
+	''' Top-level parent class for request handlers based in Tipfy. '''
 	
 	configPath = None
 	minify = False
@@ -93,15 +98,24 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 		
 		# Page Parameters
 		params['page'] = {}
-		#params['page']['manifest'] = 'lazy.manifest'
 		params['page']['manifest'] = False
+			
+		# Appcaching
+		if self._outputConfig()['appcache']['enable'] == True:
+			params['page']['manifest'] = self._outputConfig()['appcache']['manifest']
 		
 		# Bind App Engine functions
-		params['api'] = {'users':{}}
-		params['api']['users']['current_user'] = users.get_current_user
-		params['api']['users']['is_user_admin'] = users.is_current_user_admin
-		params['api']['users']['create_login_url'] = users.create_login_url
-		params['api']['users']['create_logout_url'] = users.create_logout_url
+		params['api'] = {
+			'oauth': oauth,
+			'users': {
+				'is_user_admin': users.is_current_user_admin,
+				'current_user': users.get_current_user,
+				'create_login_url': users.create_login_url,				
+				'create_logout_url': users.create_logout_url,
+			},
+			'backends': backends,
+			'multitenancy': namespace_manager
+		}
 		
 		return params
 		
@@ -111,6 +125,8 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 		
 		
 class MomentumService(remote.Service):
+	
+	''' Top-level parent class for ProtoRPC-based API services. '''
 	
 	state = {}
 	config = {}

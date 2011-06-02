@@ -1,0 +1,21 @@
+{% extends 'layouts/main.html' %}
+
+{% block title %}{% block page_title %}{% endblock %} - Development Console - FatCatMap{% endblock %}
+
+{% block content_body %}
+
+<div class='padding-20'>
+
+	<div class='contentPanel'>
+
+		<div class='panelHeader'>
+			<h1>{% block panel_header %}{% endblock %}</h1>{% block panel_header_subtext %} <span class='small'>return to --> {% block panel_backnav %}{% endblock %}</span>{% endblock %}
+		</div>
+		<div class='panelContent'>
+			{% block panel_content %}{% endblock %}
+		</div>
+		
+	</div>
+
+</div>	
+{% endblock %}

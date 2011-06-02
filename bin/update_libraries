@@ -1,6 +1,7 @@
 mkdir ../var/libs
 rm -fr ../var/libs/*
 rm -fr ../app/lib/mapreduce
-rm -fr ../app/lib/pipeline
+rm -fr ../app/pipeline
+
 svn checkout http://appengine-mapreduce.googlecode.com/svn/trunk/python/src/mapreduce ../app/lib/mapreduce
-svn checkout http://appengine-pipeline.googlecode.com/svn/trunk/src/pipeline ../app/lib/pipeline
+svn checkout http://appengine-pipeline.googlecode.com/svn/trunk/src/pipeline ../app/pipeline
