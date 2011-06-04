@@ -51,7 +51,7 @@ config['tipfyext.jinja2'] = {
 	'force_use_compiled': False, ## Force Jinja to use compiled templates, even on the Dev server
 
 	'environment_args': { ## Jinja constructor arguments
-		'optimized': False,	## 
+		'optimized': True,	## 
 	    'autoescape': True, ## Global Autoescape. BE CAREFUL WITH THIS.
 	    'extensions': ['jinja2.ext.autoescape', 'jinja2.ext.with_'],
 	},
@@ -128,7 +128,7 @@ config['momentum.fatcatmap'] = {
 	'version': {
 		'major': 1,
 		'minor': 0,
-		'micro': 20110602,
+		'micro': 20110604,
 		'release': 'ALPHA'
 	}
 
@@ -143,15 +143,17 @@ config['momentum.fatcatmap.dev'] = {
 config['momentum.fatcatmap.output'] = { 
 
 	'minify': False,
+	'watermark': True,
+	'standalone': False,
 
 	'appcache': {
 		'enable': False,
-		'manifest': 'lazy.manifest'
+		'manifest': 'scaffolding-v1.1.manifest'
 	},
 
 	'assets':{
 		'optimize': False,
-		'compiled': False, 
+		'compiled': False,
 	}
 
 }
@@ -159,7 +161,7 @@ config['momentum.fatcatmap.output'] = {
 config['momentum.fatcatmap.output.template_loader'] = {
 
 	'force': True, ## Force enable template loader even on Dev server
-	'debug': False,  ## Enable dev logging
+	'debug': True,  ## Enable dev logging
 	'use_memory_cache': False, ## Use handler in-memory cache for template source
 	'use_memcache': False, ## Use Memcache API for template source
 
@@ -288,7 +290,7 @@ config['momentum.fatcatmap.assets'] = {
 	# JavaScript Libraries & Includes
 	'js': {
 	
-		('core', 'fcm'): { # FatCatMap Scripts
+		('core', 'core'): { # FatCatMap Scripts
 		
 			'init': {'version': 0.2}, # Contains code to initiate and prepare the fatcatmap object
 			'rpc': {'version': 0.2}, # Contains code to integrate remote RPCs with the fatcatmap object
@@ -298,7 +300,7 @@ config['momentum.fatcatmap.assets'] = {
 		
 		},
 		
-		('storage', 'fcm'): { # FatCatMap Storage Drivers
+		('storage', 'core'): { # FatCatMap Storage Drivers
 		
 			'sql': {'path': 'storage/sql-0.1.js'}, # Web SQL Database driver
 			'indexed': {'path': 'storage/indexed-0.1.js'}, # IndexedDB Database driver
@@ -307,7 +309,7 @@ config['momentum.fatcatmap.assets'] = {
 		
 		},
 		
-		('polyfills', 'fcm'): {
+		('polyfills', 'core'): {
 		
 			'json': {'path': 'polyfills/json2.js'}, # Adds JSON support to old IE and others that don't natively support it
 			'history': {'path': 'polyfills/history.js'}, # Adds support for history management to old browsers
@@ -336,9 +338,9 @@ config['momentum.fatcatmap.assets'] = {
 		
 		},
 		
-		'protovis': {'path': 'protovis/protovis-d3.2.js'}, # Stanford Protovis: JS Visualization Library
-		'modernizr': {'path': 'modernizr/modernizr-1.7.min.js'}, # Modernizr: Checks browser compatibility
-		'yepnope': {'path': 'yepnope/yepnope-1.0.1-min.js'}, # YepNope: conditional script loader with Modernizr integration
+		'protovis': {'path': 'interaction/protovis-d3.2.js'}, # Stanford Protovis: JS Visualization Library
+		'modernizr': {'path': 'util/modernizr-1.7.min.js'}, # Modernizr: Checks browser compatibility
+		'yepnope': {'path': 'util/yepnope-1.0.1-min.js'}, # YepNope: conditional script loader with Modernizr integration
 		'belated_png': {'path': 'util/dd_belatedpng.js'} # Belated PNG fix
 	
 	},
@@ -359,9 +361,9 @@ config['momentum.fatcatmap.assets'] = {
 		
 		},
 		
-		('compiled', 'min'): { # Compiled FCM Stylesheets
+		('compiled', 'compiled'): { # Compiled FCM Stylesheets
 		
-			'core': {'version': 0.1}, # reset, main, fonts, layout, forms, mobile + visualizer
+			'main': {'version': 0.1}, # reset, main, fonts, layout, forms, mobile + visualizer
 			'plugins': {'version': 0.1} # tipsy, uniform, masonry, jquery ui, etc
 		
 		}

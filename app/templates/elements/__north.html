@@ -9,7 +9,9 @@
 <link rel="stylesheet" href="{{ style_url('plugins', 'core') }}">
 <link rel="stylesheet" media="handheld" href="{{ style_url('mobile', 'core') }}">
 {% else %}
-<link rel="stylesheet" media="screen" href="{{ style_url('fcm-styles', 'compiled') }}">
+<link rel="stylesheet" media="screen" href="{{ style_url('fonts', 'core') }}">
+<link rel="stylesheet" media="screen" href="{{ style_url('main', 'compiled') }}">
+<link rel="stylesheet" media="screen" href="{{ style_url('plugins', 'core') }}">
 {% endif %}
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -29,7 +31,7 @@ yepnope([
 	{
 		// Load core FCM
 		load: ["{{ script_url('init', 'core') }}", "{{ link('js-api') }}", "{{ script_url('rpc', 'core') }}", "{{ script_url('plugins', 'core') }}", "{{ script_url('layout', 'core') }}", "{{ script_url('protovis') }}", "{{ script_url('graph','core') }}"],
-		complete: function _doPhaseOneInit() { _initiateAPIFramework(fatcatmap); }
+		complete: function _doPhaseOneInit() { _initiateAPIFramework(fatcatmap); bindNavigation(); }
 	},
 	{
 		// Load visual plugins

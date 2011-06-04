@@ -24,6 +24,8 @@ import timesince
 import simplejson
 import byteconvert
 
+from os.path import getmtime
+
 from google.appengine.ext import db
 from google.appengine.api import memcache
 
@@ -77,6 +79,9 @@ def set_tdata_to_memcache(name, data, do_log):
 	
 	''' Set template data to memcache. '''
 	
+	logging.info('NAME: '+str(name))
+	logging.info('DATA: '+str(data))
+	
 	memcache.set('Core//Output//Template-'+name, data)
 	if do_log: logging.debug('OUTPUT_LOADER: Set template \''+str(name)+'\' to memcache under key \'Core//Output//Template-'+str(name)+'\'.')
 	
@@ -102,7 +107,8 @@ class FCMCoreOutputLoader(JFileSystemLoader):
 		
 		# Encode in Base64
 		b64_name = base64.b64encode(name)
-
+		uptodate = lambda: mtime == getmtime(path)
+		
 		# Debug logging
 		if y_cfg.get('debug') == True: do_log = True
 		else: do_log = False
@@ -112,21 +118,21 @@ class FCMCoreOutputLoader(JFileSystemLoader):
 		if not config.debug or self.loaderConfig['force'] is True:
 
 			# Try the in-memory supercache
-			if y_cfg.get('use_memory_cache') == True: bytecode = get_tdata_from_fastcache(b64_name, do_log)
-			else: bytecode = None
+			if y_cfg.get('use_memory_cache') == True: source = get_tdata_from_fastcache(b64_name, do_log)
+			else: source = None
 		
-			if bytecode is None: # Not found in fastcache
+			if source is None: # Not found in fastcache
 		
 				if do_log: logging.debug('OUTPUT_LOADER: Template not found in fastcache.')
 			
 				# Fallback to memcache
-				if y_cfg.get('use_memcache') == True: bytecode = get_tdata_from_memcache(b64_name, do_log)
+				if y_cfg.get('use_memcache') == True: source = get_tdata_from_memcache(b64_name, do_log)
 
 				# Fallback to regular loader, then cache
-				if bytecode is None: # Not found in memcache
+				if source is None: # Not found in memcache
 				
 					if do_log: logging.debug('OUTPUT_LOADER: Template not found in memcache.')
-					source = super(FCMCoreOutputLoader, self).get_source(environment, name)
+					source, name, uptodate = super(FCMCoreOutputLoader, self).get_source(environment, name)
 				
 					if y_cfg.get('use_memcache') != False:
 						set_tdata_to_memcache(b64_name, source, do_log)
@@ -136,10 +142,11 @@ class FCMCoreOutputLoader(JFileSystemLoader):
 	
 		else: ## In dev mode, compile everything every time
 		
-			source = super(FCMCoreOutputLoader, self).get_source(environment, name)
+			source, name, uptodate = super(FCMCoreOutputLoader, self).get_source(environment, name)
+			uptodate = False
 			
 		# Return compiled template code
-		return source
+		return source, name, uptodate
 		
 		
 # Template Factory

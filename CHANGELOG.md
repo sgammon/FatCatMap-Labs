@@ -2,6 +2,15 @@
 
 ##Change Log
 
+**Sat, June 04 2011**
+
+- We're now completely on the SASS bandwagon! See assets/style/source.
+- Created 'scaffolding' appcache manifest for deployment to production
+- Created production + labs version of the app.yaml
+- Fixed bugs in the output loader when caching was enabled
+- Fixed visual and layout bugs (mostly with opacity)
+- Structural components there for coffeescript
+- Scaled up a few of the backends
 
 **Thu, June 02 2011 version tag 1-alpha**
 

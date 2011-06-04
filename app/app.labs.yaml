@@ -1,9 +1,9 @@
-application: fatcatmap
-version: 9-dev
+application: momentum-labs
+version: fatcatmap
 runtime: python
 api_version: 1
 
-default_expiration: "0m"
+default_expiration: "365d"
 
 #### ===== Files to Skip
 skip_files:
@@ -150,19 +150,19 @@ handlers:
   mime_type: image/png
   static_files: static/favicon.ico
   upload: static/favicon.ico
-  expiration: "0m"
+  expiration: "365d"
   
 - url: /(robots\.txt|humans\.txt|crossdomain\.xml)
   static_files: static/\1
   upload: static/(.*)
-  expiration: "0m"
+  expiration: "365d"
  
 # HTML5 Appcache Manifest
 - url: /(.*\.(appcache|manifest))
   mime_type: text/cache-manifest
   static_files: static/appcache/\1
   upload: static/(.*\.(appcache|manifest))
-  expiration: "0m"
+  expiration: "365d"
 
 # Chrome Extensions
 - url: /(.*\.crx)

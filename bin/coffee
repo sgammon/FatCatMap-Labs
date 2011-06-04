@@ -1,0 +1,5 @@
+coffee -c ../app/assets/js/source/*.coffee -o ../app/assets/js/compiled --watch
+coffee -c ../app/assets/js/source/site/*.coffee -o ../app/assets/js/compiled/context
+coffee -c ../app/assets/js/source/core/*.coffee --join ../app/assets/js/compiled/core.js
+coffee -c ../app/assets/js/source/plugins/*.coffee --join ../app/assets/js/compiled/plugins.js
+coffee -c ../app/assets/js/source/storage/*.coffee --join ../app/assets/js/compiled/storage.js
