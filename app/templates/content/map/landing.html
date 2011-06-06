@@ -1,18 +1,16 @@
-{% extends "layouts/main.html" %}
+{% extends "content/map/layout.html" %}
 
-{% block title %}{% if origin_label %}{{ origin_label }} - {% endif %}Influence Map - FatCatMap{% endblock %}
+{% block subtitle %}{% if origin %}{{ origin.label }}{% else %}Mapper{% endif %}{% endblock %}
 
-{% block content_body %}
-
-<div id='grapher' class='fullheight fullwidth textcenter'>
+{% block grapher %}
 	<script type="text/javascript+protovis">
 
 	// Define local context vars
 	_graph = null;
-	_visualizer = null;	
+	_visualizer = null;
 	makeGrapher = null;
 
-	$(document).ready( function drawGraph() {		
+	$(document).ready( function drawGraph() {
 
 		{{ grapher("#grapher", "makeGrapher") }}
 		
@@ -38,12 +36,6 @@
 		
 	});
 	</script>
-</div>
-
-<!-- Sidebars -->
-{% include 'elements/pane/details-sidebar.html' %}
-{% include 'elements/pane/controls-sidebar.html' %}
-
 {% endblock %}
 
 {% block content_footer %}{% endblock %}

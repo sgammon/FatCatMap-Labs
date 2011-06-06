@@ -1,0 +1,1 @@
+## CoffeeScript - "Mapper" specific code

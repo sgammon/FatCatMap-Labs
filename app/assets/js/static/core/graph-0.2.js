@@ -1,5 +1,7 @@
 function browseToNode(node_key)
 {
+	window.location.href = '/map?n='+node_key.encoded+'&o='+node_key.parent;
+	/*
 	fatcatmap.rpc.api.graph.construct({origin: node_key}, {
 		
 		success: function graphResponse(response)
@@ -16,7 +18,7 @@ function browseToNode(node_key)
 	}, false);
 	
 	_visualizer.force.reset();
-	_visualizer = makeGrapher(_graph.nodes, _graph.edges);
+	_visualizer = makeGrapher(_graph.nodes, _graph.edges);*/
 	
 }
 

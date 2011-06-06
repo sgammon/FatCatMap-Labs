@@ -1,0 +1,6 @@
+
+class FatCatMap
+	
+	constructor:  ->
+		
+		

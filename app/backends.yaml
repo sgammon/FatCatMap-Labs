@@ -2,15 +2,20 @@ backends:
 - name: crawler
   class: B1
   options: dynamic, public
+  instances: 5
 - name: analyzer
   class: B2
+  instances: 5
   options: dynamic
 - name: scheduler
-  class: B3
-  options: dynamic
+  class: B2
+  options: resident
+  instances: 2
 - name: storage
-  class: B4
-  options: dynamic
+  class: B8
+  options: resident
+  instances: 1
 - name: intake
-  class: B1
+  class: B2
+  instances: 5
   options: dynamic, public

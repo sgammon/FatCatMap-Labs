@@ -36,7 +36,7 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 
 	}
 	
-	def render(self, path, content_type='text/html', headers={}, **kwargs):
+	def render(self, path, elements={}, content_type='text/html', headers={}, **kwargs):
 
 		''' Return a response containing a rendered Jinja template. '''
 	
@@ -70,6 +70,10 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 				minify = slimjs
 			elif content_type == 'text/css':
 				minify = slimmer.css_slimmer
+				
+		## Bind elements
+		for element, config in elements.items():
+			template_context['page']['elements'][element] = config
 		
 		return self.response(response=minify(self.render_template(path, **template_context)), content_type=content_type, headers=[(key, value) for key, value in response_headers.items()])
 				
@@ -99,6 +103,12 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 		# Page Parameters
 		params['page'] = {}
 		params['page']['manifest'] = False
+		params['page']['elements'] = {
+			'errorNotice': False,
+			'infoNotice': False,
+			'generalNotice': False,
+			'successNotice': False
+		}
 		params['page']['watermark'] = self._outputConfig()['watermark']
 		params['page']['standalone'] = self._outputConfig()['standalone']
 			

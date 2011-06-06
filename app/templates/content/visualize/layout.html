@@ -1,0 +1,131 @@
+{% extends "layouts/main.html" %}
+
+{% block title %}{% block subtitle %}{% endblock %}Visualize - FatCatMap{% endblock %}
+
+{% block content_body %}
+
+	<style type='text/css'>
+
+		#landingWrapper
+		{
+			overflow:hidden;
+		}
+
+		#landingWrapper #newsmapHeader
+		{
+			font-family:'Lekton';
+			position:absolute;
+			left:40px;
+			height:50px;
+			right:40px;
+			line-height:75px;
+			border-bottom: 1px solid #444;
+		}
+
+		#landingWrapper #newsmapHeader a
+		{
+			text-decoration:none;
+		}
+
+		#landingWrapper #newsmapHeader h1
+		{
+			float:left;
+			font-family:'Cabin';
+			font-size:22pt;
+			display:inline;
+		}
+
+		#landingWrapper #newsmapHeader span
+		{
+			line-height:85px;		
+		}
+
+		#landingWrapper #newsmapHeader .contentNavbar
+		{
+			float:left;
+			margin-left:20px;
+		}
+
+		#landingWrapper #newsmapHeader .contentNavbar b
+		{
+			font-weight:bold;
+		}
+
+		#landingWrapper #newsmapHeader .contentStatus
+		{
+			float:right;
+		}
+
+		#newsmap
+		{
+			padding:10px 0 10px 0px;
+			left:40px;
+			right:40px;
+			top:50px;
+			bottom:10px;
+		}
+
+		.newsbox
+		{
+			margin:10px;
+			display:block;
+			text-align:left;
+			width:110px;
+			padding:10px;
+			border-radius:10px;
+			float:left;
+		}
+
+		.nbHalf
+		{
+			width: 200px;
+		}
+
+		.nbFull
+		{
+			width: 440px;
+		}
+
+		.newsbox h3
+		{
+			font-size:14pt;
+		}
+		.newsbox p
+		{
+			padding:5px;
+		}
+		.newsbox a
+		{
+			padding:5px;
+		}
+
+		/* === News Types === */
+		.worldNews
+		{
+			background:#BE5758;
+		}
+		.nationalNews
+		{
+			background:#CEC828;
+		}
+		.businessNews
+		{
+			background:#8CB531;
+		}
+		.sportsNews
+		{
+			background:#196A88;
+		}
+		.techNews
+		{
+			background:teal;
+		}
+
+	</style>
+	
+	<div id='landingWrapper' class='fullwidth fullheight textcenter'>
+		{% block visualizer %}
+		{% endblock %}
+	</div>
+
+{% endblock %}

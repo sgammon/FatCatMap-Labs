@@ -1,0 +1,1 @@
+## CoffeeScript - "Interact" specific code

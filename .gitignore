@@ -1,3 +1,4 @@
+*.sass-cache
 *.pyc
 .installed.cfg
 app/lib/dist/*

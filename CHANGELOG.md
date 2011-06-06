@@ -2,6 +2,17 @@
 
 ##Change Log
 
+**Sun, June 05 2011**
+- Installed Blueprint plugins (buttons, link icons, print, ie, liquid layout and forms)
+- Committing Coffee structure for the first time
+- Browsing to nodes on the graph now works, though it's through synchronous pageloads
+- Adjusted sizing and apportioning of instances to backends
+- Added more compiled assets (see blueprint plugins), along with asset entries in config.py
+- Added a special 'elements' property to the render function, for activating/overriding page elements
+- Added easy-to-trigger global warning/notice messages from the new 'elements' special handler property
+- Moved some content sections to having their own "layout" that they can inherit from
+- Better configuration for SASS/Compass - automagically doing images now
+
 **Sat, June 04 2011**
 
 - We're now completely on the SASS bandwagon! See assets/style/source.

@@ -128,7 +128,7 @@ config['momentum.fatcatmap'] = {
 	'version': {
 		'major': 1,
 		'minor': 0,
-		'micro': 20110604,
+		'micro': 20110605,
 		'release': 'ALPHA'
 	}
 
@@ -153,7 +153,7 @@ config['momentum.fatcatmap.output'] = {
 
 	'assets':{
 		'optimize': False,
-		'compiled': False,
+		'compiled': True,
 	}
 
 }
@@ -363,9 +363,14 @@ config['momentum.fatcatmap.assets'] = {
 		
 		('compiled', 'compiled'): { # Compiled FCM Stylesheets
 		
-			'main': {'version': 0.1}, # reset, main, fonts, layout, forms, mobile + visualizer
-			'plugins': {'version': 0.1} # tipsy, uniform, masonry, jquery ui, etc
-		
+			'main': {'version': 0.3}, # reset, main, fonts, layout, forms, mobile + visualizer
+			'print': {'version': 0.2}, # alternate print stylesheet			
+			'plugins': {'version': 0.1}, # tipsy, uniform, masonry, jquery ui, etc
+			'browse': {'version': 0.1}, # content section: data browser
+			'search': {'version': 0.1}, # content section: data search
+			'map': {'version': 0.1}, # content section: data mapping
+			'interact': {'version': 0.1}, # content section: social interaction
+			'visualize': {'version': 0.1}, # content section: data visualization	
 		}
 	
 	},
