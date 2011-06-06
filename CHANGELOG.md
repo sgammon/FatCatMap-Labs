@@ -2,7 +2,7 @@
 
 ##Change Log
 
-**Sun, June 05 2011**
+**Sun, June 05 2011 software version tag 1.1-ALPHA**
 - Installed Blueprint plugins (buttons, link icons, print, ie, liquid layout and forms)
 - Committing Coffee structure for the first time
 - Browsing to nodes on the graph now works, though it's through synchronous pageloads
@@ -23,7 +23,7 @@
 - Structural components there for coffeescript
 - Scaled up a few of the backends
 
-**Thu, June 02 2011 version tag 1-alpha**
+**Thu, June 02 2011 major release version tag 1-alpha**
 
 - The platform is nearing a place where it can be used. Along with the new version tag:
 - Created this changelog (finally)
@@ -148,7 +148,7 @@
 - Moved lovely JSONRPC to lib (patched modifications), removed incompatible packages from the buildout.cfg
 - Moved NDB to app root (fixed NDB reload bug during pipeline execution), cleaned up queues, added Dev menus
 
-**Wed, March 23 2011 version tag 2-dev**
+**Wed, March 23 2011 major release version tag 2-dev**
 
 - Version increment
 - Working pipelines and grapher.
