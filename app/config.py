@@ -128,7 +128,7 @@ config['momentum.fatcatmap'] = {
 	'version': {
 		'major': 1,
 		'minor': 1,
-		'micro': 20110605,
+		'micro': 20110617,
 		'release': 'ALPHA'
 	}
 
@@ -174,7 +174,7 @@ config['momentum.fatcatmap.services'] = {
 	'enabled': True, ## Disable API services system wide
 	'logging': True, ## Logging for service request handling
 
-	# Module-level (default) config
+	# Module-level (default) config (NOT IMPLEMENTED YET)
 	'config': {
 	
 		'url_prefix': '/_api/rpc', ## Prefix for all service invocation URLs
@@ -292,7 +292,7 @@ config['momentum.fatcatmap.assets'] = {
 	
 		('core', 'core'): { # FatCatMap Scripts
 		
-			'init': {'version': 0.2}, # Contains code to initiate and prepare the fatcatmap object
+			'init': {'version': 0.3}, # Contains code to initiate and prepare the fatcatmap object
 			'rpc': {'version': 0.2}, # Contains code to integrate remote RPCs with the fatcatmap object
 			'graph': {'version': 0.2}, # Holds code used by the layout and Protovis to construct graph visualizations
 			'plugins': {'version': 0.2}, # Contains code for miscellaneous jQuery plugins
@@ -331,10 +331,13 @@ config['momentum.fatcatmap.assets'] = {
 			
 		},
 		
-		('compiled', 'min'): { # Compiled Scripts
+		('compiled', 'compiled'): { # Compiled Scripts
 			
-			'core': {'version': 0.1}, # contains core, rpc, ui
-			'plugins': {'version': 0.1} # contains ui, storage adapters, tipsy, uniform, masonry
+			'core': {'path': 'core.js'}, # init, framework, and client-side platform code
+			'storage': {'path': 'storage.js'}, # contains code for interfacing with browser-local storage
+			'layout': {'path': 'layout.js'}, # contains code for manipulating page layout
+			'interaction': {'path': 'interaction.js'}, # contains code for charting, visualization & graphing
+			'site': {'path': 'site.js'} # contains code specific to site content areas
 		
 		},
 		

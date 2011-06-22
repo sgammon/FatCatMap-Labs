@@ -195,6 +195,6 @@ handlers:
 ###### Send to Tipfy
 - url: /.*
   script: main.py
-  login: required
+  login: optional
   secure: optional
   auth_fail_action: redirect

@@ -1,3 +1,4 @@
+from google.appengine.api import users
 from momentum.fatcatmap.handlers import WebHandler
 
 
@@ -7,7 +8,13 @@ class Landing(WebHandler):
 
 		"""Simply returns a Response object with an enigmatic salutation."""
 
-		return self.render('main/landing.html')
+		if users.get_current_user() is None:
+			username = 'stranger'
+			
+		else:
+			username = users.get_current_user().nickname()
+
+		return self.render('main/landing.html', name=username)
 		
 		
 class Offline(WebHandler):

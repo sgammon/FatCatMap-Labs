@@ -165,7 +165,7 @@ function _platformInit()
 				{
 					if(this._driver != null)
 					{
-						return this._driver.getValueByKey(key);
+						return this._driver.setValueByKey(key, value);
 					}					
 				},
 				
@@ -173,7 +173,7 @@ function _platformInit()
 				{
 					if(this._driver != null)
 					{
-						return this._driver.getValueByKey(key);
+						return this._driver.clearValues();
 					}					
 				},
 				
@@ -181,7 +181,7 @@ function _platformInit()
 				{
 					if(this._driver != null)
 					{
-						return this._driver.getValueByKey(key);
+						return this._driver.allValues();
 					}					
 				}
 				

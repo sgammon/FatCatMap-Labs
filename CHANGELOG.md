@@ -2,7 +2,12 @@
 
 ##Change Log
 
+**Tue, June 21 2011**
+
+- Merge commit with Alex
+
 **Sun, June 05 2011 software version tag 1.1-ALPHA**
+
 - Installed Blueprint plugins (buttons, link icons, print, ie, liquid layout and forms)
 - Committing Coffee structure for the first time
 - Browsing to nodes on the graph now works, though it's through synchronous pageloads

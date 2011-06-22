@@ -35,7 +35,7 @@
 
 		{# Includes super navigation, currently logged in user, etc... #}
 		{% block superbar %}
-			<header class='momentumSuperbar'>
+			<header class='momentumSuperbar' data-element='superbar' data-element-type='SuperPanel'>
 				{% include 'snippets/superbar.html' %}
 			</header>
 		{% endblock %}
@@ -49,7 +49,7 @@
 
 		{# Superfooter is used for branding and copyright stuff... #}
 		{% block superfooter %}
-		<footer class='momentumSuperfooter'>
+		<footer class='momentumSuperfooter' data-element='superfooter' data-element-type='SuperPanel'>
 			{% include 'snippets/superfooter.html' %}
 		</footer>
 		{% endblock %}

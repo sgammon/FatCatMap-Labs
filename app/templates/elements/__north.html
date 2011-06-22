@@ -1,18 +1,19 @@
 <meta name="description" content="FatCatMap lets you browse the political universe!">
 <meta name="author" content="Political Momentum, Inc.">
 
-{% if not sys.output.assets.compiled %}
+{% if sys.output.assets.compiled %}
+<link rel="stylesheet" media="screen" href="{{ style_url('fonts', 'core') }}">
+<link rel="stylesheet" media="screen" href="{{ style_url('plugins', 'core') }}">
+<link rel="stylesheet" media="screen" href="{{ style_url('main', 'compiled') }}">
+{% else %}
 <link rel="stylesheet" href="{{ style_url('reset', 'core') }}">
 <link rel="stylesheet" href="{{ style_url('fonts', 'core') }}">
 <link rel="stylesheet" href="{{ style_url('main', 'core') }}">
 <link rel="stylesheet" href="{{ style_url('layout', 'core') }}">
 <link rel="stylesheet" href="{{ style_url('plugins', 'core') }}">
 <link rel="stylesheet" media="handheld" href="{{ style_url('mobile', 'core') }}">
-{% else %}
-<link rel="stylesheet" media="screen" href="{{ style_url('fonts', 'core') }}">
-<link rel="stylesheet" media="screen" href="{{ style_url('plugins', 'core') }}">
-<link rel="stylesheet" media="screen" href="{{ style_url('main', 'compiled') }}">
 {% endif %}
+
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
@@ -79,11 +80,29 @@ yepnope([
 <!-- Visualization Dependencies -->
 <script src="{{ script_url('protovis') }}"></script>
 
+{% if sys.output.assets.compiled %}
+<!-- FCM Platform -->
+<script src="{{ script_url('core','compiled') }}"></script>
+<script src="{{ script_url('storage','compiled') }}"></script>
+<script src="{{ script_url('layout','compiled') }}"></script>
+<script src="{{ script_url('interaction','compiled') }}"></script>
+<script src="{{ script_url('site','compiled') }}"></script>
+
+<!-- jQuery Plugins -->
+<script src="{{ script_url('uniform', 'jquery') }}"></script>
+<script src="{{ script_url('tipsy', 'jquery') }}"></script>
+<script src="{{ script_url('masonry','jquery') }}"></script>
+<script src="{{ script_url('fancybox','jquery') }}"></script>
+<script src="{{ script_url('easing','jquery') }}"></script>
+<script src="{{ script_url('mousewheel','jquery') }}"></script>
+
+
+{% else %}
 <!-- FCM Platform -->
 <script src="{{ script_url('init', 'core') }}"></script>
-<script src="{{ link('js-api') }}"></script>
-<script src="{{ script_url('rpc', 'core') }}"></script>
-<script src="{{ script_url('plugins', 'core') }}"></script>
+<!--><script src="{{ link('js-api') }}"></script>-->
+<!--<script src="{{ script_url('rpc', 'core') }}"></script>-->
+<!--<script src="{{ script_url('plugins', 'core') }}"></script>-->
 <script src="{{ script_url('layout', 'core') }}"></script>
 <script src="{{ script_url('graph','core') }}"></script>
 
@@ -102,22 +121,23 @@ yepnope([
 <script src="{{ script_url('sql', 'storage') }}"></script>
 <script src="{{ script_url('local', 'storage') }}"></script>
 <script src="{{ script_url('session', 'storage') }}"></script>
+{% endif %}
 
 <script type='text/javascript'>
 
 $(document).ready(function loadPlatform()
 {	
 	// Lay the piping for the internal JS API
-	_initiateAPIFramework(fatcatmap);
+	//fatcatmap.rpc.api.
 
 	// Bind navigation so we can provide top-level menus
-	bindNavigation();
+	//bindNavigation();
 	
 	// Load Storage Adapters
-	if(typeof(_indexedDBInit) == 'function') { _indexedDBInit(); }
-	if(typeof(_webSQLInit) == 'function') { _webSQLInit(); }
-	if(typeof(_localStorageInit) == 'function') { _localStorageInit(); }
-	if(typeof(_sessionStorageInit) == 'function') { _sessionStorageInit(); }
+	//if(typeof(_indexedDBInit) == 'function') { _indexedDBInit(); }
+	//if(typeof(_webSQLInit) == 'function') { _webSQLInit(); }
+	//if(typeof(_localStorageInit) == 'function') { _localStorageInit(); }
+	//if(typeof(_sessionStorageInit) == 'function') { _sessionStorageInit(); }
 });
 
 </script>
