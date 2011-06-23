@@ -111,7 +111,11 @@ class CoreAPIBridge extends CoreAPI
 						return false
 
 		## Layout API
-		@layout = {}
+		@layout =
+			
+			register: (id, element) ->
+				element.register(id)
+				return fatcatmap.state.elements.register(id, element)
 
 		## Visualizer API
 		@visualizer = {}

@@ -66,3 +66,4 @@ class ServiceWorker(Worker):
 
 class WorkerMethod(m.FCMPolyModel):
 	name = m.db.StringProperty()
+	action = m.db.StringListProperty()

@@ -9,7 +9,7 @@ coffee --join "$FCM_COFFEE_COMPILED/core.js" --compile "$FCM_COFFEE_SOURCE/core/
 coffee --join "$FCM_COFFEE_COMPILED/storage.js" --compile "$FCM_COFFEE_SOURCE/storage/_driver.coffee" "$FCM_COFFEE_SOURCE/storage/local.coffee" "$FCM_COFFEE_SOURCE/storage/object.coffee" "$FCM_COFFEE_SOURCE/storage/session.coffee" "$FCM_COFFEE_SOURCE/storage/sql.coffee"
 
 ## 3: Compile Layout
-coffee --join "$FCM_COFFEE_COMPILED/layout.js" --compile "$FCM_COFFEE_SOURCE/layout/_element.coffee" "$FCM_COFFEE_SOURCE/layout/panel.coffee" "$FCM_COFFEE_SOURCE/layout/dialog.coffee"
+coffee --join "$FCM_COFFEE_COMPILED/layout.js" --compile "$FCM_COFFEE_SOURCE/layout/_element.coffee" "$FCM_COFFEE_SOURCE/layout/panel.coffee" "$FCM_COFFEE_SOURCE/layout/dialog.coffee" "$FCM_COFFEE_SOURCE/layout/navigation.coffee"
 
 ## 4: Compile Interaction
 coffee --join "$FCM_COFFEE_COMPILED/interaction.js" --compile "$FCM_COFFEE_SOURCE/interaction/_widget.coffee" "$FCM_COFFEE_SOURCE/interaction/chart.coffee" "$FCM_COFFEE_SOURCE/interaction/graph.coffee" "$FCM_COFFEE_SOURCE/interaction/grid.coffee" "$FCM_COFFEE_SOURCE/interaction/form.coffee"

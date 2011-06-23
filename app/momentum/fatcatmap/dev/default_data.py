@@ -129,14 +129,15 @@ def add_data_engines():
 	opensecrets = ServiceWorker(key_name='opensecrets', name='CRP OpenSecrets', worker_endpoint='worker-opensecrets', service=opensecrets_service, enabled=False)
 
 	models = []
-	models.append(WorkerMethod(sunlight, key_name='getLegislator', name='getLegislator', service=sunlight))
-	models.append(WorkerMethod(sunlight, key_name='getLegislators', name='getLegislators', service=sunlight))
 
-	models.append(ServicePipeline(sunlight_service, key_name='Legislator', name='Get Single Legislator', async=True, service=sunlight_service, enabled=True))
-	models.append(ServicePipeline(sunlight_service, key_name='Legislators', name='Get Legislators List', service=sunlight_service, enabled=True))
 
-	models.append(ServicePipeline(sunlight_service, key_name='Committee', name='Get Single Legislative Committee', async=True, service=sunlight_service, enabled=True))
-	models.append(ServicePipeline(sunlight_service, key_name='Committees', name='Get Legislative Committees List', service=sunlight_service, enabled=True))
+	models.append(ServicePipeline(sunlight_service, key_name='GetLegislator', name='Get Legislator', async=False, service=sunlight_service, enabled=True, action=['momentum', 'fatcatmap', 'pipelines', 'services', 'sunlight', 'GetLegislator']))
+	
+	models.append(ServicePipeline(sunlight_service, key_name='GetLegislators', name='Get Legislators', async=False, service=sunlight_service, enabled=True, action=['momentum', 'fatcatmap', 'pipelines', 'services', 'sunlight', 'GetLegislator']))
+
+	models.append(ServicePipeline(sunlight_service, key_name='GetCommittee', name='Get Committee', async=False, service=sunlight_service, enabled=True, action=['momentum', 'fatcatmap', 'pipelines', 'services', 'sunlight', 'GetCommittee']))
+
+	models.append(ServicePipeline(sunlight_service, key_name='GetCommittees', name='Get Committees', async=False, service=sunlight_service, enabled=True, action=['momentum', 'fatcatmap', 'pipelines', 'services', 'sunlight', 'GetCommittees']))
 
 	return db.put(models)+[sunlight, opensecrets]
 

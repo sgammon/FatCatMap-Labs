@@ -1,15 +1,19 @@
 class LayoutElement
-	
-	name: null
+
+	id: null
 	state: {}
 	config: {}
 	classes: []
 	element: null
 	defaults: null	
 	selector: null
+	registered: false
 	
 	## Low-Level Methods
-	constructor: (@name, @selector, @config) ->
+	constructor: (@selector, @config={}) ->
+		
+	register: (@id) ->
+		return
 		
 	_setState: (key, value) ->
 		@state[key] = value

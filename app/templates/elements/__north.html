@@ -127,17 +127,15 @@ yepnope([
 
 $(document).ready(function loadPlatform()
 {	
-	// Lay the piping for the internal JS API
-	//fatcatmap.rpc.api.
-
-	// Bind navigation so we can provide top-level menus
-	//bindNavigation();
+	// Register page elements
+	superbar = new SuperBar('#momentumSuperbar');
+	fatcatmap.api.layout.register('superbar', superbar);
 	
-	// Load Storage Adapters
-	//if(typeof(_indexedDBInit) == 'function') { _indexedDBInit(); }
-	//if(typeof(_webSQLInit) == 'function') { _webSQLInit(); }
-	//if(typeof(_localStorageInit) == 'function') { _localStorageInit(); }
-	//if(typeof(_sessionStorageInit) == 'function') { _sessionStorageInit(); }
+	supernav = new Navigation('#topnav');
+	fatcatmap.api.layout.register('supernav', supernav);
+	
+	superfooter = new SuperFooter('#momentumSuperfooter');
+	fatcatmap.api.layout.register('superfooter', superfooter);
 });
 
 </script>

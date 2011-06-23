@@ -1,8 +1,9 @@
 from momentum.fatcatmap import models as m
 
+from momentum.fatcatmap.models.politics.party import PoliticalParty
 from momentum.fatcatmap.models.government.boundaries import USState
 from momentum.fatcatmap.models.government.boundaries import District
-
+	
 
 #### ==== Legislature Models ==== ####
 class Legislature(m.FCMPolyModel):
@@ -37,3 +38,19 @@ class UpperChamberDistrict(District):
 class LowerChamberDistrict(District):
     number = m.db.IntegerProperty()
     chamber = m.db.ReferenceProperty(LowerLegislativeChamber, collection_name='districts')
+
+
+#### ==== Legislator ==== ####
+class Legislator(m.FCMPolyModel):
+	office = m.db.PostalAddressProperty()
+	in_office = m.db.BooleanProperty()
+	webform = m.db.StringProperty()
+	website = m.db.StringProperty()
+	fax = m.db.PhoneNumberProperty()
+	phone = m.db.PhoneNumberProperty()
+	district = m.db.ReferenceProperty(District, collection_name='legislators')	
+	party = m.db.ReferenceProperty(PoliticalParty, collection_name='legislators')
+	chamber = m.db.ReferenceProperty(LegislativeChamber, collection_name='legislators')
+
+class StateLegislator(Legislator):
+	state = m.db.ReferenceProperty(USState, collection_name='state_legislators')

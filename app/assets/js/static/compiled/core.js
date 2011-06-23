@@ -133,7 +133,12 @@
           }
         }
       };
-      this.layout = {};
+      this.layout = {
+        register: function(id, element) {
+          element.register(id);
+          return fatcatmap.state.elements.register(id, element);
+        }
+      };
       this.visualizer = {};
     }
     __extends(CoreAPIBridge, CoreAPI);
@@ -711,11 +716,7 @@
       this.elements = {
         registry: {},
         get: function(id) {
-          if (__indexOf.call(this.registry, id) >= 0) {
-            return registry[id];
-          } else {
-            return null;
-          }
+          return this.registry[id];
         },
         scan: function() {
           $('[data-element]').each({
@@ -742,12 +743,14 @@
             _type = Panel;
           } else if (type === 'SuperPanel') {
             _type = SuperPanel;
+          } else if (type === 'Navigation') {
+            _type = Navigation;
           }
           return new _type(id, selector, config);
         },
         register: function(id, element) {
           this.registry[id] = element;
-          return this;
+          return this.registry[id];
         },
         _setState: function(id, key, value) {
           if (this.registry[id] !== null) {

@@ -57,10 +57,7 @@ class CoreStateAPI extends CoreAPI
 			registry: {}
 						
 			get: (id) ->
-				if id in @registry
-					return registry[id]
-				else
-					return null
+				return @registry[id]
 					
 			scan: ->
 				$('[data-element]').each(
@@ -85,12 +82,15 @@ class CoreStateAPI extends CoreAPI
 				else if type is 'SuperPanel'
 					_type = SuperPanel
 					
+				else if type is 'Navigation'
+					_type = Navigation
+					
 				return new _type(id, selector, config)
 					
 			
 			register: (id, element) ->
 				@registry[id] = element
-				return @
+				return @registry[id]
 				
 			_setState: (id, key, value) ->
 				if @registry[id] isnt null

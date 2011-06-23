@@ -11,11 +11,22 @@ from pipeline import pipeline
 
 from google.appengine.ext import db
 from google.appengine.api import xmpp
+from google.appengine.api import mail
+from google.appengine.api import users
+from google.appengine.api import oauth
+from google.appengine.api import images
 from google.appengine.api import channel
+from google.appengine.api import urlfetch
 from google.appengine.api import memcache
+from google.appengine.ext import blobstore
 from google.appengine.api import taskqueue
+from google.appengine.api import capabilities
+from google.appengine.api import namespace_manager
+from google.appengine.api import prospective_search
 
 from momentum.fatcatmap import models as m
+
+from ProvidenceClarity.struct.util import DictProxy
 
 from momentum.fatcatmap.models.core.services import ExtID
 from momentum.fatcatmap.models.core.services import ExtService
@@ -120,12 +131,30 @@ class FCMPipeline(pipeline.Pipeline):
 	m = m
 	db = db
 	_opts = {}
-	memcache = memcache
-	taskqueue = taskqueue
 	logger = None
 	cache = FCMPipelineCacheAdapter
 	pipeline = pipeline
 	common = common
+
+	## API Shortcuts
+	api = DictProxy({
+
+		'xmpp' : xmpp,
+		'mail' : mail,
+		'users': users,
+		'oauth' : oauth,
+		'images' : images,
+		'channel' : channel,
+		'urlfetch' : urlfetch,
+		'memcache' : memcache,
+		'blobstore' : blobstore,
+		'taskqueue' : taskqueue,
+		'capabilities' : capabilities,
+		'multitenancy' : namespace_manager,
+		'prospective_search' : prospective_search
+
+	})
+
 
 	def __init__(self, *args, **kwargs):
 		
@@ -136,27 +165,32 @@ class FCMPipeline(pipeline.Pipeline):
 		self.ndb = ndb
 
 		## Add Pipeline Config
-		self.pipeline_config = config.config.get('momentum.fatcatmap.pipelines')
+		self._opts = config.config.get('momentum.fatcatmap.pipelines')
 
 		## Process pipeline options
-		if '_opts' in kwargs:
-			self._opts = kwargs['_opts']
-			if 'logging' in kwargs['_opts']:
+		if 'config' in kwargs:
+			
+			if isinstance(kwargs['config'], dict):
+				for k, v in kwargs['config'].items():
+					self._opts[k] = v
+			
+		if len(self._opts) > 0:
+			if 'logging' in self._opts:
 				
-				if 'enable' in kwargs['_opts']['logging']:
+				if 'enable' in self._opts['logging']:
 
-					if kwargs['_opts']['logging']['enable'] == True:
-						if 'mode' in kwargs['_opts']['logging']:
+					if self._opts['logging']['enable'] == True:
+						if 'mode' in self._opts['logging']:
 
-							if kwargs['_opts']['logging']['mode'] == 'xmpp':
-								if 'jid' in kwargs['_opts']['logging']:
-									self.logger = FCMXMPPLogger(self, jid=kwargs['_opts']['logging']['jid'])
+							if self._opts['logging']['mode'] == 'xmpp':
+								if 'jid' in self._opts['logging']:
+									self.logger = FCMXMPPLogger(self, jid=self._opts['logging']['jid'])
 
-							elif kwargs['_opts']['logging']['mode'] == 'channel':
-								if 'channel' in kwargs['_opts']['logging']:
-									self.logger = FCMChannelLogger(self, channel_id=kwargs['_opts']['logging']['channel'])
+							elif self._opts['logging']['mode'] == 'channel':
+								if 'channel' in self._opts['logging']:
+									self.logger = FCMChannelLogger(self, channel_id=self._opts['logging']['channel'])
 
-							elif kwargs['_opts']['logging']['mode'] == 'serverlogs':
+							elif self._opts['logging']['mode'] == 'serverlogs':
 								self.logger = FCMStandardLogger(self)
 
 					else:
