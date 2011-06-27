@@ -340,7 +340,7 @@ hr {
 }
 
 /* line 91, ../../source/main-0.3.sass */
-h1, h2, h3, h4, p, div, td, button, input, b, li, span, select {
+h1, h2, h3, h4, p, div, td, b, li, span, button, input[type=submit] {
   font-family: "Cabin", "Lucida Grande", arial, sans-serif;
   color: white;
 }
@@ -627,7 +627,7 @@ li.dotSpacer {
   visibility: hidden;
 }
 /* line 316, ../../source/main-0.3.sass */
-.navbar li:hover ul.subnav {
+.navbar li:hover ul {
   visibility: visible !important;
 }
 /* line 319, ../../source/main-0.3.sass */
@@ -636,7 +636,7 @@ li.dotSpacer {
 }
 
 /* line 322, ../../source/main-0.3.sass */
-.navbar.spacer {
+.spacer {
   width: 15px;
   text-align: center;
 }
@@ -654,7 +654,7 @@ li.navButton a span {
 }
 
 /* line 339, ../../source/main-0.3.sass */
-div.navbar li.navButton:hover ul.subnav {
+.navbar li.navButton:hover ul.subnav {
   visibility: visible !important;
 }
 

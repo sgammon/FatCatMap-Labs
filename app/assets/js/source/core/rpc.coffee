@@ -2,34 +2,32 @@
 class RPCAPI
 	
 	constructor: (@name, @base_uri, @methods, @config) ->
+
 		if @methods.length > 0
 			for method in @methods
-				@[method] = (params={}, callbacks={}, async=false, opts={}) ->
-					return @makeRPCRequest(method, params, opts, async).fulfill(callbacks)
+				@[method] = @_buildRPCMethod(method)
+				
+				
+	_buildRPCMethod: (method) ->
+		api = @name
+		rpcMethod = (params={}, callbacks=null, async=false, opts={}) =>
+			do (params={}, callbacks={}, async=false, opts={}) =>
+				request = window.fatcatmap.rpc.api.createRPCRequest({
+			
+					method: method
+					api: api
+					params: params || {}
+					opts: opts || {}
+					async: async || false
+			
+				})
+				
+				if callbacks?
+					return request.fulfill(callbacks)
+				else
+					return request
 		
-	makeRPCRequest: (method, params, opts, async) ->
-		if method in @methods
-			return fatcatmap.rpc.api.createRPCRequest({
-				
-				method: method
-				api: @name
-				params: params || {}
-				opts: opts || {}
-				async: async || false
-				
-			})
-		
-	__noSuchMethod__: (id, args) ->
-		if method in @methods
-			return fatcatmap.rpc.createRPCRequest({
-				
-				method: method
-				api: @name
-				params: args[0..args.length-2] || {}
-				opts: args[-1] || {}
-				async: args[-2] || false
-				
-			})
+		return rpcMethod
 
 
 class RPCAdapter
@@ -41,59 +39,70 @@ class RPCAdapter
 		
 	response: (response, callbacks) ->
 		if 'success' in callbacks
-			fatcatmap.rpc.adapters.makeCallback(response, callbacks.success)
+			window.fatcatmap.rpc.adapters.makeCallback(response, callbacks.success)
 
 
 class RPCRequest
 	
-	params = {}
-	action = null
-	method = null
-	api = null
-	base_uri = null
-	
-	envelope:
-		id: null
-		opts: {}
-		agent: {}
-		
-	ajax:
-		async: false
-		cache: true
-		global: true
-		http_method: 'POST'
-		crossDomain: false
-		ifModified: false
-		dataType: 'json'
 
 	constructor: (id, opts, agent) ->
-		@envelope.id = id
-		@envelope.opts = opts
-		@envelope.agent = agent
+
+		@params = {}
+		@action = null
+		@method = null
+		@api = null
+		@base_uri = null
+
+		@envelope =
+			id: null
+			opts: {}
+			agent: {}
+
+		@ajax =
+			async: false
+			cache: true
+			global: true
+			http_method: 'POST'
+			crossDomain: false
+			ifModified: false
+			dataType: 'json'
+
+		if id?
+			@envelope.id = id
+		if opts?
+			@envelope.opts = opts
+		if agent?
+			@envelope.agent = agent
 		
 	fulfill: (callbacks, config...) ->
-		return fatcatmap.rpc.api.fulfillRPCRequest(config, @, @ajax.async)
-		
+		return window.fatcatmap.rpc.api.fulfillRPCRequest(config, @, callbacks)
+
+	setAsync: (async) ->
+		@ajax?.async ?= async
+		return @
+
 	setOpts: (opts) ->
-		@envelope.opts = opts
+		@envelope?.opts ?= opts
+		return @
 		
 	setAgent: (agent) ->
-		@envelope.agent = agent
+		@envelope?.agent ?= agent
+		return @
 		
-	setAction: (action) ->
-		@action = action
+	setAction: (@action) ->
+		return @
 		
-	setMethod: (method) ->
-		@method = method
+	setMethod: (@method) ->
+		return @
 		
-	setAPI: (method) ->
-		@api = api
+	setAPI: (@api) ->
+		return @
 		
-	setBaseURI: (uri) ->
-		@base_uri = uri
+	setBaseURI: (@base_uri) ->
+		return @
 		
-	setParams: (params={}) ->
-		@params = params
+	setParams: (@params={}) ->
+		return @
 			
 	payload: ->
 		_payload =
@@ -105,6 +114,7 @@ class RPCRequest
 
 		return _payload
 
+
 ## Core RPC API
 class CoreRPCAPI extends CoreAPI
 	
@@ -112,7 +122,7 @@ class CoreRPCAPI extends CoreAPI
 
 		@base_rpc_uri = '/_api/rpc'
 		@api =
-							
+			
 			lastRequest: null
 			lastFailure: null
 			lastResponse: null
@@ -123,14 +133,14 @@ class CoreRPCAPI extends CoreAPI
 			factory: (name, base_uri, methods, config) ->
 				@[name] = new RPCAPI(name, base_uri, methods, config)
 					
-			_assembleRPCURL: (method, api, prefix, base_uri) ->
-				if typeof api is null and typeof base_uri is null
-					throw "RPC Error: must specify either an API or base URI to generate an RPC endpoint."
+			_assembleRPCURL: (method, api=null, prefix=null, base_uri=null) ->
+				if api is null and base_uri is null
+					throw "[RPC] Error: Must specify either an API or base URI to generate an RPC endpoint."
 				else
-					if typeof base_uri is null
-						base_uri = fatcatmap.rpc.api[api].base_uri
+					if base_uri is null ## if we're working with an API, get the base URI
+						base_uri = window.fatcatmap.rpc.api[api].base_uri
 
-					if typeof prefix isnt null
+					if prefix isnt null
 						return [prefix+base_uri, method].join('.')
 					else
 						return [base_uri, method].join('.')
@@ -147,85 +157,119 @@ class CoreRPCAPI extends CoreAPI
 			createRPCRequest: (config) ->
 
 				request = new RPCRequest(@provisionRequestID())
+
+				if config.api?
+					request.setAPI(config.api)
+
+				if config.method?
+					request.setMethod(config.method)
+
+				if config.agent?
+					request.setAgent(config.agent)
+
+				if config.opts?
+					request.setOpts(config.opts)
+
+				if config.base_uri?
+					request.setBaseURI(config.base_uri)
+
+				if config.params?
+					request.setParams(config.params)
+
+				if config.async?
+					request.setAsync(config.async)
 				
-				for key, value of config
-					if key in request
-						request[key] = value
-					else if key is 'opts'
-						request.setOpts(value)
-					else if key is 'agent'
-						request.setAgent(value)
+				console.log('[RPC] Request: ', request, config)
+				request.setAction(@_assembleRPCURL(request.method, request.api, @action_prefix, @base_rpc_uri))
 						
 				return request
 				
 			fulfillRPCRequest: (config, request, callbacks) ->
+
+				console.log('[RPC] Fulfill: ', config, request, callbacks)
 				@lastRequest = request
+
 				@history[request.envelope.id] =
 					request: request
 					config: config
 					callbacks: callbacks
-					
+
 				if request.action is null
 					if request.method is null
-						throw "RPC Error: Request must specify at least an action or method."
+						throw "[RPC] Error: Request must specify at least an action or method."
 					if request.base_uri is null
 						if request.api is null
-							throw "RPC Error: Request must have an API or explicity BASE_URI."
+							throw "[RPC] Error: Request must have an API or explicity BASE_URI."
 						else
 							request.action = @_assembleRPCURL(request.method, request.api, @action_prefix)
 					else
 						request.action = @_assembleRPCURL(request.method, null, @action_prefix, request.base_uri)
-						
-				xhr = $.ajax({
+
+				if request.action is null or request.action is undefined
+					throw '[RPC] Error: Could not determine RPC action.'
 				
-					url: request.action
-					data: JSON.stringify request.params
-					async: request.ajax.async
-					cache: request.ajax.cache
-					global: request.ajax.global
-					type: request.ajax.http_method
-					crossDomain: request.ajax.crossDomain
-					dataType: request.ajax.dataType
-					processData: false
-					ifModified: request.ajax.ifModified
-					contentType: 'application/json'
+				do (request, callbacks) ->
+					@request = request
+					@callbacks = callbacks
+					@fatcatmap = window.fatcatmap
 					
-					beforeSend: (xhr, settings) ->
-						fatcatmap.rpc.history[request.envelope.id].xhr = xhr;
-						return xhr
-						
-					error: (xhr, status, error) ->
-						fatcatmap.rpc.lastFailure = error
-						fatcatmap.rpc.history[request.envelope.id].xhr = xhr
-						fatcatmap.rpc.history[request.envelope.id].status = status
-						fatcatmap.rpc.history[request.envelope.id].failure = error
-						callbacks.failure(data)
-						
-					success: (data, status, xhr) ->
-						fatcatmap.rpc.lastResponse = data
-						fatcatmap.rpc.history[request.envelope.id].xhr = xhr
-						fatcatmap.rpc.history[request.envelope.id].status = status
-						fatcatmap.rpc.history[request.envelope.id].response = data
-						callbacks.success(data)
-						
-					complete: (xhr, status) ->
-						fatcatmap.rpc.history[request.envelope.id].xhr = xhr
-						fatcatmap.rpc.history[request.envelope.id].status = status
-						
-					statusCode:
-						
-						404: ->
-							alert 'RPC 404: Could not resolve RPC action URI.'
-							
-						403: ->
-							alert 'RPC 403: Not authorized to access the specified endpoint.'
-							
-						500: ->
-							alert 'RPC 500: Woops! Something went wrong. Please try again.'
+					console.log('CALLBACKS_HOOK: ', @callbacks)
+					
+					xhr = $.ajax({
+			
+						url: @request.action
+						data: JSON.stringify @request.params
+						async: @request.ajax.async
+						cache: @request.ajax.cache
+						global: @request.ajax.global
+						type: @request.ajax.http_method
+						crossDomain: @request.ajax.crossDomain
+						dataType: @request.ajax.dataType
+						processData: false
+						ifModified: @request.ajax.ifModified
+						contentType: 'application/json'
 				
-				})
+						beforeSend: (xhr, settings) =>
+							@fatcatmap.rpc.api.history[@request.envelope.id].xhr = xhr;
+							return xhr
+					
+						error: (xhr, status, error) =>
+							console.log('[RPC] Error: ', data, status, xhr)
+							@fatcatmap.rpc.api.lastFailure = error
+							@fatcatmap.rpc.api.history[@request.envelope.id].xhr = xhr
+							@fatcatmap.rpc.api.history[@request.envelope.id].status = status
+							@fatcatmap.rpc.api.history[@request.envelope.id].failure = error
+							@callbacks.failure(data)
+					
+						success: (data, status, xhr) =>
+							console.log('[RPC] Success: ', data, status, xhr)
+							@fatcatmap.rpc.api.lastResponse = data
+							@fatcatmap.rpc.api.history[@request.envelope.id].xhr = xhr
+							@fatcatmap.rpc.api.history[@request.envelope.id].status = status
+							@fatcatmap.rpc.api.history[@request.envelope.id].response = data
+							@callbacks.success(data)
+					
+						complete: (xhr, status) =>
+							@fatcatmap.rpc.api.history[@request.envelope.id].xhr = xhr
+							@fatcatmap.rpc.api.history[@request.envelope.id].status = status
+					
+						statusCode:
+					
+							404: ->
+								console.log('[RPC]: 404')
+								alert 'RPC 404: Could not resolve RPC action URI.'
+						
+							403: ->
+								console.log('[RPC]: 403')
+								alert 'RPC 403: Not authorized to access the specified endpoint.'
+						
+							500: ->
+								console.log('[RPC]: 500')							
+								alert 'RPC 500: Woops! Something went wrong. Please try again.'
+			
+					})
 				
-				return {id: request.envelope.id, request: request, xhr: xhr}
+				return {id: request.envelope.id, request: request}
 						
 
 		@adapters =
@@ -238,3 +282,8 @@ class CoreRPCAPI extends CoreAPI
 			frame: new RPCAdapter('frame')
 		
 		@ext = null
+		
+		
+window.RPCAPI = RPCAPI
+window.RPCAdapter = RPCAdapter
+window.RPCRequest = RPCRequest

@@ -25,11 +25,6 @@ class FatCatMap
 		
 		## RPC API
 		@rpc = new CoreRPCAPI
-		@rpc.api.factory('data', '/_api/rpc/data', ['get', 'retrieveGraphObject', 'retrieveNative', 'retriveAsset'])
-		@rpc.api.factory('query', '/_api/rpc/query', ['search','gql','autocomplete'])
-		@rpc.api.factory('graph', '/_api/rpc/graph', ['construct', 'constructFromNode', 'constructFromObject'])
-		@rpc.api.factory('charts', '/_api/rpc/charts', ['generate', 'generateFromSeries'])
-		@rpc.api.factory('session', '/_api/rpc/session', ['init', 'authenticate', 'checkin'])
 		
 		## SYS API
 		@sys = new CoreSysAPI

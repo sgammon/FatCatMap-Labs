@@ -41,7 +41,7 @@ config['tipfy'] = {
 }
 config['tipfy.sessions'] = {
 
-	'secret_key':'ASKLdjOF)H#*@G@)*GCJDBUVF(!&Gouhf981g27gd2G@H)'
+	'secret_key':'ASDkljgdo*(#G!(CDSOICBD&V!OCXVVBIUB#V*C&VLSAXCX212e122d1))'
 
 }
 config['tipfyext.jinja2'] = {
@@ -128,7 +128,7 @@ config['momentum.fatcatmap'] = {
 	'version': {
 		'major': 1,
 		'minor': 1,
-		'micro': 20110617,
+		'micro': 20110623,
 		'release': 'ALPHA'
 	}
 

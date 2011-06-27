@@ -35,14 +35,14 @@
 				<li class='last'><a href="{{ api.users.create_logout_url('/') }}">Log Out</a></li>
 			</ul>
 		</li>
+		
+		<li id='utilDotSpacer'>&#183;</li>		
+		<li class='navButton'><a href='#'><span id='inboxCount'>0</span> Inbox</a></li>
+		
 		{% else %}
 		<li class='navButton'><a href="{{ api.users.create_login_url('/') }}">Log In</a></li>
 		{% endif %}
-		
-		<li id='utilDotSpacer'>&#183;</li>
-		
-		<li class='navButton'><a href='#'><span id='inboxCount'>0</span> Inbox</a></li>
-		
+				
 		<li id='utilDotSpacer'>&#183;</li>		
 		
 		<li class='navButton'><a href='#'>momentum</a>

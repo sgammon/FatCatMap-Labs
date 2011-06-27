@@ -7,7 +7,7 @@
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  }, __indexOf = Array.prototype.indexOf || function(item) {
+  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
     }
@@ -360,11 +360,19 @@
       this.logout_url = null;
     }
     __extends(CoreUserAPI, CoreAPI);
-    CoreUserAPI.prototype.setUserInfo = function(current_user, is_user_admin, login_url, logout_url) {
-      this.current_user = current_user;
-      this.is_user_admin = is_user_admin;
-      this.login_url = login_url;
-      this.logout_url = logout_url;
+    CoreUserAPI.prototype.setUserInfo = function(user_properties) {
+      if (user_properties['current_user'] !== null) {
+        this.current_user = user_properties['current_user'];
+      }
+      if (user_properties['is_user_admin'] !== null) {
+        this.is_user_admin = user_properties['is_user_admin'];
+      }
+      if (user_properties['login_url'] !== null) {
+        this.login_url = user_properties['login_url'];
+      }
+      if (user_properties['logout_url'] !== null) {
+        return this.logout_url = user_properties['logout_url'];
+      }
     };
     return CoreUserAPI;
   })();
@@ -379,45 +387,55 @@
         _ref = this.methods;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           method = _ref[_i];
-          this[method] = function(params, callbacks, async, opts) {
-            if (params == null) {
-              params = {};
-            }
-            if (callbacks == null) {
-              callbacks = {};
-            }
-            if (async == null) {
-              async = false;
-            }
-            if (opts == null) {
-              opts = {};
-            }
-            return this.makeRPCRequest(method, params, opts, async).fulfill(callbacks);
-          };
+          this[method] = this._buildRPCMethod(method);
         }
       }
     }
-    RPCAPI.prototype.makeRPCRequest = function(method, params, opts, async) {
-      if (__indexOf.call(this.methods, method) >= 0) {
-        return fatcatmap.rpc.api.createRPCRequest({
-          method: method,
-          api: this.name,
-          params: params || {},
-          opts: opts || {},
-          async: async || false
-        });
-      }
-    };
-    RPCAPI.prototype.__noSuchMethod__ = function(id, args) {
-      if (__indexOf.call(this.methods, method) >= 0) {
-        return fatcatmap.rpc.createRPCRequest({
-          method: method,
-          api: this.name,
-          params: args.slice(0, (args.length - 2 + 1) || 9e9) || {},
-          opts: args[-1] || {},
-          async: args[-2] || false
-        });
-      }
+    RPCAPI.prototype._buildRPCMethod = function(method) {
+      var api, rpcMethod;
+      api = this.name;
+      rpcMethod = __bind(function(params, callbacks, async, opts) {
+        if (params == null) {
+          params = {};
+        }
+        if (callbacks == null) {
+          callbacks = null;
+        }
+        if (async == null) {
+          async = false;
+        }
+        if (opts == null) {
+          opts = {};
+        }
+        return __bind(function(params, callbacks, async, opts) {
+          var request;
+          if (params == null) {
+            params = {};
+          }
+          if (callbacks == null) {
+            callbacks = {};
+          }
+          if (async == null) {
+            async = false;
+          }
+          if (opts == null) {
+            opts = {};
+          }
+          request = window.fatcatmap.rpc.api.createRPCRequest({
+            method: method,
+            api: api,
+            params: params || {},
+            opts: opts || {},
+            async: async || false
+          });
+          if (callbacks != null) {
+            return request.fulfill(callbacks);
+          } else {
+            return request;
+          }
+        }, this)(params, callbacks, async, opts);
+      }, this);
+      return rpcMethod;
     };
     return RPCAPI;
   })();
@@ -430,65 +448,99 @@
     };
     RPCAdapter.prototype.response = function(response, callbacks) {
       if (__indexOf.call(callbacks, 'success') >= 0) {
-        return fatcatmap.rpc.adapters.makeCallback(response, callbacks.success);
+        return window.fatcatmap.rpc.adapters.makeCallback(response, callbacks.success);
       }
     };
     return RPCAdapter;
   })();
   RPCRequest = (function() {
-    var action, api, base_uri, method, params;
-    params = {};
-    action = null;
-    method = null;
-    api = null;
-    base_uri = null;
-    RPCRequest.prototype.envelope = {
-      id: null,
-      opts: {},
-      agent: {}
-    };
-    RPCRequest.prototype.ajax = {
-      async: false,
-      cache: true,
-      global: true,
-      http_method: 'POST',
-      crossDomain: false,
-      ifModified: false,
-      dataType: 'json'
-    };
     function RPCRequest(id, opts, agent) {
-      this.envelope.id = id;
-      this.envelope.opts = opts;
-      this.envelope.agent = agent;
+      this.params = {};
+      this.action = null;
+      this.method = null;
+      this.api = null;
+      this.base_uri = null;
+      this.envelope = {
+        id: null,
+        opts: {},
+        agent: {}
+      };
+      this.ajax = {
+        async: false,
+        cache: true,
+        global: true,
+        http_method: 'POST',
+        crossDomain: false,
+        ifModified: false,
+        dataType: 'json'
+      };
+      if (id != null) {
+        this.envelope.id = id;
+      }
+      if (opts != null) {
+        this.envelope.opts = opts;
+      }
+      if (agent != null) {
+        this.envelope.agent = agent;
+      }
     }
     RPCRequest.prototype.fulfill = function() {
       var callbacks, config;
       callbacks = arguments[0], config = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      return fatcatmap.rpc.api.fulfillRPCRequest(config, this, this.ajax.async);
+      return window.fatcatmap.rpc.api.fulfillRPCRequest(config, this, callbacks);
+    };
+    RPCRequest.prototype.setAsync = function(async) {
+      var _ref, _ref2;
+      if ((_ref = this.ajax) != null) {
+                if ((_ref2 = _ref.async) != null) {
+          _ref2;
+        } else {
+          _ref.async = async;
+        };
+      }
+      return this;
     };
     RPCRequest.prototype.setOpts = function(opts) {
-      return this.envelope.opts = opts;
+      var _ref, _ref2;
+      if ((_ref = this.envelope) != null) {
+                if ((_ref2 = _ref.opts) != null) {
+          _ref2;
+        } else {
+          _ref.opts = opts;
+        };
+      }
+      return this;
     };
     RPCRequest.prototype.setAgent = function(agent) {
-      return this.envelope.agent = agent;
+      var _ref, _ref2;
+      if ((_ref = this.envelope) != null) {
+                if ((_ref2 = _ref.agent) != null) {
+          _ref2;
+        } else {
+          _ref.agent = agent;
+        };
+      }
+      return this;
     };
     RPCRequest.prototype.setAction = function(action) {
-      return this.action = action;
+      this.action = action;
+      return this;
     };
     RPCRequest.prototype.setMethod = function(method) {
-      return this.method = method;
+      this.method = method;
+      return this;
     };
-    RPCRequest.prototype.setAPI = function(method) {
-      return this.api = api;
+    RPCRequest.prototype.setAPI = function(api) {
+      this.api = api;
+      return this;
     };
-    RPCRequest.prototype.setBaseURI = function(uri) {
-      return this.base_uri = uri;
+    RPCRequest.prototype.setBaseURI = function(base_uri) {
+      this.base_uri = base_uri;
+      return this;
     };
     RPCRequest.prototype.setParams = function(params) {
-      if (params == null) {
-        params = {};
-      }
-      return this.params = params;
+      this.params = params != null ? params : {};
+      return this;
     };
     RPCRequest.prototype.payload = function() {
       var key, value, _payload, _ref;
@@ -520,13 +572,22 @@
           return this[name] = new RPCAPI(name, base_uri, methods, config);
         },
         _assembleRPCURL: function(method, api, prefix, base_uri) {
-          if (typeof api === null && typeof base_uri === null) {
-            throw "RPC Error: must specify either an API or base URI to generate an RPC endpoint.";
+          if (api == null) {
+            api = null;
+          }
+          if (prefix == null) {
+            prefix = null;
+          }
+          if (base_uri == null) {
+            base_uri = null;
+          }
+          if (api === null && base_uri === null) {
+            throw "[RPC] Error: Must specify either an API or base URI to generate an RPC endpoint.";
           } else {
-            if (typeof base_uri === null) {
-              base_uri = fatcatmap.rpc.api[api].base_uri;
+            if (base_uri === null) {
+              base_uri = window.fatcatmap.rpc.api[api].base_uri;
             }
-            if (typeof prefix !== null) {
+            if (prefix !== null) {
               return [prefix + base_uri, method].join('.');
             } else {
               return [base_uri, method].join('.');
@@ -545,22 +606,35 @@
           }
         },
         createRPCRequest: function(config) {
-          var key, request, value;
+          var request;
           request = new RPCRequest(this.provisionRequestID());
-          for (key in config) {
-            value = config[key];
-            if (__indexOf.call(request, key) >= 0) {
-              request[key] = value;
-            } else if (key === 'opts') {
-              request.setOpts(value);
-            } else if (key === 'agent') {
-              request.setAgent(value);
-            }
+          if (config.api != null) {
+            request.setAPI(config.api);
           }
+          if (config.method != null) {
+            request.setMethod(config.method);
+          }
+          if (config.agent != null) {
+            request.setAgent(config.agent);
+          }
+          if (config.opts != null) {
+            request.setOpts(config.opts);
+          }
+          if (config.base_uri != null) {
+            request.setBaseURI(config.base_uri);
+          }
+          if (config.params != null) {
+            request.setParams(config.params);
+          }
+          if (config.async != null) {
+            request.setAsync(config.async);
+          }
+          console.log('[RPC] Request: ', request, config);
+          request.setAction(this._assembleRPCURL(request.method, request.api, this.action_prefix, this.base_rpc_uri));
           return request;
         },
         fulfillRPCRequest: function(config, request, callbacks) {
-          var xhr;
+          console.log('[RPC] Fulfill: ', config, request, callbacks);
           this.lastRequest = request;
           this.history[request.envelope.id] = {
             request: request,
@@ -569,11 +643,11 @@
           };
           if (request.action === null) {
             if (request.method === null) {
-              throw "RPC Error: Request must specify at least an action or method.";
+              throw "[RPC] Error: Request must specify at least an action or method.";
             }
             if (request.base_uri === null) {
               if (request.api === null) {
-                throw "RPC Error: Request must have an API or explicity BASE_URI.";
+                throw "[RPC] Error: Request must have an API or explicity BASE_URI.";
               } else {
                 request.action = this._assembleRPCURL(request.method, request.api, this.action_prefix);
               }
@@ -581,56 +655,70 @@
               request.action = this._assembleRPCURL(request.method, null, this.action_prefix, request.base_uri);
             }
           }
-          xhr = $.ajax({
-            url: request.action,
-            data: JSON.stringify(request.params),
-            async: request.ajax.async,
-            cache: request.ajax.cache,
-            global: request.ajax.global,
-            type: request.ajax.http_method,
-            crossDomain: request.ajax.crossDomain,
-            dataType: request.ajax.dataType,
-            processData: false,
-            ifModified: request.ajax.ifModified,
-            contentType: 'application/json',
-            beforeSend: function(xhr, settings) {
-              fatcatmap.rpc.history[request.envelope.id].xhr = xhr;
-              return xhr;
-            },
-            error: function(xhr, status, error) {
-              fatcatmap.rpc.lastFailure = error;
-              fatcatmap.rpc.history[request.envelope.id].xhr = xhr;
-              fatcatmap.rpc.history[request.envelope.id].status = status;
-              fatcatmap.rpc.history[request.envelope.id].failure = error;
-              return callbacks.failure(data);
-            },
-            success: function(data, status, xhr) {
-              fatcatmap.rpc.lastResponse = data;
-              fatcatmap.rpc.history[request.envelope.id].xhr = xhr;
-              fatcatmap.rpc.history[request.envelope.id].status = status;
-              fatcatmap.rpc.history[request.envelope.id].response = data;
-              return callbacks.success(data);
-            },
-            complete: function(xhr, status) {
-              fatcatmap.rpc.history[request.envelope.id].xhr = xhr;
-              return fatcatmap.rpc.history[request.envelope.id].status = status;
-            },
-            statusCode: {
-              404: function() {
-                return alert('RPC 404: Could not resolve RPC action URI.');
-              },
-              403: function() {
-                return alert('RPC 403: Not authorized to access the specified endpoint.');
-              },
-              500: function() {
-                return alert('RPC 500: Woops! Something went wrong. Please try again.');
+          if (request.action === null || request.action === void 0) {
+            throw '[RPC] Error: Could not determine RPC action.';
+          }
+          (function(request, callbacks) {
+            var xhr;
+            this.request = request;
+            this.callbacks = callbacks;
+            this.fatcatmap = window.fatcatmap;
+            console.log('CALLBACKS_HOOK: ', this.callbacks);
+            return xhr = $.ajax({
+              url: this.request.action,
+              data: JSON.stringify(this.request.params),
+              async: this.request.ajax.async,
+              cache: this.request.ajax.cache,
+              global: this.request.ajax.global,
+              type: this.request.ajax.http_method,
+              crossDomain: this.request.ajax.crossDomain,
+              dataType: this.request.ajax.dataType,
+              processData: false,
+              ifModified: this.request.ajax.ifModified,
+              contentType: 'application/json',
+              beforeSend: __bind(function(xhr, settings) {
+                this.fatcatmap.rpc.api.history[this.request.envelope.id].xhr = xhr;
+                return xhr;
+              }, this),
+              error: __bind(function(xhr, status, error) {
+                console.log('[RPC] Error: ', data, status, xhr);
+                this.fatcatmap.rpc.api.lastFailure = error;
+                this.fatcatmap.rpc.api.history[this.request.envelope.id].xhr = xhr;
+                this.fatcatmap.rpc.api.history[this.request.envelope.id].status = status;
+                this.fatcatmap.rpc.api.history[this.request.envelope.id].failure = error;
+                return this.callbacks.failure(data);
+              }, this),
+              success: __bind(function(data, status, xhr) {
+                console.log('[RPC] Success: ', data, status, xhr);
+                this.fatcatmap.rpc.api.lastResponse = data;
+                this.fatcatmap.rpc.api.history[this.request.envelope.id].xhr = xhr;
+                this.fatcatmap.rpc.api.history[this.request.envelope.id].status = status;
+                this.fatcatmap.rpc.api.history[this.request.envelope.id].response = data;
+                return this.callbacks.success(data);
+              }, this),
+              complete: __bind(function(xhr, status) {
+                this.fatcatmap.rpc.api.history[this.request.envelope.id].xhr = xhr;
+                return this.fatcatmap.rpc.api.history[this.request.envelope.id].status = status;
+              }, this),
+              statusCode: {
+                404: function() {
+                  console.log('[RPC]: 404');
+                  return alert('RPC 404: Could not resolve RPC action URI.');
+                },
+                403: function() {
+                  console.log('[RPC]: 403');
+                  return alert('RPC 403: Not authorized to access the specified endpoint.');
+                },
+                500: function() {
+                  console.log('[RPC]: 500');
+                  return alert('RPC 500: Woops! Something went wrong. Please try again.');
+                }
               }
-            }
-          });
+            });
+          })(request, callbacks);
           return {
             id: request.envelope.id,
-            request: request,
-            xhr: xhr
+            request: request
           };
         }
       };
@@ -647,6 +735,9 @@
     __extends(CoreRPCAPI, CoreAPI);
     return CoreRPCAPI;
   })();
+  window.RPCAPI = RPCAPI;
+  window.RPCAdapter = RPCAdapter;
+  window.RPCRequest = RPCRequest;
   CoreStateAPI = (function() {
     function CoreStateAPI() {
       this.events = {
@@ -797,11 +888,6 @@
       this.state.events.registerEvent('PLATFORM_READY');
       this.user = new CoreUserAPI;
       this.rpc = new CoreRPCAPI;
-      this.rpc.api.factory('data', '/_api/rpc/data', ['get', 'retrieveGraphObject', 'retrieveNative', 'retriveAsset']);
-      this.rpc.api.factory('query', '/_api/rpc/query', ['search', 'gql', 'autocomplete']);
-      this.rpc.api.factory('graph', '/_api/rpc/graph', ['construct', 'constructFromNode', 'constructFromObject']);
-      this.rpc.api.factory('charts', '/_api/rpc/charts', ['generate', 'generateFromSeries']);
-      this.rpc.api.factory('session', '/_api/rpc/session', ['init', 'authenticate', 'checkin']);
       this.sys = new CoreSysAPI;
       this.dev = new CoreDevAPI;
       return this;

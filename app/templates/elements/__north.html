@@ -88,6 +88,9 @@ yepnope([
 <script src="{{ script_url('interaction','compiled') }}"></script>
 <script src="{{ script_url('site','compiled') }}"></script>
 
+<!-- JS API -->
+<script src="{{ link('js-api') }}"></script>
+
 <!-- jQuery Plugins -->
 <script src="{{ script_url('uniform', 'jquery') }}"></script>
 <script src="{{ script_url('tipsy', 'jquery') }}"></script>
@@ -100,7 +103,8 @@ yepnope([
 {% else %}
 <!-- FCM Platform -->
 <script src="{{ script_url('init', 'core') }}"></script>
-<!--><script src="{{ link('js-api') }}"></script>-->
+<script src="{{ link('js-api') }}"></script>
+
 <!--<script src="{{ script_url('rpc', 'core') }}"></script>-->
 <!--<script src="{{ script_url('plugins', 'core') }}"></script>-->
 <script src="{{ script_url('layout', 'core') }}"></script>

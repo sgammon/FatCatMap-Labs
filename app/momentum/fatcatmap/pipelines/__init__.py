@@ -211,7 +211,7 @@ class FCMPipeline(pipeline.Pipeline):
 
 		## If debugger is still none, it defaults to the dummy or standard if we're in debug mode...
 		if self.logger == None:
-			if self.pipeline_config['debug'] == True:
+			if self._opts['debug'] == True:
 				self.logger = FCMStandardLogger(self)
 			else:
 				self.logger = FCMDummyLogger(self)
