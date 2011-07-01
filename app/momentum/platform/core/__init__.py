@@ -1,0 +1,4 @@
+
+
+class SecurityMiddleware(object):
+	pass

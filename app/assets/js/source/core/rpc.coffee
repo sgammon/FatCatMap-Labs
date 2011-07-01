@@ -109,9 +109,11 @@ class RPCRequest
 			id: @envelope.id
 			opts: @envelope.opts
 			agent: @envelope.agent
-		for key, value of @params
-			_payload[key] = value
-
+			request:
+				params: @params
+				method: @method
+				api: @api
+				
 		return _payload
 
 
@@ -213,12 +215,10 @@ class CoreRPCAPI extends CoreAPI
 					@callbacks = callbacks
 					@fatcatmap = window.fatcatmap
 					
-					console.log('CALLBACKS_HOOK: ', @callbacks)
-					
 					xhr = $.ajax({
 			
 						url: @request.action
-						data: JSON.stringify @request.params
+						data: JSON.stringify @request.payload()
 						async: @request.ajax.async
 						cache: @request.ajax.cache
 						global: @request.ajax.global

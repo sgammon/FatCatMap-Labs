@@ -279,7 +279,7 @@
         }
       };
       return this.capabilities = {
-        cookies: navigator.cookiesEnabled,
+        cookies: navigator.cookieEnabled,
         ajax: $.support.ajax,
         canvas: Modernizr.canvas,
         geolocation: Modernizr.geolocation,
@@ -342,7 +342,29 @@
     function CoreDevAPI() {
       this.config = {};
       this.environment = {};
-      this.performance = {};
+      this.performance = {
+        tools: {
+          fpsstats: {
+            show: function(selector) {
+              var stats;
+              stats = new Stats();
+              stats.domElement.style.position = 'absolute';
+              stats.domElement.style.left = '50px';
+              stats.domElement.style.top = '50px';
+              stats.domElement.style.opacity = 0.7;
+              stats.domElement.id = 'js_fps_stats';
+              console.log('stats', stats);
+              $('body').append(stats.domElement);
+              return setInterval(function() {
+                return stats.update();
+              }, 1000 / 60);
+            },
+            hide: function(selector) {
+              return $('#js_fps_stats').hide();
+            }
+          }
+        }
+      };
       this.debug = {
         logging: true,
         eventlog: true,
@@ -543,17 +565,17 @@
       return this;
     };
     RPCRequest.prototype.payload = function() {
-      var key, value, _payload, _ref;
+      var _payload;
       _payload = {
         id: this.envelope.id,
         opts: this.envelope.opts,
-        agent: this.envelope.agent
+        agent: this.envelope.agent,
+        request: {
+          params: this.params,
+          method: this.method,
+          api: this.api
+        }
       };
-      _ref = this.params;
-      for (key in _ref) {
-        value = _ref[key];
-        _payload[key] = value;
-      }
       return _payload;
     };
     return RPCRequest;
@@ -663,10 +685,9 @@
             this.request = request;
             this.callbacks = callbacks;
             this.fatcatmap = window.fatcatmap;
-            console.log('CALLBACKS_HOOK: ', this.callbacks);
             return xhr = $.ajax({
               url: this.request.action,
-              data: JSON.stringify(this.request.params),
+              data: JSON.stringify(this.request.payload()),
               async: this.request.ajax.async,
               cache: this.request.ajax.cache,
               global: this.request.ajax.global,

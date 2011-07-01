@@ -104,6 +104,10 @@ class FCMStandardLogger(FCMPipelineLogger):
 	def warning(self, message): logging.warning(message)
 	def error(self, message): logging.error(message)
 	def critical(self, message): logging.critical(message)
+	
+	def dispatch(self, pipeline, severity, message):
+		if hasattr(self, severity.lower()):
+			getattr(self, severity)(message)
 
 
 #### No Logging

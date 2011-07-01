@@ -19,21 +19,21 @@ class AssetsMixin(HandlerMixin):
 		return config.get('momentum.fatcatmap.assets')		
 
 
-	def script_url(self, name, module=None, version=None, minify=False, **kwargs):
+	def script_url(self, name, module=None, version=None, minify=False, version_by_getvar=False, **kwargs):
 
 		''' Return a URL for a stylesheet. '''
 
-		return self.asset_url('js', name, module, version, minify, **kwargs)
+		return self.asset_url('js', name, module, version, minify, version_by_getvar, **kwargs)
 
 	
-	def style_url(self, name, module=None, version=None, minify=False, **kwargs):
+	def style_url(self, name, module=None, version=None, minify=False, version_by_getvar=False, **kwargs):
 
 		''' Return a URL for a stylesheet. '''
 
-		return self.asset_url('style', name, module, version, minify, **kwargs)
+		return self.asset_url('style', name, module, version, minify, version_by_getvar, **kwargs)
 		
 	
-	def asset_url(self, _type, name, module=None, version=None, minify=False, **kwargs):
+	def asset_url(self, _type, name, module=None, version=None, minify=False, version_by_getvar=False, **kwargs):
 
 		''' Return a URL for an asset, according to the current configuration. '''
 
@@ -70,13 +70,19 @@ class AssetsMixin(HandlerMixin):
 
 			else:
 				# 3: Add the name of the file
-				filename = name+'-'
+				filename = name
 	
 				# 4: Consider version
 				if version is not None:
-					filename += str(version)
+					if version_by_getvar is False:
+						filename += '-'+str(version)
+					else:
+						query_string['v'] = str(version)
 				elif 'version' in asset:
-					filename += str(asset['version'])
+					if version_by_getvar is False:
+						filename += '-'+str(asset['version'])
+					else:
+						query_string['v'] = str(asset['version'])
 		
 				# 5: Add Extension
 				if 'extension' in asset:
@@ -97,12 +103,13 @@ class AssetsMixin(HandlerMixin):
 			if len(kwargs) > 0:
 				for k, v in kwargs.items():
 					query_string[k] = str(v)
-		
+
+			if len(query_string) > 0:
 				# Build URL and return!
 				return '/'+'/'.join(asset_url)+'?'+'&'.join([str(k)+'='+str(v) for k, v in query_string.items()])
-	
-			# Build URL and return!
-			return '/'+'/'.join(asset_url)
+			else:
+				# Build URL and return!
+				return '/'+'/'.join(asset_url)
 		
 		else:
 			if module not in c[_type] and name not in c[_type]:

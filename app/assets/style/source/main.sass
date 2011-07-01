@@ -1,0 +1,731 @@
+@import "blueprint/reset"
+
+@import partials/base
+
+@import compass/utilities/general/float
+
+@import "blueprint"
+@import "blueprint/ie"
+@import "blueprint/form"
+@import "blueprint/liquid"
+@import "blueprint/colors"
+@import "blueprint/buttons"
+@import "blueprint/fancy-type"
+@import "blueprint/grid"
+@import "blueprint/interaction"
+@import "blueprint/link-icons"
+@import "blueprint/print"
+@import "blueprint/typography"
+@import "blueprint/typography"
+
+@import partials/fcm_dark
+
+
+// ROOT
+html, body
+	overflow: auto
+	background-color: #222
+	font: 13px/1.231 sans-serif
+	*font-size: small
+	
+body
+	
+	
+	// Forms & link icons
+	+link-icons
+	+blueprint-form
+	
+	color: $text_color
+	background: $main_bg	
+	
+	a
+		color: $a_color
+		&:hover
+			color: $a_hover_color
+			
+	a.noicon
+		+no-link-icon
+
+// BUTTONS
+a.button
+	// you can pass "left" or "right" to +anchor-button to float it in that direction
+	// or you can pass no argument to leave it inline-block (cross browser safe!) within
+	// the flow of your page.
+	+anchor-button()
+	// All the button color mixins take 4 optional arguments:
+	// font color, background color, border color, border highlight color
+	// the first three default to constants set in blueprint/buttons.sass
+	// the last one defaults to a shade lighter than the border color.
+	+button-colors
+	+button-hover-colors
+	+button-active-colors
+
+button
+	// The +button-button mixin is just like the +anchor-button mixin, but for <button> elements.
+	+button-button(left)
+	+button-colors
+	+button-hover-colors
+	+button-active-colors
+
+// We can change the colors for buttons of certain classes, etc.
+a.positive, button.positive
+	color: #529214
+	+button-hover-colors(#529214, #E6EFC2, #C6D880)
+	+button-active-colors(#FFF, #529214, #529214)
+
+a.negative, button.negative
+	color: #D12F19
+	+button-hover-colors(#D12F19, #FBE3E4, #FBC2C4)
+	+button-active-colors(#FFF, #D12F19, #D12F19)
+
+
+hr
+	display: block
+	height: 1px
+	border: 0
+	border-top: 1px solid #ccc
+	margin: 1em 0
+	padding: 0
+	
+
+h1, h2, h3, h4, p, div, td, b, li, span, button, input[type=submit]
+	font-family: 'Cabin', 'Lucida Grande', arial, sans-serif
+	color: $text_color
+	
+ins
+	background-color: #ff9
+	color: #000
+	text-decoration: none
+
+mark
+	background-color: #ff9
+	color: #000
+	text-decoration: none
+	
+del
+	text-decoration: line-through
+	
+abbr[title], dfn[title]
+	border-bottom: 1px dotted
+	cursor: help
+	
+table
+	border-collapse: collapsed
+	border-spacing: 0
+	
+hr
+	display: block
+	height: 1px
+	border: 0
+	border-top: 1px solid #ccc
+	margin: 1em 0
+	padding: 0
+	
+input, select
+	vertical-align: middle
+
+button
+	padding: 2px 4px 2px 4px
+	
+input[type=submit]
+	padding: 3px
+
+select, input, textarea, button
+	font-size: 99%
+	background: transparent
+	
+pre, code, kbd, samp
+	font-family: monospace, sans-serif
+	
+a:hover, a:active
+	outline: none
+	
+ul, ol
+	margin-left: 2em
+	
+ol
+	list-style-type: decimal
+	
+nav ul, nav li
+	margin: 0
+	list-style: none
+	list-style-image: none
+	
+small
+	font-size: 85%
+	
+strong, th
+	font-weight: bold
+	
+td
+	vertical-align: top
+	
+sub, sup
+	line-height: 0
+	font-size: 75%	
+	position: relative
+	
+sup
+	top: -0.5em
+
+sub
+	bottom: -0.25em
+	
+pre
+	white-space: pre
+	white-space: pre-wrap
+	word-wrap: break-word
+	padding: 15px
+	
+textarea
+	overflow: auto
+	
+	
+// SUPERBAR
+.superbar
+	width: 100%
+	z-index: 600
+	height: 25px
+	background: $panel_bg
+	position: absolute
+	opacity: 0.8
+	top: 0
+	
+	#fcmTopBranding
+		padding:
+			top: 4px
+			left: 5px
+			right: 5px
+		width: 165px
+		text-align: center
+		float: left
+		
+	li
+		a
+			color: $superbar_a
+			text-shadow: 1px 1px 0px #111
+			text-decoration: none
+			
+			&:hover
+				color: $superbar_a_hover
+			
+	ul.topNavigation
+		margin-left: 0
+		line-height: 25px
+		list-style: none
+		display: inline
+		
+		li
+			list-style: none
+			padding:
+				right: 10px
+				left: 10px
+			display: inline
+			font-size: 10pt
+			color: $superbar_color
+			float: left
+			position: relative
+			
+	#util_navigation
+		padding-right: 5px
+	
+li.dotSpacer
+	font-size: 12pt !important
+	padding-right: 0
+	font-weight: bold
+	color: #666 !important
+	
+#utilDotSpacer
+	font-size: 12pt !important
+	padding-right: 0
+	font-weight: bold
+	color: #666 !important
+	width: 20px
+	text-align: center
+
+// NAVBAR
+.navbar 
+	padding: 0
+	margin: 0
+		
+	ul
+		padding: 0
+		margin: 0
+		
+		ul
+			position: absolute
+			top: 20px
+			z-index: 1000
+			background: $panel_bg
+			border:
+				left: $superbar_sub_border
+				right: $superbar_sub_border
+				
+		
+		ul.leftsub
+			left: 0
+			margin-top: 0
+			
+		ul.rightsub
+			right: 0px
+			margin-top: 3px
+			
+			li
+				text-align: right !important
+				
+		
+	li
+		position: relative
+		float: left
+		list-style: none
+		line-height: 25px
+		margin: 0
+		
+		b
+			height: 25px
+			display: inline
+			line-height: 25px
+			font-weight: bold
+			text-align: center
+			
+		a
+			height: 25px
+			line-height: 25px
+			display: inline
+			text-decoration: none
+			text-align: center
+			
+		ul
+			li
+				width: 160px
+				text-align: left
+				display: block
+				border-top: 1px solid #222
+				padding: 3px
+				
+				a
+					text-align: left
+				
+			li.last
+				border-bottom: 1px solid #222
+				
+		ul.subnav
+			visibility: hidden
+			
+		&:hover
+			ul
+				visibility: visible !important
+			
+	li.nolink
+		padding-top: 1px
+
+.spacer
+	width: 15px
+	text-align: center
+	
+	
+.navButton
+	padding-left: 6px
+	height: 25px
+	padding-right: 6px
+	
+li.navButton
+	a
+		span
+			color: black !important
+			
+.navbar
+	li.navButton:hover
+		ul.subnav
+			visibility: visible !important
+			
+.extendedNav
+	overflow: hidden
+	padding: 5px
+
+// SUPERFOOTER + BRANDING
+.superfooter
+	width: 100%
+	height: 55px
+	bottom: 0
+	font-weight: normal
+	position: absolute
+	background: $panel_bg
+	overflow: hidden
+	line-height: 55px
+	opacity: 0.7
+	
+	div
+		color: $superfooter_text
+		margin:
+			left: 10px
+			right: 10px
+			
+	#bottomFcmBranding
+		width: 180px
+		height: 50px
+		overflow: hidden
+		
+		a
+			width: 100%
+			height: 100%
+			
+			#momentumBrand
+				height: 55px
+				opacity: 0.5
+				background: no-repeat center transparent $momentum_branding
+				
+.brandingHover
+	opacity: 1.0 !important
+	background: no-repeat center transparent $momentum_branding_hover !important
+
+
+// CONTENT
+.rootContent
+	top: 25px
+	bottom: 55px
+	width: 100%
+	background: $main_bg
+	position: absolute
+	
+.content_header
+	background: $panel_bg
+	height: 100px
+	z-index: 500
+	position: absolute
+	width: 100%
+	margin-top: 0
+
+.content_body
+	top: 0
+	height: 100%
+	width: 100%
+	overflow: hidden
+	
+.content_footer
+	height: 10%
+	position: absolute
+	width: 100%
+	bottom: 0
+	
+	
+// NAVIGATION
+.foldNavigation
+	text-align: center
+	font-size: 9pt
+	position: absolute
+	bottom: 0
+	margin-bottom: -20px
+	width: 100%
+	
+	a
+		color: #666
+
+		&:hover
+			color: white
+
+// CONTENT PANEL
+.panelHeader
+	background: transparent url("/assets/img/static/layout/bg/light-gray-transparent-75.png")
+	opacity: 0.7
+	color: #DDD
+	padding: 10px 0 10px 10px
+	border-top-left-radius: 5px
+	border-top-right-radius: 5px
+	
+	h1
+		font-size: 14pt
+		color: #DDD
+		
+.panelContent
+	font-size: 10pt
+	padding: 10px
+	background: #222
+	min-height: 200px
+	border-bottom-left-radius: 5px
+	border-bottom-right-radius: 5px
+	
+// SIDEBARS
+.sidebar
+	color: #999 important
+	position: absolute
+	top: 25px
+	bottom: 25px
+	width: 35px
+	background: #111
+	opacity: 0.6
+	
+	&:hover
+		opacity: 0.8
+		
+	.panelWrapper
+		white-space: nowrap
+		overflow: hidden
+		
+		.title
+			font-weight: 400
+			padding: 10px 0 10px 10px
+			font-size: 150%
+			color: $panel_header_text
+			
+		.panelBox
+			padding:
+				top: 3px
+				bottom: 3px
+			border:
+				bottom: 1px solid #222
+				top: 1px solid #222
+			font-size: 100%
+			color: #FFF
+			
+			.subtitle
+				text-align: left
+				padding:
+					top: 3px
+					bottom: 3px
+				font-size: 110%
+				color: #fff
+				
+			.content
+				font-size: 80%
+				padding-right: 5px
+				color: #fff
+				
+				div
+					color: #fff
+					
+		.content
+			font-weight: normal
+			margin-right: 10px
+			padding: 10px 0 10px 10px
+			color: #fff
+		
+.sb-right
+	right: 0
+	margin-right: 0
+	margin-left: auto
+	clear: right
+	
+	.panelWrapper
+		.title
+			text-align: right
+			width: 160px
+	
+.sb-left
+	left: 0
+	clear: left
+	margin-right: auto
+	margin-left: 0
+	
+.paneButton
+	position: absolute
+	top: 10px
+	opacity: 0.2
+	
+.enabled:hover
+	opacity: 0.8
+	
+.cp-right
+	right: 10px
+
+.cp-right2
+	right: 35px
+	
+.cp-left
+	left: 10px
+	
+.cp-left2
+	left: 35px
+	
+// ACTUAL SIDEBARS
+#controlsPane.unfolded
+	max-width: 220px
+	
+.panelLabels
+	span
+		width: 40px
+		height: 13px
+		color: #fff
+
+.graphPhysicsInput
+	width: 45px
+	margin-right: 0
+
+.graphSettings
+	td
+		padding: 5px
+
+.graphButtons
+	text-align: center
+	margin-right: auto
+	margin-left: auto
+
+// DEV NOTICE
+#devNotice
+	position: absolute
+	text-align: right
+	right: 55px
+	bottom: 25px
+	font-size: 7pt
+	color: #666 !important
+	padding: 5px
+	border-radius: 5px
+	border: 1px solid #111
+	background: #222
+	opacity: 0.95
+
+	a
+		color: #666 !important
+		text-decoration: underline
+
+	b
+		color: #666
+		
+	hr
+		border-top: 1px solid #666
+		
+		
+#inboxCount
+	background: #666
+	padding: 1px 3px 1px 2px
+	margin-right: 3px
+	border-radius: 3px
+	font-family: Helvetica, Arial, sans-serif
+	font-size: 8pt
+	
+// UTIL CLASSES
+
+.absolute
+	position: absolute
+.floatleft
+	float: left 
+.floatright
+	float: right
+.clearleft
+	clear: left
+.clearright
+	clear: right
+.clearboth
+	clear: both 
+.fullwidth
+	width: 100% 
+.halfwidth
+	width: 50% 
+.quarterwidth
+	width: 25%
+.tenthwidth
+	width: 10% 
+.fullheight
+	height: 100% 
+.halfheight
+	height: 50% 
+.quarterheight
+	height: 25% 
+.tenthheight
+	height: 10% 
+.hideoverflow
+	overflow: hidden 
+.textcenter
+	text-align: center 
+.textleft
+	text-align: left 
+.textright
+	text-align: right 
+.alignmiddle
+	margin-left: auto
+	margin-right: auto
+.padding-5
+	padding: 5px
+.padding-10
+	padding: 10px 
+.padding-15 
+	padding: 15px 
+.padding-20
+	padding: 20px 
+.padding-25
+	padding: 25px 
+.padding-30
+	padding: 30px 
+.snapright
+	right: 0px
+.snapleft
+	left: 0px
+.snaptop
+	top: 0px
+.bigtext
+	font-size: 28pt
+.snapbottom
+	bottom: 0px
+.notice
+	min-width: 300px
+	min-height: 20px
+	background: #B4B955
+	color: black
+	border-radius: 3px
+	-moz-border-radius: 3px
+	opacity: 0.8
+	padding: 5px
+	margin: 10px 
+.ir
+	display: block
+	text-indent: -999em
+	overflow: hidden
+	background-repeat: no-repeat
+	text-align: left
+	direction: ltr
+.hidden
+	display: none
+	visibility: hidden 
+.displaynone
+	display: none
+.visuallyhidden
+	border: 0
+	clip: rect(0 0 0 0)
+	height: 1px
+	margin: -1px
+	overflow: hidden
+	padding: 0
+	position: absolute
+	width: 1px 
+.visuallyhidden.focusable:active,
+.visuallyhidden.focusable:focus
+	clip: auto
+	height: auto
+	margin: 0
+	overflow: visible
+	position: static
+	width: auto 
+.invisible
+	visibility: hidden 
+.clearfix:before, .clearfix:after
+	content: "\0020"
+	display: block
+	height: 0
+	overflow: hidden 
+.clearfix:after
+	clear: both 
+.clearfix
+	zoom: 1
+	
+// GLOBAL ALERTS
+#globalAlerts
+	position: absolute
+	top: 25
+	left: 0
+	width: 100%
+	text-align: center
+	
+.globalAlert
+	width: 50%
+	margin-left: auto
+	margin-right: auto
+	text-align: left
+	min-width: 300px
+	height: 20px
+	background: #B4B955
+	color: black
+	border-radius: 3px
+	-moz-border-radius: 3px
+	opacity: 0.8
+	padding: 5px
+	margin-top: 15px

@@ -22,4 +22,12 @@ $(document).ready(function fcmPageInit()
 	g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
 	s.parentNode.insertBefore(g,s)}(document,'script'));
 </script>
+
+{% else %}
+
+<!-- On-screen FPS/MB widget -->
+<script src="{{ script_url('fpsstats', 'dev') }}"></script>
+
+
+
 {% endif %}

@@ -70,7 +70,7 @@ class LayoutElement
 	
 	## High-Level Methods
 	hide: (duration, easing, callback) ->
-		@_setState('visibile', false)
+		@_setState('visible', false)
 		@get().hide(duration, easing, callback)
 		return @
 		
@@ -92,6 +92,3 @@ class LayoutElement
 	animate: (properties, options={}) ->
 		@get().animate(properties, options)
 		return @
-		
-		
-window.LayoutElement = LayoutElement

@@ -2,9 +2,30 @@
 
 ##Change Log
 
+**Thu, June 30 2011**
+- New 'require'-based structure for CoffeeScript, with a better build script
+- Proper compartmentalization of [Coffee/Java]Scripts, allowing more nimble page loads
+- New coffee files for 'plugins' folder - geo + workers to start
+- Version-by-getvar now a simple configuration switch for the Assets subsystem
+- Split up config files into smaller chunks for easier versioning + development
+- Cleaned up SCSS files from manual versioning
+- Added nifty FPS counter for JS rendering speed benchmarking
+
+
+**Wed, June 29 2011**
+- Structure in place for service layer middleware (authentication, authorization & audit)
+- Revamped AJAX and RPCAPI mechanism for the JS API layer
+- Asset versioning by GETVARS now supported
+- Config-based control of service layer caching, audit, and security
+- Config-based control of exposed service layer to JS clients
+- Dynamic generation of RPC APIs exposed to JS clients
+- People can now see FCM without being logged in as an admin (or at all)
+
 **Tue, June 21 2011**
 
 - Merge commit with Alex
+- New design for AJAX transport for JS API
+- New design for asset management & versioning via GETVARS
 
 **Sun, June 05 2011 software version tag 1.1-ALPHA**
 

@@ -10,6 +10,10 @@ import webapp2 as webapp
 from webapp2_extras import protorpc
 from google.appengine.ext.webapp import util
 
+from momentum.services import MomentumServiceHandlerFactory
+
+## Get services configuration
+services_config = config.config.get('momentum.fatcatmap.services')
 
 def enable_appstats(app):
 	
@@ -33,17 +37,20 @@ def generateServiceMappings(svc_cfg):
 		return service_mappings
 	else:
 		return None
-
+		
 
 def main():
 	
-	services_config = config.config.get('momentum.fatcatmap.services')
+	global services_config
 	if services_config['enabled'] == True:
 		service_mappings = generateServiceMappings(services_config)
 		if service_mappings is not None:
+			
 			## Map URL's to services
+			protorpc.ServiceHandlerFactory = MomentumServiceHandlerFactory
 			service_mappings = protorpc.service_mapping(service_mappings)
-	
+
+			## Build application
 			application = webapp.WSGIApplication(service_mappings)
 	
 			## Consider services config

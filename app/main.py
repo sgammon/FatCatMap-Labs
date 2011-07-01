@@ -10,8 +10,6 @@ bootstrap.MomentumBootstrapper.prepareImports()
 
 from tipfy import Tipfy
 from urls import get_rules
-
-from protorpc import service_handlers
 	
 
 def enable_appstats(app):

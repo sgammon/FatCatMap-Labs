@@ -1,0 +1,28 @@
+export FATCATMAP="/Users/Sam/Workspace/FatCatMap Labs"
+export FCM_COFFEE_SOURCE="$FATCATMAP/app/assets/js/source"
+export FCM_COFFEE_COMPILED="$FATCATMAP/app/assets/js/static/compiled/beta"
+
+## 1: Compile Core
+coffee --join "$FCM_COFFEE_COMPILED/fcm.js" --compile "$FCM_COFFEE_SOURCE/_root.coffee" "$FCM_COFFEE_SOURCE/core/_core.coffee" "$FCM_COFFEE_SOURCE/core/agent.coffee" "$FCM_COFFEE_SOURCE/core/api.coffee" "$FCM_COFFEE_SOURCE/core/sys.coffee" "$FCM_COFFEE_SOURCE/core/user.coffee" "$FCM_COFFEE_SOURCE/core/rpc.coffee" "$FCM_COFFEE_SOURCE/core/state.coffee" "$FCM_COFFEE_SOURCE/layout/_element.coffee" "$FCM_COFFEE_SOURCE/interaction/_widget.coffee" "$FCM_COFFEE_SOURCE/site/_section.coffee" "$FCM_COFFEE_SOURCE/core/init.coffee"
+
+## 2: Compile Storage
+
+coffee --require "$FCM_COFFEE_SOURCE/storage/_driver.coffee" --output "$FCM_COFFEE_COMPILED/storage" --compile "$FCM_COFFEE_SOURCE/storage/local.coffee" "$FCM_COFFEE_SOURCE/storage/session.coffee" "$FCM_COFFEE_SOURCE/storage/object.coffee" "$FCM_COFFEE_SOURCE/storage/sql.coffee"
+
+## 3: Compile Layout
+coffee --require "$FCM_COFFEE_SOURCE/layout/_element.coffee" --join "$FCM_COFFEE_COMPILED/layout.js" --compile "$FCM_COFFEE_SOURCE/layout/panel.coffee" "$FCM_COFFEE_SOURCE/layout/dialog.coffee" "$FCM_COFFEE_SOURCE/layout/navigation.coffee"
+
+## 4: Compile Interaction
+coffee --require "$FCM_COFFEE_SOURCE/interaction/_widget.coffee" --join "$FCM_COFFEE_COMPILED/interaction.js" --compile "$FCM_COFFEE_SOURCE/interaction/chart.coffee" "$FCM_COFFEE_SOURCE/interaction/graph.coffee" "$FCM_COFFEE_SOURCE/interaction/grid.coffee" "$FCM_COFFEE_SOURCE/interaction/form.coffee"
+
+## 5: Compile Misc. Plugins
+
+# Geo + Location
+coffee --require "$FCM_COFFEE_SOURCE/_root.coffee" --output "$FCM_COFFEE_COMPILED/plugins" --compile "$FCM_COFFEE_SOURCE/plugins/geo.coffee"
+
+# Workers
+coffee --require "$FCM_COFFEE_SOURCE/_root.coffee" --output "$FCM_COFFEE_COMPILED/plugins" --compile "$FCM_COFFEE_SOURCE/plugins/workers.coffee"
+
+## 6: Compile Site
+
+coffee --require "$FCM_COFFEE_SOURCE/site/_section.coffee" --output "$FCM_COFFEE_COMPILED/site" --compile "$FCM_COFFEE_SOURCE/site/browse.coffee" "$FCM_COFFEE_SOURCE/site/search.coffee" "$FCM_COFFEE_SOURCE/site/map.coffee" "$FCM_COFFEE_SOURCE/site/visualize.coffee" "$FCM_COFFEE_SOURCE/site/interact.coffee"

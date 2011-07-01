@@ -4,7 +4,7 @@
 {% if sys.output.assets.compiled %}
 <link rel="stylesheet" media="screen" href="{{ style_url('fonts', 'core') }}">
 <link rel="stylesheet" media="screen" href="{{ style_url('plugins', 'core') }}">
-<link rel="stylesheet" media="screen" href="{{ style_url('main', 'compiled') }}">
+<link rel="stylesheet" media="screen" href="{{ style_url('main', 'compiled', version_by_getvar=true) }}">
 {% else %}
 <link rel="stylesheet" href="{{ style_url('reset', 'core') }}">
 <link rel="stylesheet" href="{{ style_url('fonts', 'core') }}">

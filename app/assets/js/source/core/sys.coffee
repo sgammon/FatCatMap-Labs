@@ -38,7 +38,33 @@ class CoreDevAPI extends CoreAPI
 
 		@config = {}
 		@environment = {}
-		@performance = {}
+
+		@performance =
+			tools:
+				fpsstats:
+					show: (selector) ->
+						
+						stats = new Stats()
+						stats.domElement.style.position = 'absolute'
+						stats.domElement.style.left = '50px'
+						stats.domElement.style.top = '50px'
+						stats.domElement.style.opacity = 0.7
+						stats.domElement.id = 'js_fps_stats'
+						
+						console.log('stats', stats)
+
+						$('body').append(stats.domElement)
+
+						setInterval(
+
+							->
+							    stats.update()
+
+						, 1000 / 60 );
+						
+					hide: (selector) ->
+						$('#js_fps_stats').hide()
+		
 		@debug =
 			logging: true
 			eventlog: true

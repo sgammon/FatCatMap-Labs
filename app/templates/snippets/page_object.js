@@ -2,11 +2,11 @@
 <script type="text/javascript">
 {% endif %}
 
-window.fatcatmap.rpc.api.factory('data', '/_api/rpc/data', ['get', 'retrieveGraphObject', 'retrieveNative', 'retriveAsset'])
-window.fatcatmap.rpc.api.factory('query', '/_api/rpc/query', ['search','gql','autocomplete'])
-window.fatcatmap.rpc.api.factory('graph', '/_api/rpc/graph', ['construct', 'constructFromNode', 'constructFromObject'])
-window.fatcatmap.rpc.api.factory('charts', '/_api/rpc/charts', ['generate', 'generateFromSeries'])
-window.fatcatmap.rpc.api.factory('session', '/_api/rpc/session', ['init', 'authenticate', 'checkin'])
+{% if services %}
+	{% for service, action, config in services %}	
+		window.fatcatmap.rpc.api.factory('{{ service }}', '{{ action }}', [{% for method in config.methods %}'{{ method }}',{% endfor %}]);
+	{% endfor %}
+{% endif %}
 
 // Initliaze user object
 window.fatcatmap.user.setUserInfo({

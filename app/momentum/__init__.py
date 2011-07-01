@@ -25,6 +25,7 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 	''' Top-level parent class for request handlers based in Tipfy. '''
 	
 	configPath = None
+	config = config.config
 	minify = False
 	response = Response
 	

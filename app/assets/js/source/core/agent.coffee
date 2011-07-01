@@ -159,7 +159,7 @@ class CoreAgentAPI extends CoreAPI
 				mozilla: $.browser.mozilla
 
 		@capabilities =
-			cookies: navigator.cookiesEnabled
+			cookies: navigator.cookieEnabled
 			ajax: $.support.ajax
 			canvas: Modernizr.canvas
 			geolocation: Modernizr.geolocation
