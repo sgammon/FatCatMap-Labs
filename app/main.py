@@ -65,6 +65,7 @@ def main():
 
 	## If we're in debug mode, automatically activate some stuff
 	if debug:
+		logging.info('CORE: Jinja2 debugging enabled.')
 		enable_jinja2_debugging()
 
 	## Consider system hooks

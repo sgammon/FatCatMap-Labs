@@ -92,3 +92,7 @@ class LayoutElement
 	animate: (properties, options={}) ->
 		@get().animate(properties, options)
 		return @
+		
+		
+if window?
+	window.LayoutElement = LayoutElement

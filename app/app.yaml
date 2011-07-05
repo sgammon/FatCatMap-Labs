@@ -1,5 +1,5 @@
 application: fatcatmap
-version: 9-dev
+version: 1-2-alpha
 runtime: python
 api_version: 1
 
@@ -189,7 +189,7 @@ handlers:
 ###### API Requests to the Gateway
 - url: /_api/rpc.*
   script: services.py
-  login: required
+  login: optional
   auth_fail_action: unauthorized
 
 ###### Send to Tipfy

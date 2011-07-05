@@ -34,4 +34,4 @@ class FatCatMap
 		
 		return @
 		
-window.fatcatmap = new FatCatMap
+window.fatcatmap = new FatCatMap()

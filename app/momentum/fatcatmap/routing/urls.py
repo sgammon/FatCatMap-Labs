@@ -68,6 +68,7 @@ rules = [
 		Rule('/_api/js', endpoint='js-api', handler='api.JavascriptAPIDispatcher'),
 		Rule('/_api/rpc', endpoint='rpc-api', handler='api.FatcatmapAPIDispatcher'),
 		Rule('/_api/rpc/<string:service>', endpoint='rpc-api-service', handler='api.FatcatmapAPIDispatcher'),
+
 		Rule('/_api/<string:module>', endpoint='api', handler='api.FatcatmapAPIDispatcher'),
 		Rule('/_api/<string:module>/<string:service>', endpoint='api-call', handler='api.FatcatmapAPIDispatcher'),
 		Rule('/_api/<string:module>/<string:service>/<string:method>', endpoint='api-call-rest', handler='api.FatcatmapAPIDispatcher'),			

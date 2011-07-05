@@ -1,5 +1,5 @@
 (function() {
-  var CoreAPI, CoreAPIBridge, CoreAgentAPI, CoreDevAPI, CoreRPCAPI, CoreStateAPI, CoreSysAPI, CoreUserAPI, FatCatMap, RPCAPI, RPCAdapter, RPCRequest;
+  var CoreAPI, CoreAPIBridge, CoreAgentAPI, CoreDevAPI, CoreRPCAPI, CoreStateAPI, CoreSysAPI, CoreUserAPI, FatCatMap, InteractiveWidget, LayoutElement, RPCAPI, RPCAdapter, RPCRequest, SiteSection;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -20,129 +20,6 @@
       this.config = config;
     }
     return CoreAPI;
-  })();
-  CoreAPIBridge = (function() {
-    function CoreAPIBridge() {
-      this.storage = {
-        local: {
-          _driver: null,
-          _resolveDriver: function() {
-            return this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'local');
-          },
-          getValue: function(key) {
-            if (this._driver !== null) {
-              return this._driver.getValueByKey(key);
-            } else {
-              return false;
-            }
-          },
-          setValue: function(key, value) {
-            if (this._driver !== null) {
-              return this._driver.setValueByKey(key, value);
-            } else {
-              return false;
-            }
-          },
-          clearValues: function() {
-            if (this._driver !== null) {
-              return this._driver.allValues();
-            } else {
-              return false;
-            }
-          }
-        },
-        session: {
-          _driver: null,
-          _resolveDriver: function() {
-            return this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'session');
-          },
-          getValue: function(key) {
-            if (this._driver !== null) {
-              return this._driver.getValueByKey(key);
-            } else {
-              return false;
-            }
-          },
-          setValue: function(key, value) {
-            if (this._driver !== null) {
-              return this._driver.setValueByKey(key, value);
-            } else {
-              return false;
-            }
-          },
-          clearValues: function() {
-            if (this._driver !== null) {
-              return this._driver.allValues();
-            } else {
-              return false;
-            }
-          }
-        },
-        object: {
-          _driver: null,
-          _resolveDriver: function() {
-            return this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'object');
-          },
-          getValue: function(key) {
-            if (this._driver !== null) {
-              return this._driver.getValueByKey(key);
-            } else {
-              return false;
-            }
-          },
-          setValue: function(key, value) {
-            if (this._driver !== null) {
-              return this._driver.setValueByKey(key, value);
-            } else {
-              return false;
-            }
-          },
-          clearValues: function() {
-            if (this._driver !== null) {
-              return this._driver.allValues();
-            } else {
-              return false;
-            }
-          }
-        },
-        sql: {
-          _driver: null,
-          _resolveDriver: function() {
-            return this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'sql');
-          },
-          getValue: function(key) {
-            if (this._driver !== null) {
-              return this._driver.getValueByKey(key);
-            } else {
-              return false;
-            }
-          },
-          setValue: function(key, value) {
-            if (this._driver !== null) {
-              return this._driver.setValueByKey(key, value);
-            } else {
-              return false;
-            }
-          },
-          clearValues: function() {
-            if (this._driver !== null) {
-              return this._driver.allValues();
-            } else {
-              return false;
-            }
-          }
-        }
-      };
-      this.layout = {
-        register: function(id, element) {
-          element.register(id);
-          return fatcatmap.state.elements.register(id, element);
-        }
-      };
-      this.visualizer = {};
-    }
-    __extends(CoreAPIBridge, CoreAPI);
-    return CoreAPIBridge;
   })();
   CoreAgentAPI = (function() {
     function CoreAgentAPI() {
@@ -296,6 +173,129 @@
       };
     };
     return CoreAgentAPI;
+  })();
+  CoreAPIBridge = (function() {
+    function CoreAPIBridge() {
+      this.storage = {
+        local: {
+          _driver: null,
+          _resolveDriver: function() {
+            return this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'local');
+          },
+          getValue: function(key) {
+            if (this._driver !== null) {
+              return this._driver.getValueByKey(key);
+            } else {
+              return false;
+            }
+          },
+          setValue: function(key, value) {
+            if (this._driver !== null) {
+              return this._driver.setValueByKey(key, value);
+            } else {
+              return false;
+            }
+          },
+          clearValues: function() {
+            if (this._driver !== null) {
+              return this._driver.allValues();
+            } else {
+              return false;
+            }
+          }
+        },
+        session: {
+          _driver: null,
+          _resolveDriver: function() {
+            return this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'session');
+          },
+          getValue: function(key) {
+            if (this._driver !== null) {
+              return this._driver.getValueByKey(key);
+            } else {
+              return false;
+            }
+          },
+          setValue: function(key, value) {
+            if (this._driver !== null) {
+              return this._driver.setValueByKey(key, value);
+            } else {
+              return false;
+            }
+          },
+          clearValues: function() {
+            if (this._driver !== null) {
+              return this._driver.allValues();
+            } else {
+              return false;
+            }
+          }
+        },
+        object: {
+          _driver: null,
+          _resolveDriver: function() {
+            return this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'object');
+          },
+          getValue: function(key) {
+            if (this._driver !== null) {
+              return this._driver.getValueByKey(key);
+            } else {
+              return false;
+            }
+          },
+          setValue: function(key, value) {
+            if (this._driver !== null) {
+              return this._driver.setValueByKey(key, value);
+            } else {
+              return false;
+            }
+          },
+          clearValues: function() {
+            if (this._driver !== null) {
+              return this._driver.allValues();
+            } else {
+              return false;
+            }
+          }
+        },
+        sql: {
+          _driver: null,
+          _resolveDriver: function() {
+            return this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'sql');
+          },
+          getValue: function(key) {
+            if (this._driver !== null) {
+              return this._driver.getValueByKey(key);
+            } else {
+              return false;
+            }
+          },
+          setValue: function(key, value) {
+            if (this._driver !== null) {
+              return this._driver.setValueByKey(key, value);
+            } else {
+              return false;
+            }
+          },
+          clearValues: function() {
+            if (this._driver !== null) {
+              return this._driver.allValues();
+            } else {
+              return false;
+            }
+          }
+        }
+      };
+      this.layout = {
+        register: function(id, element) {
+          element.register(id);
+          return fatcatmap.state.elements.register(id, element);
+        }
+      };
+      this.visualizer = {};
+    }
+    __extends(CoreAPIBridge, CoreAPI);
+    return CoreAPIBridge;
   })();
   CoreSysAPI = (function() {
     function CoreSysAPI() {
@@ -893,6 +893,138 @@
     __extends(CoreStateAPI, CoreAPI);
     return CoreStateAPI;
   })();
+  LayoutElement = (function() {
+    LayoutElement.prototype.id = null;
+    LayoutElement.prototype.state = {};
+    LayoutElement.prototype.config = {};
+    LayoutElement.prototype.classes = [];
+    LayoutElement.prototype.element = null;
+    LayoutElement.prototype.defaults = null;
+    LayoutElement.prototype.selector = null;
+    LayoutElement.prototype.registered = false;
+    function LayoutElement(selector, config) {
+      this.selector = selector;
+      this.config = config != null ? config : {};
+    }
+    LayoutElement.prototype.register = function(id) {
+      this.id = id;
+    };
+    LayoutElement.prototype._setState = function(key, value) {
+      this.state[key] = value;
+      return this;
+    };
+    LayoutElement.prototype._getState = function(key, default_value) {
+      if (default_value == null) {
+        default_value = null;
+      }
+      if (this.state[key] === void 0) {
+        return default_value;
+      } else {
+        return this.state[key];
+      }
+    };
+    LayoutElement.prototype._deleteState = function(key) {
+      return delete this.state[key];
+    };
+    LayoutElement.prototype._loadState = function(state, classes) {
+      this.state = state;
+      this.classes = classes;
+      return this._refreshState();
+    };
+    LayoutElement.prototype._flushState = function() {
+      var finalState;
+      finalState = {
+        state: this.state,
+        classes: this.classes
+      };
+      return finalState;
+    };
+    LayoutElement.prototype._refreshState = function() {
+      var classname, _i, _len, _ref, _results;
+      _ref = this.classes;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        classname = _ref[_i];
+        _results.push(this.get().addClass(classname));
+      }
+      return _results;
+    };
+    LayoutElement.prototype.get = function() {
+      if (this.element === null) {
+        this.element = $(this.selector);
+      }
+      return this.element;
+    };
+    LayoutElement.prototype.addClass = function(classname) {
+      this.classes.push(classname);
+      this.get().addClass(classname);
+      return this;
+    };
+    LayoutElement.prototype.removeClass = function(classname) {
+      if (__indexOf.call(this.classes, classname) >= 0) {
+        this.classes.remove(classname);
+      }
+      this.get().removeClass(classname);
+      return this;
+    };
+    LayoutElement.prototype.toggleClass = function(classname) {
+      if (__indexOf.call(this.classes, classname) >= 0) {
+        this.classes.remove(classname);
+      } else {
+        this.classes.push(classname);
+      }
+      this.get().toggleClass(classname);
+      return this;
+    };
+    LayoutElement.prototype.hide = function(duration, easing, callback) {
+      this._setState('visible', false);
+      this.get().hide(duration, easing, callback);
+      return this;
+    };
+    LayoutElement.prototype.show = function(duration, easing, callback) {
+      this._setState('visible', true);
+      return this.get().show(duration, easing, callback);
+    };
+    LayoutElement.prototype.showhide = function(duration, easing, callback) {
+      if (this._getState('visible', false) !== false) {
+        this.get().hide(duration, easing, callback);
+      } else {
+        this.get().show(duration, easing, callback);
+      }
+      return this;
+    };
+    LayoutElement.prototype.css = function(properties) {
+      this.get().css(properties);
+      return this;
+    };
+    LayoutElement.prototype.animate = function(properties, options) {
+      if (options == null) {
+        options = {};
+      }
+      this.get().animate(properties, options);
+      return this;
+    };
+    return LayoutElement;
+  })();
+  if (typeof window !== "undefined" && window !== null) {
+    window.LayoutElement = LayoutElement;
+  }
+  InteractiveWidget = (function() {
+    function InteractiveWidget(name, path, config) {
+      this.name = name;
+      this.path = path;
+      this.config = config;
+    }
+    return InteractiveWidget;
+  })();
+  SiteSection = (function() {
+    function SiteSection(name, path, config) {
+      this.name = name;
+      this.path = path;
+      this.config = config;
+    }
+    return SiteSection;
+  })();
   FatCatMap = (function() {
     function FatCatMap(config) {
       this.config = config;
@@ -915,5 +1047,5 @@
     }
     return FatCatMap;
   })();
-  window.fatcatmap = new FatCatMap;
+  window.fatcatmap = new FatCatMap();
 }).call(this);

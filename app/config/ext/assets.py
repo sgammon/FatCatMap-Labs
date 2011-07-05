@@ -12,67 +12,96 @@ config['momentum.fatcatmap.assets'] = {
 
 	# JavaScript Libraries & Includes
 	'js': {
+
+		### FatCatMap Platform Scripts ####
+		('fatcatmap', 'compiled'): {
+		
+			'fcm': {}, # init, framework, and client-side platform code
+			'layout': {}, # contains code for manipulating page layout			
+			'interaction': {}, # contains code for charting, visualization & graphing
+			'geo': {'path': 'plugins/geo.js'}, # contains code for geo-detection and geo-operations
+			'workers': {'path': 'plugins/workers.js'}, # contains code for splitting intense tasks to workers
+			'storage': {'path': 'storage.js'}, # contains code for interfacing with browser-local storage
 	
-		('core', 'core'): { # FatCatMap Scripts
+		},
+
+
+		### Core Dependencies ###
+		('core', 'core'): {
 		
-			'init': {'version': 0.3}, # Contains code to initiate and prepare the fatcatmap object
-			'rpc': {'version': 0.2}, # Contains code to integrate remote RPCs with the fatcatmap object
-			'graph': {'version': 0.2}, # Holds code used by the layout and Protovis to construct graph visualizations
-			'plugins': {'version': 0.2}, # Contains code for miscellaneous jQuery plugins
-			'layout': {'version': 0.2} # Contains code to animate and fade the top navigation pulldown, and sidebars, etc
+			'backbone': {'min': True}, # Backbone.JS - site MVC core
+			'underscore': {'min': True}, # Underscore - fantastic JS toolkit
+			'amplify': {'min': True}, # AmplifyJS - for request, local storage + pubsub management
+			'modernizr': {'min': True}, # Modernizr - browser polyfill + compatibility testing
+			'yepnope': {'min': True} # YepNope: conditional async script loader
+		
+		},	
+		
+
+		### FatCatMap Local Storage Drivers ###
+		('storage', 'compiled'): {
+		
+			'sql': {'path': 'storage/sql.js'}, # Web SQL Database driver
+			'indexed': {'path': 'storage/object.js'}, # IndexedDB Database driver
+			'session': {'path': 'storage/session.js'}, # SessionStorage driver
+			'local': {'path': 'storage/local.js'} # LocalStorage driver
 		
 		},
-		
-		('storage', 'core'): { # FatCatMap Storage Drivers
-		
-			'sql': {'path': 'storage/sql-0.1.js'}, # Web SQL Database driver
-			'indexed': {'path': 'storage/indexed-0.1.js'}, # IndexedDB Database driver
-			'session': {'path': 'storage/session-0.1.js'}, # SessionStorage driver
-			'local': {'path': 'storage/local-0.1.js'} # LocalStorage driver
-		
-		},
-		
-		('polyfills', 'core'): { # Browser feature Polyfills
+
+
+		### Browser feature Polyfills ###
+		('polyfills', 'core'): { 
 		
 			'json': {'path': 'polyfills/json2.js'}, # Adds JSON support to old IE and others that don't natively support it
 			'history': {'path': 'polyfills/history.js'}, # Adds support for history management to old browsers
 		
 		},
 		
-		('dev', 'util'): { # FatCatMap Developer Tools
+
+		### FatCatMap Developer Tools ###
+		('dev', 'util'): {
 		
-			'fpsstats': {'path': 'fps_stats.js'} # Little JS snippet to enable an on-page FPS/MB counter
+			'fps_stats': {} # Little JS snippet to enable an on-page FPS/MB counter
 		
-		},
+		},						
+				
+
+		### jQuery Core & Plugins ###
+		('jquery', 'jquery'): { 
 		
-		('jquery', 'jquery'): { # jQuery Core & Plugins
-		
-			'core': {'path': 'core/jquery.full.1.5.js'}, # jQuery Core
-			'ui': {'path': 'ui/jquery.ui-1.8.9.full.js'}, # jQuery UI
-			'indexeddb': {'path': 'core/storage/jquery.indexeddb.1.1-full.js'}, # Indexed DB interface
-			'websql': {'path': 'core/storage/jquery.sql.0.8a.min.js'}, # WebSQL interface
-			'tipsy': {'path': 'ui/jquery.tipsy.js'}, # Effect for slick, animated tooltips
-			'uniform': {'path': 'ui/jquery.uniform.js'}, # Form styling
-			'masonry': {'path': 'ui/jquery.masonry.js'}, # Special easy-on-the-eye layout styling
-			'fancybox': {'path': 'ui/jquery.fancybox.js'}, # Quick + clean lightbox-style dialogs
-			'easing': {'path': 'core/interaction/jquery.easing-1.3.pack.js'}, # Easing transitions for smoother animations
-			'mousewheel': {'path': 'core/interaction/jquery.mousewheel-3.0.4.pack.js'} # jQuery plugin for mousewheel events + interactions
+			'core': {'path': 'core/jquery.js', 'min': 'core/jquery.min.js'}, # jQuery Core
+			'ui': {'path': 'ui/jqui.js', 'min': 'ui/jqui.min.js'}, # jQuery UI
+			'tipsy': {'path': 'ui/tipsy.js'}, # Effect for slick, animated tooltips
+			'masonry': {'path': 'ui/masonry.min.js'}, # Special easy-on-the-eye layout styling
+			'fancybox': {'path': 'ui/fancybox.min.js'}, # Quick + clean lightbox-style dialogs
+			'easing': {'path': 'core/interaction/easing.min.js'}, # Easing transitions for smoother animations
+			'mousewheel': {'path': 'core/interaction/mousewheel.min.js'} # jQuery plugin for mousewheel events + interactions
 			
 		},
 		
-		('compiled', 'compiled'): { # Compiled Scripts
-			
-			'core': {'path': 'core.js'}, # init, framework, and client-side platform code
-			'storage': {'path': 'storage.js'}, # contains code for interfacing with browser-local storage
-			'layout': {'path': 'layout.js'}, # contains code for manipulating page layout
-			'interaction': {'path': 'interaction.js'}, # contains code for charting, visualization & graphing
-			'site': {'path': 'site.js'} # contains code specific to site content areas
+
+		### D3: Data Driven Diagrams ###	
+		('d3', 'd3'): {
+		
+			'core': {'path': 'd3.js'}, # D3 Core Library
+			'behavior': {'path': 'd3.behavior.js'}, # D3 Behaviors
+			'chart': {'path': 'd3.chart.js'}, # D3 Charting
+			'csv': {'path': 'd3.csv.js'}, # D3 CSV Parsing
+			'geo': {'path': 'd3.geo.js'}, # D3 Geo-related functions
+			'geom': {'path': 'd3.geom.js'}, # D3 Geo-map related functions
+			'layout': {'path': 'd3.layout.js'}, # D3 Layout
+			'time': {'path': 'd3.time.js'} # D3 Time/Date based functions
 		
 		},
+				
+
+		### FatCatMap Interaction Libraries ###
+		('vis', 'interaction'): {
+
+			'protovis': {'min': True}, # Stanford Protovis: JS Visualization
 		
-		'protovis': {'path': 'interaction/protovis-d3.2.js'}, # Stanford Protovis: JS Visualization Library
-		'modernizr': {'path': 'util/modernizr-1.7.min.js'}, # Modernizr: Checks browser compatibility
-		'yepnope': {'path': 'util/yepnope-1.0.1-min.js'}, # YepNope: conditional script loader with Modernizr integration
+		},
+
 		'belated_png': {'path': 'util/dd_belatedpng.js'} # Belated PNG fix
 	
 	},

@@ -1,6 +1,6 @@
 export FATCATMAP="/Users/Sam/Workspace/FatCatMap Labs"
 export FCM_COFFEE_SOURCE="$FATCATMAP/app/assets/js/source"
-export FCM_COFFEE_COMPILED="$FATCATMAP/app/assets/js/static/compiled/beta"
+export FCM_COFFEE_COMPILED="$FATCATMAP/app/assets/js/static/compiled"
 
 ## 1: Compile Core
 coffee --join "$FCM_COFFEE_COMPILED/fcm.js" --compile "$FCM_COFFEE_SOURCE/_root.coffee" "$FCM_COFFEE_SOURCE/core/_core.coffee" "$FCM_COFFEE_SOURCE/core/agent.coffee" "$FCM_COFFEE_SOURCE/core/api.coffee" "$FCM_COFFEE_SOURCE/core/sys.coffee" "$FCM_COFFEE_SOURCE/core/user.coffee" "$FCM_COFFEE_SOURCE/core/rpc.coffee" "$FCM_COFFEE_SOURCE/core/state.coffee" "$FCM_COFFEE_SOURCE/layout/_element.coffee" "$FCM_COFFEE_SOURCE/interaction/_widget.coffee" "$FCM_COFFEE_SOURCE/site/_section.coffee" "$FCM_COFFEE_SOURCE/core/init.coffee"

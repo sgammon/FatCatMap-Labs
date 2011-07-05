@@ -2,7 +2,19 @@
 
 ##Change Log
 
+**Tue, July 05 2011**
+
+- Rewritten CoreAssetsAPI, supporting auto-switching to minified external assets
+- Better, more modular approach to compiled JS files (storage JS and site JS split up)
+- D3 js files installed (but not yet in use)
+- Backbone JS and Underscore JS files installed (but not yet in use)
+- New version of Modernizr installed
+- Amplify JS installed (but not yet in use)
+- Asset versioning convention switched to all dots (file.1.0.js instead of file-1.0.js)
+- Better coffee build scripts on the way (halfway done in bin/coffee2)
+
 **Thu, June 30 2011**
+
 - New 'require'-based structure for CoffeeScript, with a better build script
 - Proper compartmentalization of [Coffee/Java]Scripts, allowing more nimble page loads
 - New coffee files for 'plugins' folder - geo + workers to start
@@ -11,8 +23,8 @@
 - Cleaned up SCSS files from manual versioning
 - Added nifty FPS counter for JS rendering speed benchmarking
 
-
 **Wed, June 29 2011**
+
 - Structure in place for service layer middleware (authentication, authorization & audit)
 - Revamped AJAX and RPCAPI mechanism for the JS API layer
 - Asset versioning by GETVARS now supported

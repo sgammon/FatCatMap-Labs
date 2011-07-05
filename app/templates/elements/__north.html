@@ -17,13 +17,21 @@
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-<!-- jQuery 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>-->
-<script src="{{ script_url('core','jquery') }}" type='text/javascript'></script>
+<!-- jQuery
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script> 
+
+<script type="text/javascript">
+	window.jQuery || document.write("<script src='{{ script_url('core','jquery') }}' type='text/javascript'></script>");
+</script>-->
+
+<script src="{{ script_url('core', 'jquery') }}"></script>
 
 <!-- Modernizr & YepNope -->
-<script src="{{ script_url('modernizr') }}"></script>
-<script src="{{ script_url('yepnope') }}"></script>
+<script src="{{ script_url('underscore', 'core') }}"></script>
+<script src="{{ script_url('backbone', 'core') }}"></script>
+<script src="{{ script_url('amplify', 'core') }}"></script>
+<script src="{{ script_url('modernizr', 'core') }}"></script>
+<script src="{{ script_url('yepnope', 'core') }}"></script>
 
 {% if sys.output.assets.optimize %}
 <script type="text/javascript">
@@ -31,14 +39,15 @@
 yepnope([
 	{
 		// Load core FCM
-		load: ["{{ script_url('init', 'core') }}", "{{ link('js-api') }}", "{{ script_url('rpc', 'core') }}", "{{ script_url('plugins', 'core') }}", "{{ script_url('layout', 'core') }}", "{{ script_url('protovis') }}", "{{ script_url('graph','core') }}"],
-		complete: function _doPhaseOneInit() { _initiateAPIFramework(fatcatmap); bindNavigation(); }
+		load: ["{{ script_url('fcm', 'fatcatmap') }}", "{{ link('js-api') }}", "{{ script_url('layout', 'fatcatmap') }}", "{{ script_url('interaction', 'fatcatmap') }}", "{{ script_url('protovis', 'vis') }}"]
+		
 	},
 	{
 		// Load visual plugins
 		test: typeof(window.jQuery) == 'function',
 		nope: "{{ script_url('core','jquery') }}",
-		load: ["{{ script_url('uniform', 'jquery') }}", "{{ script_url('tipsy', 'jquery') }}", "{{ script_url('masonry','jquery') }}", "{{ script_url('fancybox', 'jquery') }}", "{{ script_url('easing', 'jquery') }}", "{{ script_url('mousewheel','jquery') }}"]
+		complete: function () { yepnope(["{{ script_url('tipsy', 'jquery') }}", "{{ script_url('masonry','jquery') }}", "{{ script_url('fancybox', 'jquery') }}", "{{ script_url('easing', 'jquery') }}", "{{ script_url('mousewheel','jquery') }}"]); }
+		
 	},
 	{
 		// Polyfill JSON Support
@@ -51,26 +60,22 @@ yepnope([
 	{
 		// Load IndexedDB
 		test: Modernizr.indexeddb,
-		yep: ["{{ script_url('indexeddb', 'jquery') }}", "{{ script_url('indexed', 'storage') }}"],
-		complete: function (url, result, key) { _indexedDBInit(); }
+		yep: ["{{ script_url('indexed', 'storage') }}"]
 	},
 	{
 		// Load WebSQL
 		test: Modernizr.websqldatabase,
-		yep: ["{{ script_url('websql', 'jquery') }}", "{{ script_url('sql', 'storage') }}"],
-		complete: function (url, result, key) { _webSQLInit(); }
+		yep: ["{{ script_url('sql', 'storage') }}"]
 	},	
 	{
 		// Load LocalStorage
 		test: Modernizr.localstorage,
-		yep: ["{{ script_url('local', 'storage') }}"],
-		complete: function (url, result, key) { _localStorageInit(); }
+		yep: ["{{ script_url('local', 'storage') }}"]
 	},
 	{
 		// Load SessionStorage
 		test: Modernizr.sessionstorage,
-		yep: ["{{ script_url('session', 'storage') }}"],
-		complete: function (url, result, key) { _sessionStorageInit(); }
+		yep: ["{{ script_url('session', 'storage') }}"]
 	}
 ]);
 
@@ -78,60 +83,28 @@ yepnope([
 {% else %}
 
 <!-- Visualization Dependencies -->
-<script src="{{ script_url('protovis') }}"></script>
+<script src="{{ script_url('protovis', 'vis') }}"></script>
 
-{% if sys.output.assets.compiled %}
 <!-- FCM Platform -->
-<script src="{{ script_url('core','compiled') }}"></script>
-<script src="{{ script_url('storage','compiled') }}"></script>
-<script src="{{ script_url('layout','compiled') }}"></script>
-<script src="{{ script_url('interaction','compiled') }}"></script>
-<script src="{{ script_url('site','compiled') }}"></script>
+<script src="{{ script_url('fcm','fatcatmap') }}"></script>
+<script src="{{ script_url('layout','fatcatmap') }}"></script>
+<script src="{{ script_url('interaction','fatcatmap') }}"></script>
 
 <!-- JS API -->
 <script src="{{ link('js-api') }}"></script>
 
 <!-- jQuery Plugins -->
-<script src="{{ script_url('uniform', 'jquery') }}"></script>
 <script src="{{ script_url('tipsy', 'jquery') }}"></script>
 <script src="{{ script_url('masonry','jquery') }}"></script>
 <script src="{{ script_url('fancybox','jquery') }}"></script>
 <script src="{{ script_url('easing','jquery') }}"></script>
 <script src="{{ script_url('mousewheel','jquery') }}"></script>
 
-
-{% else %}
-<!-- FCM Platform -->
-<script src="{{ script_url('init', 'core') }}"></script>
-<script src="{{ link('js-api') }}"></script>
-
-<!--<script src="{{ script_url('rpc', 'core') }}"></script>-->
-<!--<script src="{{ script_url('plugins', 'core') }}"></script>-->
-<script src="{{ script_url('layout', 'core') }}"></script>
-<script src="{{ script_url('graph','core') }}"></script>
-
-<!-- jQuery Plugins -->
-<script src="{{ script_url('uniform', 'jquery') }}"></script>
-<script src="{{ script_url('tipsy', 'jquery') }}"></script>
-<script src="{{ script_url('masonry','jquery') }}"></script>
-<script src="{{ script_url('fancybox','jquery') }}"></script>
-<script src="{{ script_url('easing','jquery') }}"></script>
-<script src="{{ script_url('mousewheel','jquery') }}"></script>
-
-<!-- Load Storage Adapters -->
-<script src="{{ script_url('indexeddb', 'jquery') }}"></script>
-<script src="{{ script_url('indexed', 'storage') }}"></script>
-<script src="{{ script_url('websql', 'jquery') }}"></script>
-<script src="{{ script_url('sql', 'storage') }}"></script>
-<script src="{{ script_url('local', 'storage') }}"></script>
-<script src="{{ script_url('session', 'storage') }}"></script>
-{% endif %}
 
 <script type='text/javascript'>
 
 $(document).ready(function loadPlatform()
-{	
-	// Register page elements
+{
 	superbar = new SuperBar('#momentumSuperbar');
 	fatcatmap.api.layout.register('superbar', superbar);
 	
