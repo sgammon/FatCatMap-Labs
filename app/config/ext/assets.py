@@ -230,7 +230,7 @@ config['momentum.fatcatmap.assets'] = {
 		},
 		
 		# Static FCM Stylesheets
-		('core', 'core'): {
+		('core', 'fcm'): {
 			
 			'config': {
 				'min': False,

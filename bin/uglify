@@ -1,0 +1,27 @@
+export UGLIFY="/Users/Sam/node_modules/uglify-js/bin/uglifyjs"
+
+export FCM_COFFEE_SOURCE="$FATCATMAP/app/assets/js/source"
+export FCM_COFFEE_COMPILED="$FATCATMAP/app/assets/js/static/compiled"
+
+
+## FatCatMap Core ##
+$UGLIFY -o "$FCM_COFFEE_COMPILED/base.min.js" "$FCM_COFFEE_COMPILED/base.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/fcm.min.js" "$FCM_COFFEE_COMPILED/fcm.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/layout.min.js" "$FCM_COFFEE_COMPILED/layout.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/interaction.min.js" "$FCM_COFFEE_COMPILED/interaction.js"
+
+## FatCatMap Plugins ##
+$UGLIFY -o "$FCM_COFFEE_COMPILED/plugins/geo.min.js" "$FCM_COFFEE_COMPILED/plugins/geo.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/plugins/workers.min.js" "$FCM_COFFEE_COMPILED/plugins/workers.js"
+
+## FatCatMap Storage Drivers ##
+$UGLIFY -o "$FCM_COFFEE_COMPILED/storage/local.min.js" "$FCM_COFFEE_COMPILED/storage/local.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/storage/object.min.js" "$FCM_COFFEE_COMPILED/storage/object.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/storage/sql.min.js" "$FCM_COFFEE_COMPILED/storage/sql.js"
+
+## FatCatMap Site Scripts ##
+$UGLIFY -o "$FCM_COFFEE_COMPILED/site/browse.min.js" "$FCM_COFFEE_COMPILED/site/browse.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/site/search.min.js" "$FCM_COFFEE_COMPILED/site/search.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/site/map.min.js" "$FCM_COFFEE_COMPILED/site/map.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/site/visualize.min.js" "$FCM_COFFEE_COMPILED/site/visualize.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/site/interact.min.js" "$FCM_COFFEE_COMPILED/site/interact.js"
