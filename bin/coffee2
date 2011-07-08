@@ -1,21 +1,46 @@
+export UGLIFY="/Users/Sam/node_modules/uglify-js/bin/uglifyjs"
 export FATCATMAP="/Users/Sam/Workspace/FatCatMap Labs"
 export FCM_COFFEE_SOURCE="$FATCATMAP/app/assets/js/source"
 export FCM_COFFEE_COMPILED="$FATCATMAP/app/assets/js/static/compiled"
 
 ## 1: Compile Core
-coffee --join "$FCM_COFFEE_COMPILED/fcm.js" --compile "$FCM_COFFEE_SOURCE/_root.coffee" "$FCM_COFFEE_SOURCE/core/_core.coffee" "$FCM_COFFEE_SOURCE/core/agent.coffee" "$FCM_COFFEE_SOURCE/core/api.coffee" "$FCM_COFFEE_SOURCE/core/sys.coffee" "$FCM_COFFEE_SOURCE/core/user.coffee" "$FCM_COFFEE_SOURCE/core/rpc.coffee" "$FCM_COFFEE_SOURCE/core/state.coffee" "$FCM_COFFEE_SOURCE/layout/_element.coffee" "$FCM_COFFEE_SOURCE/interaction/_widget.coffee" "$FCM_COFFEE_SOURCE/site/_section.coffee" "$FCM_COFFEE_SOURCE/core/init.coffee"
+coffee --join "$FCM_COFFEE_COMPILED/base.js" --compile "$FCM_COFFEE_SOURCE/_root.coffee" "$FCM_COFFEE_SOURCE/_underscore.coffee" "$FCM_COFFEE_SOURCE/_milk.coffee"
 
-## 2: Compile Storage
+$UGLIFY -o "$FCM_COFFEE_COMPILED/base.min.js" "$FCM_COFFEE_COMPILED/base.js"
 
-coffee --require "$FCM_COFFEE_SOURCE/storage/_driver.coffee" --output "$FCM_COFFEE_COMPILED/storage" --compile "$FCM_COFFEE_SOURCE/storage/local.coffee" "$FCM_COFFEE_SOURCE/storage/session.coffee" "$FCM_COFFEE_SOURCE/storage/object.coffee" "$FCM_COFFEE_SOURCE/storage/sql.coffee"
 
-## 3: Compile Layout
+## 2: Compile FCM
+coffee --join "$FCM_COFFEE_COMPILED/fcm.js" --compile "$FCM_COFFEE_SOURCE/core/_core.coffee" "$FCM_COFFEE_SOURCE/layout/_element.coffee" "$FCM_COFFEE_SOURCE/core/dev.coffee"  "$FCM_COFFEE_SOURCE/core/sys.coffee" "$FCM_COFFEE_SOURCE/core/agent.coffee" "$FCM_COFFEE_SOURCE/core/state.coffee" "$FCM_COFFEE_SOURCE/core/model.coffee" "$FCM_COFFEE_SOURCE/core/api.coffee" "$FCM_COFFEE_SOURCE/core/user.coffee" "$FCM_COFFEE_SOURCE/core/rpc.coffee"  "$FCM_COFFEE_SOURCE/interaction/_widget.coffee" "$FCM_COFFEE_SOURCE/site/_section.coffee" "$FCM_COFFEE_SOURCE/core/live.coffee" "$FCM_COFFEE_SOURCE/core/init.coffee"
+
+$UGLIFY -o "$FCM_COFFEE_COMPILED/fcm.min.js" "$FCM_COFFEE_COMPILED/fcm.js"
+
+
+## 3: Compile Storage
+
+# Local + Session storage are combined in local.js
+coffee --require "$FCM_COFFEE_SOURCE/storage/_driver.coffee" --join "$FCM_COFFEE_COMPILED/storage/local.js" --compile "$FCM_COFFEE_SOURCE/storage/local.coffee" "$FCM_COFFEE_SOURCE/storage/session.coffee"
+
+# IndexedDB and WebSQL drivers are compiled seperately
+coffee --require "$FCM_COFFEE_SOURCE/storage/_driver.coffee" --output "$FCM_COFFEE_COMPILED/storage" --compile "$FCM_COFFEE_SOURCE/storage/object.coffee" "$FCM_COFFEE_SOURCE/storage/sql.coffee"
+
+$UGLIFY -o "$FCM_COFFEE_COMPILED/storage/local.min.js" "$FCM_COFFEE_COMPILED/storage/local.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/storage/object.min.js" "$FCM_COFFEE_COMPILED/storage/object.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/storage/sql.min.js" "$FCM_COFFEE_COMPILED/storage/sql.js"
+
+
+## 4: Compile Layout
 coffee --require "$FCM_COFFEE_SOURCE/layout/_element.coffee" --join "$FCM_COFFEE_COMPILED/layout.js" --compile "$FCM_COFFEE_SOURCE/layout/panel.coffee" "$FCM_COFFEE_SOURCE/layout/dialog.coffee" "$FCM_COFFEE_SOURCE/layout/navigation.coffee"
 
-## 4: Compile Interaction
+$UGLIFY -o "$FCM_COFFEE_COMPILED/layout.min.js" "$FCM_COFFEE_COMPILED/layout.js"
+
+
+## 5: Compile Interaction
 coffee --require "$FCM_COFFEE_SOURCE/interaction/_widget.coffee" --join "$FCM_COFFEE_COMPILED/interaction.js" --compile "$FCM_COFFEE_SOURCE/interaction/chart.coffee" "$FCM_COFFEE_SOURCE/interaction/graph.coffee" "$FCM_COFFEE_SOURCE/interaction/grid.coffee" "$FCM_COFFEE_SOURCE/interaction/form.coffee"
 
-## 5: Compile Misc. Plugins
+$UGLIFY -o "$FCM_COFFEE_COMPILED/interaction.min.js" "$FCM_COFFEE_COMPILED/interaction.js"
+
+
+## 6: Compile Misc. Plugins
 
 # Geo + Location
 coffee --require "$FCM_COFFEE_SOURCE/_root.coffee" --output "$FCM_COFFEE_COMPILED/plugins" --compile "$FCM_COFFEE_SOURCE/plugins/geo.coffee"
@@ -23,6 +48,16 @@ coffee --require "$FCM_COFFEE_SOURCE/_root.coffee" --output "$FCM_COFFEE_COMPILE
 # Workers
 coffee --require "$FCM_COFFEE_SOURCE/_root.coffee" --output "$FCM_COFFEE_COMPILED/plugins" --compile "$FCM_COFFEE_SOURCE/plugins/workers.coffee"
 
-## 6: Compile Site
+$UGLIFY -o "$FCM_COFFEE_COMPILED/plugins/geo.min.js" "$FCM_COFFEE_COMPILED/plugins/geo.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/plugins/workers.min.js" "$FCM_COFFEE_COMPILED/plugins/workers.js"
+
+
+## 7: Compile Site
 
 coffee --require "$FCM_COFFEE_SOURCE/site/_section.coffee" --output "$FCM_COFFEE_COMPILED/site" --compile "$FCM_COFFEE_SOURCE/site/browse.coffee" "$FCM_COFFEE_SOURCE/site/search.coffee" "$FCM_COFFEE_SOURCE/site/map.coffee" "$FCM_COFFEE_SOURCE/site/visualize.coffee" "$FCM_COFFEE_SOURCE/site/interact.coffee"
+
+$UGLIFY -o "$FCM_COFFEE_COMPILED/site/browse.min.js" "$FCM_COFFEE_COMPILED/site/browse.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/site/search.min.js" "$FCM_COFFEE_COMPILED/site/search.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/site/map.min.js" "$FCM_COFFEE_COMPILED/site/map.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/site/visualize.min.js" "$FCM_COFFEE_COMPILED/site/visualize.js"
+$UGLIFY -o "$FCM_COFFEE_COMPILED/site/interact.min.js" "$FCM_COFFEE_COMPILED/site/interact.js"

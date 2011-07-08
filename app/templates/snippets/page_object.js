@@ -2,14 +2,18 @@
 <script type="text/javascript">
 {% endif %}
 
+fatcatmap = window.fatcatmap;
+
 {% if services %}
 	{% for service, action, config in services %}	
-		window.fatcatmap.rpc.api.factory('{{ service }}', '{{ action }}', [{% for method in config.methods %}'{{ method }}',{% endfor %}]);
+		fatcatmap.rpc.api.factory('{{ service }}', '{{ action }}', [{% for method in config.methods %}'{{ method }}',{% endfor %}]);
 	{% endfor %}
+	
+		fatcatmap.state.events.triggerEvent('API_READY');
 {% endif %}
 
 // Initliaze user object
-window.fatcatmap.user.setUserInfo({
+fatcatmap.user.setUserInfo({
 	
 	{% if api.users.current_user() != none %}
 		current_user: "{{ api.users.current_user() }}",
@@ -33,6 +37,8 @@ fatcatmap.dev.environment = {
 	{{ key }}: "{{ value }}",
 	{% endfor %}
 };
+
+fatcatmap.dev.setDebug({logging: true, eventlog: true, verbose: true});
 {% endif %}
 
 {% if script_tag %}

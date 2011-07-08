@@ -226,7 +226,7 @@ config['momentum.fatcatmap.services'] = {
 		'data': {
 			'enabled': True,
 			'service': 'momentum.fatcatmap.api.data.DataAPIService',
-			'methods': ['get', 'sync', 'preload', 'getObject', 'getNative', 'getAsset', 'putAsset'],
+			'methods': ['get', 'create', 'update', 'delete', 'sync', 'preload', 'getObject', 'getNative', 'getAsset', 'putAsset'],
 			'config': {
 				'caching': 'none',
 				'security': 'none',

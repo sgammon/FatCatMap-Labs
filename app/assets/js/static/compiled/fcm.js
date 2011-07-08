@@ -1,17 +1,17 @@
 (function() {
-  var CoreAPI, CoreAPIBridge, CoreAgentAPI, CoreDevAPI, CoreRPCAPI, CoreStateAPI, CoreSysAPI, CoreUserAPI, FatCatMap, InteractiveWidget, LayoutElement, RPCAPI, RPCAdapter, RPCRequest, SiteSection;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var CoreAPI, CoreAPIBridge, CoreAgentAPI, CoreDevAPI, CoreLiveAPI, CoreModelAPI, CoreRPCAPI, CoreStateAPI, CoreSysAPI, CoreUserAPI, FatCatMap, InteractiveWidget, LayoutElement, LocalModel, RPCAPI, RPCAdapter, RPCRequest, RemoteModel, SiteSection;
+  var __indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (this[i] === item) return i;
+    }
+    return -1;
+  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __indexOf = Array.prototype.indexOf || function(item) {
-    for (var i = 0, l = this.length; i < l; i++) {
-      if (this[i] === item) return i;
-    }
-    return -1;
   }, __slice = Array.prototype.slice;
   CoreAPI = (function() {
     function CoreAPI(name, path, config) {
@@ -21,8 +21,243 @@
     }
     return CoreAPI;
   })();
+  LayoutElement = (function() {
+    LayoutElement.prototype.id = null;
+    LayoutElement.prototype.state = {};
+    LayoutElement.prototype.config = {};
+    LayoutElement.prototype.classes = [];
+    LayoutElement.prototype.element = null;
+    LayoutElement.prototype.defaults = null;
+    LayoutElement.prototype.selector = null;
+    LayoutElement.prototype.registered = false;
+    function LayoutElement(selector, config) {
+      this.selector = selector;
+      this.config = config != null ? config : {};
+    }
+    LayoutElement.prototype.register = function(id) {
+      this.id = id;
+    };
+    LayoutElement.prototype._setState = function(key, value) {
+      this.state[key] = value;
+      return this;
+    };
+    LayoutElement.prototype._getState = function(key, default_value) {
+      if (default_value == null) {
+        default_value = null;
+      }
+      if (this.state[key] === void 0) {
+        return default_value;
+      } else {
+        return this.state[key];
+      }
+    };
+    LayoutElement.prototype._deleteState = function(key) {
+      return delete this.state[key];
+    };
+    LayoutElement.prototype._loadState = function(state, classes) {
+      this.state = state;
+      this.classes = classes;
+      return this._refreshState();
+    };
+    LayoutElement.prototype._flushState = function() {
+      var finalState;
+      finalState = {
+        state: this.state,
+        classes: this.classes
+      };
+      return finalState;
+    };
+    LayoutElement.prototype._refreshState = function() {
+      var classname, _i, _len, _ref, _results;
+      _ref = this.classes;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        classname = _ref[_i];
+        _results.push(this.get().addClass(classname));
+      }
+      return _results;
+    };
+    LayoutElement.prototype.get = function() {
+      if (this.element === null) {
+        this.element = $(this.selector);
+      }
+      return this.element;
+    };
+    LayoutElement.prototype.addClass = function(classname) {
+      this.classes.push(classname);
+      this.get().addClass(classname);
+      return this;
+    };
+    LayoutElement.prototype.removeClass = function(classname) {
+      if (__indexOf.call(this.classes, classname) >= 0) {
+        this.classes.remove(classname);
+      }
+      this.get().removeClass(classname);
+      return this;
+    };
+    LayoutElement.prototype.toggleClass = function(classname) {
+      if (__indexOf.call(this.classes, classname) >= 0) {
+        this.classes.remove(classname);
+      } else {
+        this.classes.push(classname);
+      }
+      this.get().toggleClass(classname);
+      return this;
+    };
+    LayoutElement.prototype.hide = function(duration, easing, callback) {
+      this._setState('visible', false);
+      this.get().hide(duration, easing, callback);
+      return this;
+    };
+    LayoutElement.prototype.show = function(duration, easing, callback) {
+      this._setState('visible', true);
+      return this.get().show(duration, easing, callback);
+    };
+    LayoutElement.prototype.showhide = function(duration, easing, callback) {
+      if (this._getState('visible', false) !== false) {
+        this.get().hide(duration, easing, callback);
+      } else {
+        this.get().show(duration, easing, callback);
+      }
+      return this;
+    };
+    LayoutElement.prototype.css = function(properties) {
+      this.get().css(properties);
+      return this;
+    };
+    LayoutElement.prototype.animate = function(properties, options) {
+      if (options == null) {
+        options = {};
+      }
+      this.get().animate(properties, options);
+      return this;
+    };
+    return LayoutElement;
+  })();
+  if (typeof window !== "undefined" && window !== null) {
+    window.LayoutElement = LayoutElement;
+  }
+  CoreDevAPI = (function() {
+    function CoreDevAPI(fcm) {
+      this.fcm = fcm;
+      this.verbose = __bind(this.verbose, this);;
+      this.error = __bind(this.error, this);;
+      this.log = __bind(this.log, this);;
+      this.setDebug = __bind(this.setDebug, this);;
+      this.config = {};
+      this.environment = {};
+      this.performance = {
+        tools: {
+          fpsstats: {
+            show: function(selector) {
+              var stats;
+              stats = new Stats();
+              stats.domElement.style.position = 'absolute';
+              stats.domElement.style.left = '50px';
+              stats.domElement.style.top = '50px';
+              stats.domElement.style.opacity = 0.7;
+              stats.domElement.id = 'js_fps_stats';
+              console.log('stats', stats);
+              $('body').append(stats.domElement);
+              setInterval(function() {
+                return stats.update();
+              }, 1000 / 60);
+            },
+            hide: function(selector) {
+              $('#js_fps_stats').hide();
+            }
+          }
+        }
+      };
+      this.debug = {
+        logging: true,
+        eventlog: true,
+        verbose: true
+      };
+    }
+    __extends(CoreDevAPI, CoreAPI);
+    CoreDevAPI.prototype.setDebug = function(debug) {
+      this.debug = debug;
+      return console.log("[CoreDev] Debug has been set.", this.debug);
+    };
+    CoreDevAPI.prototype.log = function() {
+      var context, message, module;
+      module = arguments[0], message = arguments[1], context = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
+      if (context != null) {
+        context = '{no context}';
+      }
+      if (this.debug.logging === true) {
+        console.log("[" + module + "] INFO: " + message, context);
+      }
+    };
+    CoreDevAPI.prototype.error = function() {
+      var context, message, module;
+      module = arguments[0], message = arguments[1], context = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
+      if (this.debug.logging === true) {
+        console.log("[" + module + "] ERROR: " + message, context);
+      }
+    };
+    CoreDevAPI.prototype.verbose = function() {
+      var context, message, module;
+      module = arguments[0], message = arguments[1], context = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
+      if (this.debug.verbose === true) {
+        this.log.apply(this, [module, message].concat(__slice.call(context)));
+      }
+    };
+    return CoreDevAPI;
+  })();
+  CoreSysAPI = (function() {
+    function CoreSysAPI(fcm) {
+      this.fcm = fcm;
+      this.version = {
+        minor: null,
+        major: null,
+        release: null,
+        setVersion: function(minor, major, release) {
+          this.minor = minor;
+          this.major = major;
+          this.release = release;
+        }
+      };
+      this.drivers = {
+        registry: {},
+        register: function(module, name, fn, initialized, callback) {
+          var context;
+          if (typeof this.registry[module] === null) {
+            this.registry[module] = {};
+          }
+          this.registry[module][name] = {
+            initialized: initialized,
+            registered: true,
+            hook_point: fn,
+            init_callback: callback
+          };
+          context = {
+            module: module,
+            name: name,
+            hook: fn
+          };
+          this.fcm.state.events.triggerEvent('DRIVER_REGISTERED', context);
+        },
+        resolve: function(module, name) {
+          if (typeof this.registry[module] === null) {
+            return false;
+          } else {
+            if (typeof this.registry[module][name] === null) {
+              return false;
+            } else {
+              return this.registry[module][name].hook_point;
+            }
+          }
+        }
+      };
+    }
+    __extends(CoreSysAPI, CoreAPI);
+    return CoreSysAPI;
+  })();
   CoreAgentAPI = (function() {
-    function CoreAgentAPI() {
+    function CoreAgentAPI(fcm) {
+      this.fcm = fcm;
       this._data = {};
       this.platform = {};
       this.capabilities = {};
@@ -174,40 +409,283 @@
     };
     return CoreAgentAPI;
   })();
+  CoreStateAPI = (function() {
+    function CoreStateAPI(fcm) {
+      this.fcm = fcm;
+      this.events = {
+        registry: [],
+        callchain: {},
+        history: [],
+        registerEvent: __bind(function(name) {
+          this.events.registry.push(name);
+          this.events.callchain[name] = [];
+          if (this.fcm.dev.debug.eventlog === true) {
+            this.fcm.dev.verbose('EventLog', "Event Registered: " + name);
+          }
+          return this;
+        }, this),
+        registerHook: function(_event, fn, once) {
+          var calltask;
+          if (typeof once === null) {
+            once = false;
+          }
+          try {
+            calltask = {
+              executed: false,
+              callback: function(context) {
+                return fn(context);
+              },
+              runonce: one
+            };
+            return this.callchain[_event].push(calltask);
+          } catch (_e) {}
+        },
+        triggerEvent: __bind(function(_event, context) {
+          var calltask, result, result_calltask, _i, _len, _ref, _results;
+          if (this.fcm.dev.debug.eventlog === true) {
+            console.log("[EventLog] Event Triggered: " + _event, context || '{no context}');
+          }
+          if (typeof this.events.callchain[_event] !== null) {
+            if (this.events.callchain[_event].length > 0) {
+              _ref = this.events.callchain[_event];
+              _results = [];
+              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                calltask = _ref[_i];
+                if (this.events.callchain[_event][calltask].executed === true && this.events.callchain[_event][calltask].runonce === true) {
+                  continue;
+                } else {
+                  try {
+                    result = this.events.callchain[_event][calltask].callback(context);
+                    result_calltask = {
+                      event: _event,
+                      context: context,
+                      task: this.events.callchain[_event][calltask],
+                      result: result
+                    };
+                  } catch (error) {
+                    result_calltask = {
+                      event: _event,
+                      context: context,
+                      task: this.events.callchain[_event][calltask],
+                      error: error
+                    };
+                  } finally {
+                    this.events.history.push(result_calltask);
+                    this.events.callchain[_event][calltask].executed = true;
+                  }
+                }
+              }
+              return _results;
+            }
+          }
+        }, this)
+      };
+      this.session = {};
+      this.local = {};
+      this.elements = {
+        registry: {},
+        get: function(id) {
+          return this.registry[id];
+        },
+        scan: function() {
+          $('[data-element]').each({
+            buildElement: function(index, element) {
+              return this.register(element.attr('data-element'), this.factory(element.attr('data-element'), '#' + element.attr('id'), element.attr('data-element-type') || null));
+            }
+          });
+          return this;
+        },
+        factory: function(id, selector, type, config) {
+          var _type;
+          if (type == null) {
+            type = 'LayoutElement';
+          }
+          if (config == null) {
+            config = {};
+          }
+          if (type === null) {
+            _type = LayoutElement;
+          }
+          if (type === 'LayoutElement') {
+            _type = LayoutElement;
+          } else if (type === 'Panel') {
+            _type = Panel;
+          } else if (type === 'SuperPanel') {
+            _type = SuperPanel;
+          } else if (type === 'Navigation') {
+            _type = Navigation;
+          }
+          return new _type(id, selector, config);
+        },
+        register: __bind(function(id, element) {
+          var context;
+          this.events.registry[id] = element;
+          context = {
+            id: id,
+            element: element
+          };
+          this.fcm.state.events.triggerEvent('REGISTER_ELEMENT', context);
+          return this.events.registry[id];
+        }, this),
+        _setState: function(id, key, value) {
+          if (this.registry[id] !== null) {
+            this.registry[id]._setState(key, value);
+          }
+          return this;
+        },
+        _getState: function(id, key, default_value) {
+          if (default_value == null) {
+            default_value = null;
+          }
+          if (this.registry[id] !== null) {
+            return this.registry[id]._getState(key, default_value);
+          } else {
+            return default_value;
+          }
+        },
+        _loadState: function(id, state) {
+          if (this.registry[id] === null) {
+            throw "Must register element before setting state!";
+          } else {
+            this.registry[id]._loadState(state);
+          }
+          return this;
+        }
+      };
+    }
+    __extends(CoreStateAPI, CoreAPI);
+    return CoreStateAPI;
+  })();
+  LocalModel = (function() {
+    function LocalModel() {
+      LocalModel.__super__.constructor.apply(this, arguments);
+    }
+    __extends(LocalModel, Backbone.Model);
+    LocalModel.prototype._type = function() {
+      return 'local';
+    };
+    return LocalModel;
+  })();
+  RemoteModel = (function() {
+    function RemoteModel() {
+      RemoteModel.__super__.constructor.apply(this, arguments);
+    }
+    __extends(RemoteModel, Backbone.Model);
+    RemoteModel.prototype._type = function() {
+      return 'remote';
+    };
+    return RemoteModel;
+  })();
+  CoreModelAPI = (function() {
+    function CoreModelAPI(fcm) {
+      this.fcm = fcm;
+      this.fcm.state.events.registerEvent('MODEL_DEFINE');
+      this.fcm.state.events.registerEvent('MODEL_SYNC');
+      this.fcm.state.events.registerEvent('ENTITY_CREATE');
+      this.fcm.state.events.registerEvent('ENTITY_PUT');
+      this.fcm.state.events.registerEvent('ENTITY_GET');
+      this.fcm.state.events.registerEvent('ENTITY_DELETE');
+      this.local = {
+        schema: {}
+      };
+      this.remote = {
+        schema: {}
+      };
+    }
+    __extends(CoreModelAPI, CoreAPI);
+    CoreModelAPI.prototype.sync = function(method, model, options) {
+      var config, failure_callback, success_callback;
+      switch (method) {
+        case "create":
+          this.fcm.state.events.triggerEvent('ENTITY_CREATE', {
+            model: model,
+            options: options
+          });
+          success_callback = options[0], failure_callback = options[1], config = 3 <= options.length ? __slice.call(options, 2) : [];
+          return this.fcm.rpc.api.data.create({
+            object: model.toJSON()
+          }).fulfill({
+            success: success_callback,
+            failure: failure_callback
+          }, config);
+        case "read":
+          this.fcm.state.events.triggerEvent('ENTITY_GET', {
+            model: model,
+            options: options
+          });
+          success_callback = options[0], failure_callback = options[1], config = 3 <= options.length ? __slice.call(options, 2) : [];
+          return this.fcm.rpc.api.data.get({
+            key: model.id
+          }).fulfill({
+            success: success_callback,
+            failure: failure_callback
+          }, config);
+        case "update":
+          this.fcm.state.events.triggerEvent('ENTITY_PUT', {
+            model: model,
+            options: options
+          });
+          success_callback = options[0], failure_callback = options[1], config = 3 <= options.length ? __slice.call(options, 2) : [];
+          return this.fcm.rpc.api.data.update({
+            key: model.id,
+            object: model.toJSON()
+          }).fulfill({
+            success: success_callback,
+            failure: failure_callback
+          }, config);
+        case "delete":
+          this.fcm.state.events.triggerEvent('ENTITY_DELETE', {
+            model: model,
+            options: options
+          });
+          success_callback = options[0], failure_callback = options[1], config = 3 <= options.length ? __slice.call(options, 2) : [];
+          return this.fcm.rpc.api.data["delete"]({
+            key: model.id
+          }).fulfill({
+            success: success_callback,
+            failure: failure_callback
+          }, config);
+      }
+    };
+    return CoreModelAPI;
+  })();
+  window.LocalModel = LocalModel;
+  window.RemoteModel = RemoteModel;
   CoreAPIBridge = (function() {
-    function CoreAPIBridge() {
+    function CoreAPIBridge(fcm) {
+      this.fcm = fcm;
       this.storage = {
         local: {
           _driver: null,
-          _resolveDriver: function() {
-            return this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'local');
-          },
-          getValue: function(key) {
+          _resolveDriver: __bind(function() {
+            return this._driver = this.fcm.sys.drivers.resolve('storage', 'local');
+          }, this),
+          getValue: __bind(function(key) {
             if (this._driver !== null) {
               return this._driver.getValueByKey(key);
             } else {
               return false;
             }
-          },
-          setValue: function(key, value) {
+          }, this),
+          setValue: __bind(function(key, value) {
             if (this._driver !== null) {
               return this._driver.setValueByKey(key, value);
             } else {
               return false;
             }
-          },
-          clearValues: function() {
+          }, this),
+          clearValues: __bind(function() {
             if (this._driver !== null) {
               return this._driver.allValues();
             } else {
               return false;
             }
-          }
+          }, this)
         },
         session: {
           _driver: null,
           _resolveDriver: function() {
-            return this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'session');
+            return this._driver = this.fcm.sys.drivers.resolve('storage', 'session');
           },
           getValue: function(key) {
             if (this._driver !== null) {
@@ -234,7 +712,7 @@
         object: {
           _driver: null,
           _resolveDriver: function() {
-            return this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'object');
+            return this._driver = this.fcm.sys.drivers.resolve('storage', 'object');
           },
           getValue: function(key) {
             if (this._driver !== null) {
@@ -261,7 +739,7 @@
         sql: {
           _driver: null,
           _resolveDriver: function() {
-            return this._driver = window.fatcatmap.sys.drivers.resolve('storage', 'sql');
+            return this._driver = this.fcm.sys.drivers.resolve('storage', 'sql');
           },
           getValue: function(key) {
             if (this._driver !== null) {
@@ -287,95 +765,20 @@
         }
       };
       this.layout = {
-        register: function(id, element) {
+        register: __bind(function(id, element) {
           element.register(id);
-          return fatcatmap.state.elements.register(id, element);
-        }
+          return this.fcm.state.elements.register(id, element);
+        }, this)
       };
       this.visualizer = {};
     }
     __extends(CoreAPIBridge, CoreAPI);
     return CoreAPIBridge;
   })();
-  CoreSysAPI = (function() {
-    function CoreSysAPI() {
-      this.version = {
-        minor: null,
-        major: null,
-        release: null,
-        setVersion: function(minor, major, release) {
-          this.minor = minor;
-          this.major = major;
-          this.release = release;
-        }
-      };
-      this.drivers = {
-        registry: {},
-        register: function(module, name, fn, initialized, callback) {
-          if (typeof this.registry[module] === null) {
-            this.registry[module] = {};
-          }
-          return this.registry[module][name] = {
-            initialized: initialized,
-            registered: true,
-            hook_point: fn,
-            init_callback: callback
-          };
-        },
-        resolve: function(module, name) {
-          if (typeof this.registry[module] === null) {
-            return false;
-          } else {
-            if (typeof this.registry[module][name] === null) {
-              return false;
-            } else {
-              return this.registry[module][name].hook_point;
-            }
-          }
-        }
-      };
-    }
-    __extends(CoreSysAPI, CoreAPI);
-    return CoreSysAPI;
-  })();
-  CoreDevAPI = (function() {
-    function CoreDevAPI() {
-      this.config = {};
-      this.environment = {};
-      this.performance = {
-        tools: {
-          fpsstats: {
-            show: function(selector) {
-              var stats;
-              stats = new Stats();
-              stats.domElement.style.position = 'absolute';
-              stats.domElement.style.left = '50px';
-              stats.domElement.style.top = '50px';
-              stats.domElement.style.opacity = 0.7;
-              stats.domElement.id = 'js_fps_stats';
-              console.log('stats', stats);
-              $('body').append(stats.domElement);
-              return setInterval(function() {
-                return stats.update();
-              }, 1000 / 60);
-            },
-            hide: function(selector) {
-              return $('#js_fps_stats').hide();
-            }
-          }
-        }
-      };
-      this.debug = {
-        logging: true,
-        eventlog: true,
-        verbose: true
-      };
-    }
-    __extends(CoreDevAPI, CoreAPI);
-    return CoreDevAPI;
-  })();
   CoreUserAPI = (function() {
-    function CoreUserAPI() {
+    function CoreUserAPI(fcm) {
+      this.fcm = fcm;
+      this.fcm.state.events.registerEvent('USER_CHANGE');
       this.current_user = null;
       this.is_user_admin = null;
       this.login_url = null;
@@ -393,8 +796,9 @@
         this.login_url = user_properties['login_url'];
       }
       if (user_properties['logout_url'] !== null) {
-        return this.logout_url = user_properties['logout_url'];
+        this.logout_url = user_properties['logout_url'];
       }
+      return this.fcm.state.events.triggerEvent('USER_CHANGE');
     };
     return CoreUserAPI;
   })();
@@ -581,7 +985,12 @@
     return RPCRequest;
   })();
   CoreRPCAPI = (function() {
-    function CoreRPCAPI() {
+    function CoreRPCAPI(fcm) {
+      fcm.state.events.registerEvent('RPC_CREATE');
+      fcm.state.events.registerEvent('RPC_FULFILL');
+      fcm.state.events.registerEvent('RPC_SUCCESS');
+      fcm.state.events.registerEvent('RPC_ERROR');
+      fcm.state.events.registerEvent('RPC_COMPLETE');
       this.base_rpc_uri = '/_api/rpc';
       this.api = {
         lastRequest: null,
@@ -656,6 +1065,7 @@
           return request;
         },
         fulfillRPCRequest: function(config, request, callbacks) {
+          var context;
           console.log('[RPC] Fulfill: ', config, request, callbacks);
           this.lastRequest = request;
           this.history[request.envelope.id] = {
@@ -680,6 +1090,12 @@
           if (request.action === null || request.action === void 0) {
             throw '[RPC] Error: Could not determine RPC action.';
           }
+          context = {
+            config: config,
+            request: request,
+            callbacks: callbacks
+          };
+          fcm.state.events.triggerEvent('RPC_FULFILL', context);
           (function(request, callbacks) {
             var xhr;
             this.request = request;
@@ -702,24 +1118,45 @@
                 return xhr;
               }, this),
               error: __bind(function(xhr, status, error) {
+                var _ref;
                 console.log('[RPC] Error: ', data, status, xhr);
                 this.fatcatmap.rpc.api.lastFailure = error;
                 this.fatcatmap.rpc.api.history[this.request.envelope.id].xhr = xhr;
                 this.fatcatmap.rpc.api.history[this.request.envelope.id].status = status;
                 this.fatcatmap.rpc.api.history[this.request.envelope.id].failure = error;
-                return this.callbacks.failure(data);
+                context = {
+                  xhr: xhr,
+                  status: status,
+                  error: error
+                };
+                fcm.state.events.triggerEvent('RPC_ERROR', context);
+                return (_ref = this.callbacks) != null ? _ref.failure(data) : void 0;
               }, this),
               success: __bind(function(data, status, xhr) {
+                var _ref;
                 console.log('[RPC] Success: ', data, status, xhr);
                 this.fatcatmap.rpc.api.lastResponse = data;
                 this.fatcatmap.rpc.api.history[this.request.envelope.id].xhr = xhr;
                 this.fatcatmap.rpc.api.history[this.request.envelope.id].status = status;
                 this.fatcatmap.rpc.api.history[this.request.envelope.id].response = data;
-                return this.callbacks.success(data);
+                context = {
+                  xhr: xhr,
+                  status: status,
+                  data: data
+                };
+                fcm.state.events.triggerEvent('RPC_SUCCESS', context);
+                return (_ref = this.callbacks) != null ? _ref.success(data) : void 0;
               }, this),
               complete: __bind(function(xhr, status) {
+                var _ref;
                 this.fatcatmap.rpc.api.history[this.request.envelope.id].xhr = xhr;
-                return this.fatcatmap.rpc.api.history[this.request.envelope.id].status = status;
+                this.fatcatmap.rpc.api.history[this.request.envelope.id].status = status;
+                context = {
+                  xhr: xhr,
+                  status: status
+                };
+                fcm.state.events.triggerEvent('RPC_COMPLETE', context);
+                return (_ref = this.callbacks) != null ? _ref.complete(xhr, status) : void 0;
               }, this),
               statusCode: {
                 404: function() {
@@ -752,6 +1189,7 @@
         frame: new RPCAdapter('frame')
       };
       this.ext = null;
+      fcm.state.events.triggerEvent('RPC_READY');
     }
     __extends(CoreRPCAPI, CoreAPI);
     return CoreRPCAPI;
@@ -759,256 +1197,6 @@
   window.RPCAPI = RPCAPI;
   window.RPCAdapter = RPCAdapter;
   window.RPCRequest = RPCRequest;
-  CoreStateAPI = (function() {
-    function CoreStateAPI() {
-      this.events = {
-        registry: [],
-        callchain: {},
-        history: [],
-        registerEvent: function(name) {
-          this.registry.push(name);
-          this.callchain[name] = [];
-          return this;
-        },
-        registerHook: function(_event, fn, once) {
-          var calltask;
-          if (typeof once === null) {
-            once = false;
-          }
-          try {
-            calltask = {
-              executed: false,
-              callback: function(context) {
-                return fn(context);
-              },
-              runonce: one
-            };
-            return this.callchain[_event].push(calltask);
-          } catch (_e) {}
-        },
-        triggerEvent: function(_event, context) {
-          var calltask, result, result_calltask, _i, _len, _ref, _results;
-          if (typeof this.callchain[_event] !== null) {
-            if (this.callchain[_event].length > 0) {
-              _ref = this.callchain[_event];
-              _results = [];
-              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                calltask = _ref[_i];
-                if (this.callchain[_event][calltask].executed === true && this.callchain[_event][calltask].runonce === true) {
-                  continue;
-                } else {
-                  try {
-                    result = this.callchain[_event][calltask].callback(context);
-                    result_calltask = {
-                      event: _event,
-                      context: context,
-                      task: this.callchain[_event][calltask],
-                      result: result
-                    };
-                  } catch (error) {
-                    result_calltask = {
-                      event: _event,
-                      context: context,
-                      task: this.callchain[_event][calltask],
-                      error: error
-                    };
-                  } finally {
-                    this.history.push(result_calltask);
-                    this.callchain[_event][calltask].executed = true;
-                  }
-                }
-              }
-              return _results;
-            }
-          }
-        }
-      };
-      this.session = {};
-      this.local = {};
-      this.elements = {
-        registry: {},
-        get: function(id) {
-          return this.registry[id];
-        },
-        scan: function() {
-          $('[data-element]').each({
-            buildElement: function(index, element) {
-              return this.register(element.attr('data-element'), this.factory(element.attr('data-element'), '#' + element.attr('id'), element.attr('data-element-type') || null));
-            }
-          });
-          return this;
-        },
-        factory: function(id, selector, type, config) {
-          var _type;
-          if (type == null) {
-            type = 'LayoutElement';
-          }
-          if (config == null) {
-            config = {};
-          }
-          if (type === null) {
-            _type = LayoutElement;
-          }
-          if (type === 'LayoutElement') {
-            _type = LayoutElement;
-          } else if (type === 'Panel') {
-            _type = Panel;
-          } else if (type === 'SuperPanel') {
-            _type = SuperPanel;
-          } else if (type === 'Navigation') {
-            _type = Navigation;
-          }
-          return new _type(id, selector, config);
-        },
-        register: function(id, element) {
-          this.registry[id] = element;
-          return this.registry[id];
-        },
-        _setState: function(id, key, value) {
-          if (this.registry[id] !== null) {
-            this.registry[id]._setState(key, value);
-          }
-          return this;
-        },
-        _getState: function(id, key, default_value) {
-          if (default_value == null) {
-            default_value = null;
-          }
-          if (this.registry[id] !== null) {
-            return this.registry[id]._getState(key, default_value);
-          } else {
-            return default_value;
-          }
-        },
-        _loadState: function(id, state) {
-          if (this.registry[id] === null) {
-            throw "Must register element before setting state!";
-          } else {
-            this.registry[id]._loadState(state);
-          }
-          return this;
-        }
-      };
-    }
-    __extends(CoreStateAPI, CoreAPI);
-    return CoreStateAPI;
-  })();
-  LayoutElement = (function() {
-    LayoutElement.prototype.id = null;
-    LayoutElement.prototype.state = {};
-    LayoutElement.prototype.config = {};
-    LayoutElement.prototype.classes = [];
-    LayoutElement.prototype.element = null;
-    LayoutElement.prototype.defaults = null;
-    LayoutElement.prototype.selector = null;
-    LayoutElement.prototype.registered = false;
-    function LayoutElement(selector, config) {
-      this.selector = selector;
-      this.config = config != null ? config : {};
-    }
-    LayoutElement.prototype.register = function(id) {
-      this.id = id;
-    };
-    LayoutElement.prototype._setState = function(key, value) {
-      this.state[key] = value;
-      return this;
-    };
-    LayoutElement.prototype._getState = function(key, default_value) {
-      if (default_value == null) {
-        default_value = null;
-      }
-      if (this.state[key] === void 0) {
-        return default_value;
-      } else {
-        return this.state[key];
-      }
-    };
-    LayoutElement.prototype._deleteState = function(key) {
-      return delete this.state[key];
-    };
-    LayoutElement.prototype._loadState = function(state, classes) {
-      this.state = state;
-      this.classes = classes;
-      return this._refreshState();
-    };
-    LayoutElement.prototype._flushState = function() {
-      var finalState;
-      finalState = {
-        state: this.state,
-        classes: this.classes
-      };
-      return finalState;
-    };
-    LayoutElement.prototype._refreshState = function() {
-      var classname, _i, _len, _ref, _results;
-      _ref = this.classes;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        classname = _ref[_i];
-        _results.push(this.get().addClass(classname));
-      }
-      return _results;
-    };
-    LayoutElement.prototype.get = function() {
-      if (this.element === null) {
-        this.element = $(this.selector);
-      }
-      return this.element;
-    };
-    LayoutElement.prototype.addClass = function(classname) {
-      this.classes.push(classname);
-      this.get().addClass(classname);
-      return this;
-    };
-    LayoutElement.prototype.removeClass = function(classname) {
-      if (__indexOf.call(this.classes, classname) >= 0) {
-        this.classes.remove(classname);
-      }
-      this.get().removeClass(classname);
-      return this;
-    };
-    LayoutElement.prototype.toggleClass = function(classname) {
-      if (__indexOf.call(this.classes, classname) >= 0) {
-        this.classes.remove(classname);
-      } else {
-        this.classes.push(classname);
-      }
-      this.get().toggleClass(classname);
-      return this;
-    };
-    LayoutElement.prototype.hide = function(duration, easing, callback) {
-      this._setState('visible', false);
-      this.get().hide(duration, easing, callback);
-      return this;
-    };
-    LayoutElement.prototype.show = function(duration, easing, callback) {
-      this._setState('visible', true);
-      return this.get().show(duration, easing, callback);
-    };
-    LayoutElement.prototype.showhide = function(duration, easing, callback) {
-      if (this._getState('visible', false) !== false) {
-        this.get().hide(duration, easing, callback);
-      } else {
-        this.get().show(duration, easing, callback);
-      }
-      return this;
-    };
-    LayoutElement.prototype.css = function(properties) {
-      this.get().css(properties);
-      return this;
-    };
-    LayoutElement.prototype.animate = function(properties, options) {
-      if (options == null) {
-        options = {};
-      }
-      this.get().animate(properties, options);
-      return this;
-    };
-    return LayoutElement;
-  })();
-  if (typeof window !== "undefined" && window !== null) {
-    window.LayoutElement = LayoutElement;
-  }
   InteractiveWidget = (function() {
     function InteractiveWidget(name, path, config) {
       this.name = name;
@@ -1025,27 +1213,79 @@
     }
     return SiteSection;
   })();
+  CoreLiveAPI = (function() {
+    function CoreLiveAPI(fcm) {
+      this.fcm = fcm;
+      this.onClose = __bind(this.onClose, this);;
+      this.onError = __bind(this.onError, this);;
+      this.onMessage = __bind(this.onMessage, this);;
+      this.onOpen = __bind(this.onOpen, this);;
+      this.openChannel = __bind(this.openChannel, this);;
+      this.fcm.state.events.registerEvent('CHANNEL_OPEN');
+      this.fcm.state.events.registerEvent('CHANNEL_MESSAGE');
+      this.fcm.state.events.registerEvent('CHANNEL_ERROR');
+      this.fcm.state.events.registerEvent('CHANNEL_CLOSE');
+      this.token = null;
+      this.channel = null;
+      this.socket = null;
+    }
+    __extends(CoreLiveAPI, CoreAPI);
+    CoreLiveAPI.prototype.openChannel = function(token) {
+      var _ref;
+      this.token = token;
+      this.fcm.dev.debug.log('CoreLive', 'Opening channel.', this.token);
+      try {
+        this.channel = typeof goog !== "undefined" && goog !== null ? (_ref = goog.appengine) != null ? new _ref.Channel(this.token) : void 0 : void 0;
+        this.socket = this.channel.open();
+        this.socket.onopen = this.onOpen;
+        this.socket.onmessage = this.onMessage;
+        this.socket.onerror = this.onError;
+        return this.socket.onclose = this.onClose;
+      } catch (error) {
+        return this.fcm.dev.debug.error('CoreLive', 'Encountered error preparing live channel.', error);
+      }
+    };
+    CoreLiveAPI.prototype.onOpen = function() {
+      this.fcm.dev.debug.log('CoreLive', 'Channel is ready to receive live messages.');
+      return this.fcm.state.events.triggerEvent('CHANNEL_OPEN');
+    };
+    CoreLiveAPI.prototype.onMessage = function(message) {
+      this.fcm.dev.debug.verbose('CoreLive', 'Channel message received.', message);
+      return this.fcm.state.events.triggerEvent('CHANNEL_MESSAGE', message);
+    };
+    CoreLiveAPI.prototype.onError = function(error) {
+      this.fcm.dev.debug.error('CoreLive', 'Encountered channel error.', error);
+      return this.fcm.state.events.triggerEvent('CHANNEL_ERROR', error);
+    };
+    CoreLiveAPI.prototype.onClose = function() {
+      this.fcm.dev.debug.log('CoreLive', 'Channel has been closed.');
+      return this.fcm.state.events.triggerEvent('CHANNEL_CLOSE');
+    };
+    return CoreLiveAPI;
+  })();
   FatCatMap = (function() {
     function FatCatMap(config) {
       this.config = config;
-      this.api = new CoreAPIBridge;
-      this.agent = new CoreAgentAPI;
+      this.dev = new CoreDevAPI(this);
+      this.sys = new CoreSysAPI(this);
+      this.agent = new CoreAgentAPI(this);
       this.agent.discover();
-      this.state = new CoreStateAPI;
-      this.state.events.registerEvent('CORE_INIT');
-      this.state.events.registerEvent('RPC_INIT');
-      this.state.events.registerEvent('API_INIT');
+      this.state = new CoreStateAPI(this);
+      this.state.events.registerEvent('RPC_READY');
+      this.state.events.registerEvent('API_READY');
       this.state.events.registerEvent('CORE_READY');
       this.state.events.registerEvent('DRIVER_REGISTERED');
       this.state.events.registerEvent('REGISTER_ELEMENT');
       this.state.events.registerEvent('PLATFORM_READY');
-      this.user = new CoreUserAPI;
-      this.rpc = new CoreRPCAPI;
-      this.sys = new CoreSysAPI;
-      this.dev = new CoreDevAPI;
+      this.model = new CoreModelAPI(this);
+      this.api = new CoreAPIBridge(this);
+      this.user = new CoreUserAPI(this);
+      this.rpc = new CoreRPCAPI(this);
+      this.live = new CoreLiveAPI(this);
       return this;
     }
     return FatCatMap;
   })();
   window.fatcatmap = new FatCatMap();
+  window.fatcatmap.state.events.triggerEvent('CORE_READY');
 }).call(this);

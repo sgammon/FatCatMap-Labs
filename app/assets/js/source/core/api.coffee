@@ -1,7 +1,7 @@
 ## Core API Bride
 class CoreAPIBridge extends CoreAPI
 
-	constructor: ->
+	constructor: (@fcm) ->
 
 		## Storage API
 		@storage =
@@ -11,22 +11,22 @@ class CoreAPIBridge extends CoreAPI
 
 				_driver: null
 
-				_resolveDriver: ->
-					@_driver = window.fatcatmap.sys.drivers.resolve('storage', 'local')
+				_resolveDriver: =>
+					@_driver = @fcm.sys.drivers.resolve('storage', 'local')
 
-				getValue: (key) ->
+				getValue: (key) =>
 					if @_driver isnt null
 						return @_driver.getValueByKey(key)
 					else
 						return false
 
-				setValue: (key, value) ->
+				setValue: (key, value) =>
 					if @_driver isnt null
 						return @_driver.setValueByKey(key, value)
 					else
 						return false
 
-				clearValues: ->
+				clearValues: =>
 					if @_driver isnt null
 						return @_driver.allValues()
 					else
@@ -38,7 +38,7 @@ class CoreAPIBridge extends CoreAPI
 				_driver: null
 
 				_resolveDriver: ->
-					@_driver = window.fatcatmap.sys.drivers.resolve('storage', 'session')
+					@_driver = @fcm.sys.drivers.resolve('storage', 'session')
 
 				getValue: (key) ->
 					if @_driver isnt null
@@ -64,7 +64,7 @@ class CoreAPIBridge extends CoreAPI
 				_driver: null
 
 				_resolveDriver: ->
-					@_driver = window.fatcatmap.sys.drivers.resolve('storage', 'object')
+					@_driver = @fcm.sys.drivers.resolve('storage', 'object')
 
 				getValue: (key) ->
 					if @_driver isnt null
@@ -90,7 +90,7 @@ class CoreAPIBridge extends CoreAPI
 				_driver: null
 
 				_resolveDriver: ->
-					@_driver = window.fatcatmap.sys.drivers.resolve('storage', 'sql')
+					@_driver = @fcm.sys.drivers.resolve('storage', 'sql')
 
 				getValue: (key) ->
 					if @_driver isnt null
@@ -113,9 +113,9 @@ class CoreAPIBridge extends CoreAPI
 		## Layout API
 		@layout =
 			
-			register: (id, element) ->
+			register: (id, element) =>
 				element.register(id)
-				return fatcatmap.state.elements.register(id, element)
+				return @fcm.state.elements.register(id, element)
 
 		## Visualizer API
 		@visualizer = {}

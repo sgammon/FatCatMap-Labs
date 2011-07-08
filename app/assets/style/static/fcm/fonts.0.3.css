@@ -1,0 +1,154 @@
+@font-face {
+    font-family: 'Cabin';
+    src: url('/static/resources/fonts/cabin-bold-webfont.eot');
+    src: url('/static/resources/fonts/cabin-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/resources/fonts/cabin-bold-webfont.woff') format('woff'),
+         url('/static/resources/fonts/cabin-bold-webfont.ttf') format('truetype'),
+         url('/static/resources/fonts/cabin-bold-webfont.svgz#CabinBold') format('svg'),
+         url('/static/resources/fonts/cabin-bold-webfont.svg#CabinBold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Cabin';
+    src: url('/static/resources/fonts/cabin-bolditalic-webfont.eot');
+    src: url('/static/resources/fonts/cabin-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/resources/fonts/cabin-bolditalic-webfont.woff') format('woff'),
+         url('/static/resources/fonts/cabin-bolditalic-webfont.ttf') format('truetype'),
+         url('/static/resources/fonts/cabin-bolditalic-webfont.svgz#CabinBoldItalic') format('svg'),
+         url('/static/resources/fonts/cabin-bolditalic-webfont.svg#CabinBoldItalic') format('svg');
+    font-weight: bold;
+    font-style: italic;
+
+}
+
+@font-face {
+    font-family: 'Cabin';
+    src: url('/static/resources/fonts/cabin-italic-webfont.eot');
+    src: url('/static/resources/fonts/cabin-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/resources/fonts/cabin-italic-webfont.woff') format('woff'),
+         url('/static/resources/fonts/cabin-italic-webfont.ttf') format('truetype'),
+         url('/static/resources/fonts/cabin-italic-webfont.svgz#CabinItalic') format('svg'),
+         url('/static/resources/fonts/cabin-italic-webfont.svg#CabinItalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+
+}
+
+@font-face {
+    font-family: 'CabinMedium';
+    src: url('/static/resources/fonts/cabin-medium-webfont.eot');
+    src: url('/static/resources/fonts/cabin-medium-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/resources/fonts/cabin-medium-webfont.woff') format('woff'),
+         url('/static/resources/fonts/cabin-medium-webfont.ttf') format('truetype'),
+         url('/static/resources/fonts/cabin-medium-webfont.svgz#CabinMedium') format('svg'),
+         url('/static/resources/fonts/cabin-medium-webfont.svg#CabinMedium') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'CabinMediumItalic';
+    src: url('/static/resources/fonts/cabin-mediumitalic-webfont.eot');
+    src: url('/static/resources/fonts/cabin-mediumitalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/resources/fonts/cabin-mediumitalic-webfont.woff') format('woff'),
+         url('/static/resources/fonts/cabin-mediumitalic-webfont.ttf') format('truetype'),
+         url('/static/resources/fonts/cabin-mediumitalic-webfont.svgz#CabinMediumItalic') format('svg'),
+         url('/static/resources/fonts/cabin-mediumitalic-webfont.svg#CabinMediumItalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+
+}
+
+@font-face {
+    font-family: 'Cabin';
+    src: url('/static/resources/fonts/cabin-regular-webfont.eot');
+    src: url('/static/resources/fonts/cabin-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/resources/fonts/cabin-regular-webfont.woff') format('woff'),
+         url('/static/resources/fonts/cabin-regular-webfont.ttf') format('truetype'),
+         url('/static/resources/fonts/cabin-regular-webfont.svgz#CabinRegular') format('svg'),
+         url('/static/resources/fonts/cabin-regular-webfont.svg#CabinRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'CabinSemiBold';
+    src: url('/static/resources/fonts/cabin-semibold-webfont.eot');
+    src: url('/static/resources/fonts/cabin-semibold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/resources/fonts/cabin-semibold-webfont.woff') format('woff'),
+         url('/static/resources/fonts/cabin-semibold-webfont.ttf') format('truetype'),
+         url('/static/resources/fonts/cabin-semibold-webfont.svgz#CabinSemiBold') format('svg'),
+         url('/static/resources/fonts/cabin-semibold-webfont.svg#CabinSemiBold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'CabinSemiBoldItalic';
+    src: url('/static/resources/fonts/cabin-semibolditalic-webfont.eot');
+    src: url('/static/resources/fonts/cabin-semibolditalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/resources/fonts/cabin-semibolditalic-webfont.woff') format('woff'),
+         url('/static/resources/fonts/cabin-semibolditalic-webfont.ttf') format('truetype'),
+         url('/static/resources/fonts/cabin-semibolditalic-webfont.svgz#CabinSemiBoldItalic') format('svg'),
+         url('/static/resources/fonts/cabin-semibolditalic-webfont.svg#CabinSemiBoldItalic') format('svg');
+    font-weight: bold;
+    font-style: italic;
+
+}
+
+@font-face {
+    font-family: 'Lekton';
+    src: url('/static/resources/fonts/lekton-bold-webfont.eot');
+    src: url('/static/resources/fonts/lekton-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/resources/fonts/lekton-bold-webfont.woff') format('woff'),
+         url('/static/resources/fonts/lekton-bold-webfont.ttf') format('truetype'),
+         url('/static/resources/fonts/lekton-bold-webfont.svgz#LektonBold') format('svg'),
+         url('/static/resources/fonts/lekton-bold-webfont.svg#LektonBold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'Lekton';
+    src: url('/static/resources/fonts/lekton-italic-webfont.eot');
+    src: url('/static/resources/fonts/lekton-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/resources/fonts/lekton-italic-webfont.woff') format('woff'),
+         url('/static/resources/fonts/lekton-italic-webfont.ttf') format('truetype'),
+         url('/static/resources/fonts/lekton-italic-webfont.svgz#LektonItalic') format('svg'),
+         url('/static/resources/fonts/lekton-italic-webfont.svg#LektonItalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+
+}
+
+@font-face {
+    font-family: 'Lekton';
+    src: url('/static/resources/fonts/lekton-regular-webfont.eot');
+    src: url('/static/resources/fonts/lekton-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/resources/fonts/lekton-regular-webfont.woff') format('woff'),
+         url('/static/resources/fonts/lekton-regular-webfont.ttf') format('truetype'),
+         url('/static/resources/fonts/lekton-regular-webfont.svgz#LektonRegular') format('svg'),
+         url('/static/resources/fonts/lekton-regular-webfont.svg#LektonRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'CabinSketch';
+    src: url('/static/resources/fonts/cabinsketch-bold-webfont.eot');
+    src: url('/static/resources/fonts/cabinsketch-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/resources/fonts/cabinsketch-bold-webfont.woff') format('woff'),
+         url('/static/resources/fonts/cabinsketch-bold-webfont.ttf') format('truetype'),
+         url('/static/resources/fonts/cabinsketch-bold-webfont.svgz#CabinSketchBold') format('svg'),
+         url('/static/resources/fonts/cabinsketch-bold-webfont.svg#CabinSketchBold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+
+}

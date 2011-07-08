@@ -103,7 +103,7 @@ def systemLog(message, _type='debug'):
 	global debug
 	global _config
 	prefix = '[CORE_SYSTEM]: '
-	if _config['momentum.system']['debug'] is True:
+	if _config['momentum.system']['debug'] is True or _type in ('error', 'critical'):
 		if _type == 'debug' or debug is True:
 			logging.debug(prefix+message)
 		elif _type == 'info' or debug is True:
