@@ -5,13 +5,13 @@
 {% block content %}
 
 {% if not page.standalone %}
-	<div id='contentHeader' class='{% block content_header_class %}content_header{% endblock %} hidden'>
+	<div id='contentHeader' class='{% block content_headerheader_class %}content_header{% endblock %} hidden'>
 		{% block content_header %}
 			<div class='extendedNav'>
 
 				<div id='browsePane' class='navpane hidden' data-navref='browse'>
 
-					<div class='floatleft fullheight tenthwidth'>		
+					<div class='floatleft fullheight tenthwidth'>
 						<a href="{{ link('browse:landing') }}" title='browse raw data, in context and with easy connections to related information'><img src='/assets/img/static/layout/headers/browse.png' alt='fatcatmap: browse' width='124' height='90' /></a>
 					</div>
 				

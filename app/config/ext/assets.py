@@ -10,6 +10,9 @@ config = {}
 # Installed Assets
 config['momentum.fatcatmap.assets'] = {
 
+	'debug': False, ## Output log messages about what's going on.
+	'verbose': False, ## Raise debug-level messages to 'info'.
+
 	# JavaScript Libraries & Includes
 	'js': {
 
