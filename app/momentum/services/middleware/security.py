@@ -4,15 +4,15 @@ from momentum.services.middleware import ServiceGatewayMiddleware
 
 class AuthenticationMiddleware(ServiceGatewayMiddleware):
 
-	def __call__(self, request, response):
+	def before_request(self, service, request, response):
 		
-		logging.info('REQUEST_HEADERS: '+str(request.headers))
-		logging.info('REQUEST_GETVARS: '+str(request.str_queryvars))
+		logging.info('SERVICE: '+str(service))
+		logging.info('REQUEST_TOKEN: '+str(request.GET.get('token', '_NOTOKEN_')))
 				
-		return (request, response)
+		return (service, request, response)
 	
 	
 class AuthorizationMiddleware(ServiceGatewayMiddleware):
 
-	def __call__(self, request, response):
-		return (request, response)
+	def before_request(self, service, request, response):
+		return (service, request, response)

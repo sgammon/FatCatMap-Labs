@@ -4,6 +4,8 @@ from protorpc import remote
 
 from momentum.fatcatmap import models as m
 
+from momentum.fatcatmap.api import FatCatMapAPIService
+
 from momentum.fatcatmap.models.core.object import Node
 
 from momentum.fatcatmap.messages.util import DatastoreKey
@@ -20,7 +22,9 @@ from momentum.fatcatmap.messages.graph import GraphSchemaItem
 from momentum.fatcatmap.core.api.graph.factory import GraphFactory
 
 
-class GraphAPIService(remote.Service):
+class GraphAPIService(FatCatMapAPIService):
+	
+	configPath = 'services.graph.config'
 
 	@remote.method(GraphRequest, GraphResponse)
 	def construct(self, request):

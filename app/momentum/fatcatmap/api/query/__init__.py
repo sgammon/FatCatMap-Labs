@@ -6,6 +6,8 @@ from momentum.fatcatmap.api import FatCatMapAPIService
 
 class QueryAPIService(FatCatMapAPIService):
 
+	config_path = 'services.query.config'
+
 	#@remote.method()
 	def search(self, request):
 		pass

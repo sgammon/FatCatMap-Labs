@@ -5,6 +5,8 @@ from momentum.fatcatmap.api import FatCatMapAPIService
 
 
 class ChartsAPIService(FatCatMapAPIService):
+	
+	config_path = 'services.charts.config'
 
 	#@remote.method()
 	def generate(self, request):

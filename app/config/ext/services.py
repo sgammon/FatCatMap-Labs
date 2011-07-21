@@ -51,24 +51,23 @@ config['momentum.services'] = {
 			
 			}			
 		
+		}),
+		
+		('caching', {
+		
+			'enabled': True,
+			'debug': True,
+			'path': 'momentum.services.middleware.caching.CachingMiddleware',
+			'args': {
+			
+			}
+		
 		})
 
-	]
-
-}
-
-
-
-# FCM Services
-config['momentum.fatcatmap.services'] = {
-
-	'enabled': True, ## Disable API services system wide
-	'logging': True, ## Logging for service request handling
-
-	# Module-level (default) config (NOT IMPLEMENTED YET)
-	'config': {
+	],
 	
-		'url_prefix': '/_api/rpc', ## Prefix for all service invocation URLs
+	## Configuration profiles that can be assigned to services
+	'middleware_config': {
 	
 		## Response + data caching middleware
 		'caching': {
@@ -218,6 +217,43 @@ config['momentum.fatcatmap.services'] = {
 		},
 	
 	},
+	
+	### Default config values
+	'defaults': {
+	
+		'module': {},
+		'service': {
+		
+			'config': {
+				'caching': 'none',
+				'security': 'none',
+				'recording': 'none'
+			},
+			
+			'args': {
+			
+			}
+		
+		}
+	
+	},
+
+}
+
+
+
+# FCM Services
+config['momentum.fatcatmap.services'] = {
+
+	'enabled': True, ## Disable API services system wide
+	'logging': True, ## Logging for service request handling
+
+	# Module-level (default) config (NOT IMPLEMENTED YET)
+	'config': {
+	
+		'url_prefix': '/_api/rpc', ## Prefix for all service invocation URLs
+	
+	},
 
 	# Installed API's
 	'services': {
@@ -227,6 +263,7 @@ config['momentum.fatcatmap.services'] = {
 			'enabled': True,
 			'service': 'momentum.fatcatmap.api.data.DataAPIService',
 			'methods': ['get', 'create', 'update', 'delete', 'sync', 'preload', 'getObject', 'getNative', 'getAsset', 'putAsset'],
+
 			'config': {
 				'caching': 'none',
 				'security': 'none',
@@ -239,6 +276,7 @@ config['momentum.fatcatmap.services'] = {
 			'enabled': True,
 			'service': 'momentum.fatcatmap.api.graph.GraphAPIService',
 			'methods': ['construct', 'constructFromNode', 'constructFromObject'],
+
 			'config': {
 				'caching': 'none',
 				'security': 'none',
@@ -251,6 +289,7 @@ config['momentum.fatcatmap.services'] = {
 			'enabled': True,
 			'service': 'momentum.fatcatmap.api.frame.FrameAPIService',
 			'methods': ['render', 'renderWidget', 'renderDialog'],
+
 			'config': {
 				'caching': 'none',
 				'security': 'none',
@@ -263,6 +302,7 @@ config['momentum.fatcatmap.services'] = {
 			'enabled': True,
 			'service': 'momentum.fatcatmap.api.query.QueryAPIService',
 			'methods': ['search', 'gql', 'quickSearch'],
+
 			'config': {
 				'caching': 'none',
 				'security': 'none',
@@ -275,6 +315,7 @@ config['momentum.fatcatmap.services'] = {
 			'enabled': True,
 			'service': 'momentum.fatcatmap.api.charts.ChartsAPIService',
 			'methods': ['generate', 'generateFromSeries'],		
+
 			'config': {
 				'caching': 'none',
 				'security': 'none',
@@ -287,12 +328,14 @@ config['momentum.fatcatmap.services'] = {
 			'enabled': True,
 			'service': 'momentum.fatcatmap.api.session.SessionAPIService',
 			'methods': ['init', 'authenticate', 'checkin'],
+
 			'config': {
 				'caching': 'none',
 				'security': 'none',
 				'recording': 'none'				
 			}
-		}	
-	}
+		}
+		
+	} ## End services
 
-}
+} ## End services

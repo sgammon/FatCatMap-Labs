@@ -42,10 +42,43 @@ config['momentum.fatcatmap.output'] = {
 
 }
 
+## Caching
+config['momentum.fatcatmap.cache'] = {
+
+	'key_seperator': '::',
+	'prefix': 'dev',
+	'prefix_mode': 'explicit',
+	'prefix_namespace': False,
+	'namespace_seperator': '::',
+	
+	'adapters': {
+
+		'fastcache': {
+
+			'default_ttl': 600
+	
+		},
+		
+		'memcache': {
+
+			'default_ttl': 10800
+		
+		}, 
+		
+		'datastore': {
+
+			'default_ttl': 86400
+		
+		}
+	
+	}
+
+}
+
 config['momentum.fatcatmap.output.template_loader'] = {
 
 	'force': True, ## Force enable template loader even on Dev server
-	'debug': True,  ## Enable dev logging
+	'debug': False,  ## Enable dev logging
 	'use_memory_cache': False, ## Use handler in-memory cache for template source
 	'use_memcache': False, ## Use Memcache API for template source
 
