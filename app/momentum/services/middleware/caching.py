@@ -6,6 +6,7 @@ class CachingMiddleware(ServiceGatewayMiddleware):
 	
 	def before_request(self, service, request, response):
 		return (service, request, response)
-		
+
+
 	def after_request(self, service, request, response):
-		return (service, request, response)
+		pass

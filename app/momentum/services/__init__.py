@@ -9,6 +9,7 @@ from werkzeug import cached_property
 
 from webapp2_extras import protorpc as proto
 
+global_debug = config.debug
 _middleware_cache = {}
 
 
@@ -100,13 +101,11 @@ class MomentumServiceHandler(proto.ServiceHandler):
 		
 	def run_post_action_middleware(self, service):
 		
-		logging.info('RUNNING POST ACTION MIDDLEWARE!!! :)')
-		
+		global global_debug
 		global _middleware_cache
 		
 		middleware = self.servicesConfig.get('middleware', False)
 		if middleware is not False and len(middleware) > 0:
-			
 			for name, config in middleware:
 				self.log('Considering '+str(name)+' middleware...')
 				if config['enabled'] is True:
@@ -119,7 +118,7 @@ class MomentumServiceHandler(proto.ServiceHandler):
 						middleware_object = middleware_class(debug=config['debug'], config=config.get('args', {}))
 						
 						if hasattr(middleware_object, 'after_request'):
-							self.service, self.request, self.response = middleware_object.after_request(self.service, self.request, self.response)
+							middleware_object.after_request(self.service, self.request, self.response)
 							continue
 						else:
 							self.log('Middleware '+str(name)+' does not have after_request method. Continuing.')
@@ -127,7 +126,10 @@ class MomentumServiceHandler(proto.ServiceHandler):
 						
 					except Exception, e:
 						self.error('Middleware "'+str(name)+'" raised an unhandled exception of type "'+str(e)+'".')
-						continue
+						if global_debug:
+							raise e
+						else:
+							continue
 				else:
 					self.log('Middleware '+str(name)+' is disabled.')
 					continue
@@ -178,6 +180,7 @@ class MomentumServiceHandlerFactory(proto.ServiceHandlerFactory):
 	
 	def __call__(self, request, response):
 		
+		global global_debug
 		global _middleware_cache
 
 		## Manufacture service + handler
@@ -208,7 +211,10 @@ class MomentumServiceHandlerFactory(proto.ServiceHandlerFactory):
 						
 					except Exception, e:
 						self.error('Middleware "'+str(name)+'" raise an unhandled exception of type "'+str(e)+'".')
-						continue
+						if global_debug:
+							raise e
+						else:
+							continue
 						
 				else:
 					self.log('Middleware '+str(name)+' is disabled.')
