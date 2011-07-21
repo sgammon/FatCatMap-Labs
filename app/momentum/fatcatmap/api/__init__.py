@@ -1,19 +1,12 @@
 
 import config
 from protorpc import remote
-from momentum import MomentumService
+from momentum.services import MomentumService
 
 
 class FatCatMapAPIService(MomentumService):
 
-	state = {}
-	config = {}
-
-	def __init__(self):
-		self.config = config.config.get('momentum.fatcatmap.services')
-
-	def initialize_request_state(self, state):
-		self.state = state
+	moduleConfigPath = 'momentum.fatcatmap.services'
 		
 	
 def CallResponder(func):

@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
 import os
 import config
+import hashlib
+import logging
 import simplejson
+
+# ProtoRPC Imports
+from protorpc import remote
 
 # Tipfy Imports
 from tipfy import RequestHandler, Response
 from tipfyext.jinja2 import Jinja2Mixin
 
-# ProtoRPC Imports
-from protorpc import remote
+from tipfy.i18n import I18nMiddleware
+from tipfy.sessions import SessionMiddleware
 
 # App Engine Imports
 from google.appengine.api import oauth
@@ -16,11 +21,13 @@ from google.appengine.api import users
 from google.appengine.api import backends
 from google.appengine.api import namespace_manager
 
-# Output Mixin Imports
+# Handler Mixins
 from momentum.fatcatmap.core.api.output.assets import AssetsMixin
+from momentum.fatcatmap.core.api.output.live import LiveServicesMixin
+from momentum.fatcatmap.core.api.output.sessions import SessionsMixin
 
 
-class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
+class MomentumHandler(RequestHandler, Jinja2Mixin, AssetsMixin, LiveServicesMixin, SessionsMixin):
 
 	''' Top-level parent class for request handlers based in Tipfy. '''
 	
@@ -29,22 +36,24 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 	minify = False
 	response = Response
 	
+	middleware = [SessionMiddleware(), I18nMiddleware()]
+	
 	baseHeaders = {
 		
 		'X-Platform': 'Providence/Clarity-Embedded', # Indicate the platform that is serving this request
-		'X-Powered-By': 'Google App Engine/1.5.0', # Indicate the SDK version
+		'X-Powered-By': 'Google App Engine/1.5.1', # Indicate the SDK version
 		'X-UA-Compatible': 'IE=edge,chrome=1' # Enable compatibility with Chrome Frame, and force IE to render with the latest engine
 
-	}
+	}		
 	
-	def render(self, path, elements={}, content_type='text/html', headers={}, **kwargs):
+	
+	def render(self, path, context={}, elements={}, content_type='text/html', headers={}, **kwargs):
 
-		''' Return a response containing a rendered Jinja template. '''
+		''' Return a response containing a rendered Jinja template. Create a session if one doesn't exist. '''
 	
-		template_context = {
-			## Create empty template context...
-			'user': users.get_current_user()
-		}
+		self.context['user'] = users.get_current_user()
+		self.context['session'] = self.getFatCatMapSession()		
+		
 		
 		response_headers = {}
 		for key, value in self.baseHeaders.items():
@@ -56,9 +65,9 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 		# Consider kwargs
 		if len(kwargs) > 0:
 			for k, v in kwargs.items():
-				template_context[k] = v
+				self.context[k] = v
 		
-		params = self._bindTemplateFunctions(template_context, self._outputConfig())
+		params = self._bindTemplateFunctions(self.context, self._outputConfig())
 		
 		minify = unicode
 
@@ -74,9 +83,9 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 				
 		## Bind elements
 		for element, config in elements.items():
-			template_context['page']['elements'][element] = config
+			self.context['page']['elements'][element] = config
 		
-		return self.response(response=minify(self.render_template(path, **template_context)), content_type=content_type, headers=[(key, value) for key, value in response_headers.items()])
+		return self.response(response=minify(self.render_template(path, **self.context)), content_type=content_type, headers=[(key, value) for key, value in response_headers.items()])
 				
 
 	def _bindTemplateFunctions(self, params, output_cfg):
@@ -130,22 +139,16 @@ class MomentumHandler(RequestHandler, AssetsMixin, Jinja2Mixin):
 			'multitenancy': namespace_manager
 		}
 		
+		# Bind Live Services (channel functions)
+		params['live'] = {
+			
+			'get_lib': self.getChannelLib,
+			'get_channel': self.getLiveChannel
+			
+		}
+		
 		return params
 		
 
 	def _outputConfig(self):
 		return config.config.get(self.configPath+'.output')
-		
-		
-class MomentumService(remote.Service):
-	
-	''' Top-level parent class for ProtoRPC-based API services. '''
-	
-	state = {}
-	config = {}
-
-	def __init__(self):
-		self.config = config.config.get('momentum.services')
-
-	def initialize_request_state(self, state):
-		self.state = state

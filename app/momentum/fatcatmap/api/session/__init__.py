@@ -5,6 +5,8 @@ from momentum.fatcatmap.api import FatCatMapAPIService
 
 
 class SessionAPIService(FatCatMapAPIService):
+	
+	config_path = 'services.session.config'
 
 	#@remote.method()
 	def authenticate(self, request):

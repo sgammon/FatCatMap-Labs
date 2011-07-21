@@ -16,6 +16,8 @@ class TestDataResponse(messages.Message):
 
 class DataAPIService(FatCatMapAPIService):
 
+	config_path = 'services.data.config'
+
 	@remote.method(TestDataRequest, TestDataResponse)
 	def get(self, request):
 		return TestDataResponse(response='Hello, JavaScript!')

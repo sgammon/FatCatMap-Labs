@@ -3,5 +3,5 @@ from momentum.services.middleware import ServiceGatewayMiddleware
 
 class MonitoringMiddleware(ServiceGatewayMiddleware):
 
-	def __call__(self, request, response):
-		return (request, response)
+	def before_request(self, service, request, response):
+		return (service, request, response)

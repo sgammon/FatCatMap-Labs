@@ -1,4 +1,5 @@
 import logging
+import config as cfg
 from config import config
 from werkzeug import cached_property
 
@@ -33,7 +34,26 @@ class CoreAssetsAPI(MomentumCoreAPI):
 		''' Grab and parse the output config from config.py and return. '''
 		
 		return config.get('momentum.fatcatmap.output')
-
+		
+	
+	def _log(self, message, severity='info'):
+		
+		''' Takes in log messages from the API and outputs them according to config. (Errors are always logged) '''
+		
+		if severity == 'debug' and self._AssetConfig.get('debug', False) == True:
+			if self._AssetConfig.get('verbose', False) == True or cfg.debug == True:
+				logging.info('CoreAssets: '+str(message))
+			else:
+				logging.debug('CoreAssets: '+str(message))
+				
+		elif severity == 'info' and self._AssetConfig.get('debug', False) == True:
+			logging.info('CoreAssets: '+str(message))
+			
+		elif severity == 'error':
+			logging.error('CoreAssets: '+str(message))
+			
+		return
+				
 
 	def script_url(self, name, module=None, prefix='static', version=None, minify=False, version_by_getvar=False, **kwargs):
 
@@ -201,8 +221,8 @@ class CoreAssetsAPI(MomentumCoreAPI):
 						for key, value in kwargs.items():
 							query_string[key] = str(value)
 
-					logging.info('ASSET_URL: '+str(asset_url))
-					logging.info('QUERY_STRING: '+str(query_string))
+					self._log('Asset URL = '+str(asset_url), 'info')
+					self._log('Query String = '+str(query_string), 'debug')
 					
 					## 2.4: Build relative asset URL
 					if len(query_string) > 0:

@@ -7,6 +7,7 @@ bootstrap.MomentumBootstrapper.prepareImports()
 
 ## App Engine Imports
 import webapp2 as webapp
+from protorpc import registry
 from webapp2_extras import protorpc
 from google.appengine.ext.webapp import util
 
@@ -26,6 +27,7 @@ def enable_appstats(app):
 
 def generateServiceMappings(svc_cfg):
 	
+	#('/'.join(svc_cfg['config']['url_prefix'].split('/')+svc_cfg['config']['registry']['endpoint']), registry.RegistryService)
 	service_mappings = []
 	
 	## Generate service mappings in tuple(<invocation_url>, <classpath>) format
@@ -48,7 +50,7 @@ def main():
 			
 			## Map URL's to services
 			protorpc.ServiceHandlerFactory = MomentumServiceHandlerFactory
-			service_mappings = protorpc.service_mapping(service_mappings)
+			service_mappings = protorpc.service_mapping(service_mappings, '/_registry')
 
 			## Build application
 			application = webapp.WSGIApplication(service_mappings)
