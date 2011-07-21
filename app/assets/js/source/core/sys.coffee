@@ -1,6 +1,6 @@
 class CoreSysAPI extends CoreAPI
 	
-	constructor: ->
+	constructor: (@fcm) ->
 		
 		@version =
 			minor: null
@@ -21,6 +21,15 @@ class CoreSysAPI extends CoreAPI
 					registered: true
 					hook_point: fn
 					init_callback: callback
+				
+				## Trigger DRIVER_REGISTERED
+				context =
+					module: module
+					name: name
+					hook: fn
+				
+				@fcm.state.events.triggerEvent('DRIVER_REGISTERED', context)
+				return
 		
 			resolve: (module, name) ->
 				if typeof @registry[module] is null
@@ -30,42 +39,3 @@ class CoreSysAPI extends CoreAPI
 						return false
 					else
 						return @registry[module][name].hook_point
-
-						
-class CoreDevAPI extends CoreAPI
-
-	constructor: ->
-
-		@config = {}
-		@environment = {}
-
-		@performance =
-			tools:
-				fpsstats:
-					show: (selector) ->
-						
-						stats = new Stats()
-						stats.domElement.style.position = 'absolute'
-						stats.domElement.style.left = '50px'
-						stats.domElement.style.top = '50px'
-						stats.domElement.style.opacity = 0.7
-						stats.domElement.id = 'js_fps_stats'
-						
-						console.log('stats', stats)
-
-						$('body').append(stats.domElement)
-
-						setInterval(
-
-							->
-							    stats.update()
-
-						, 1000 / 60 );
-						
-					hide: (selector) ->
-						$('#js_fps_stats').hide()
-		
-		@debug =
-			logging: true
-			eventlog: true
-			verbose: true

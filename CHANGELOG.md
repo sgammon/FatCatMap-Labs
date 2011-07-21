@@ -2,6 +2,20 @@
 
 ##Change Log
 
+**Thu, July 07 2011**
+
+- Numerous bug fixes in the CoreAssetsAPI, along with path/bundle config support
+- More compatible support for fonts in browsers like iOS/Safari and IE
+- Cleaned up lots of filename-based versioning
+- Added bundle-wide config option for presence of minified assets and automatic version mode handling
+- Installed CanVG polyfill, along with JS-level RGB color support
+- Better coffee build script
+- Added CoreLiveAPI module to the js codebase, for mediating communication over the Channel API on the client side
+- Added CoreModelAPI module to manage schema and instantiated models (both remote and local)
+- Installed Zepto for jQuery support on mobile
+- Backbone sync method overridden (but not yet tested) to work through the JS Data API
+- Created 'base' compiled JS file to contain _root, _underscore and milk (mustache templates for CoffeeScript)
+
 **Tue, July 05 2011**
 
 - Rewritten CoreAssetsAPI, supporting auto-switching to minified external assets

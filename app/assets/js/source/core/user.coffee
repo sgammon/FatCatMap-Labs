@@ -1,6 +1,10 @@
 class CoreUserAPI extends CoreAPI
 	
-	constructor: ->
+	constructor: (@fcm) ->
+
+		## Register FCM events
+		@fcm.state.events.registerEvent('USER_CHANGE')
+		
 		@current_user = null
 		@is_user_admin = null
 		@login_url = null
@@ -18,3 +22,5 @@ class CoreUserAPI extends CoreAPI
 
 		if user_properties['logout_url'] isnt null
 			@logout_url = user_properties['logout_url']
+			
+		@fcm.state.events.triggerEvent('USER_CHANGE')

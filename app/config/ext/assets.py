@@ -16,51 +16,84 @@ config['momentum.fatcatmap.assets'] = {
 	# JavaScript Libraries & Includes
 	'js': {
 
-		### FatCatMap Platform Scripts ####
-		('fatcatmap', 'compiled'): {
-		
-			'fcm': {}, # init, framework, and client-side platform code
-			'layout': {}, # contains code for manipulating page layout			
-			'interaction': {}, # contains code for charting, visualization & graphing
-			'geo': {'path': 'plugins/geo.js'}, # contains code for geo-detection and geo-operations
-			'workers': {'path': 'plugins/workers.js'}, # contains code for splitting intense tasks to workers
-			'storage': {'path': 'storage.js'}, # contains code for interfacing with browser-local storage
-	
-		},
-
 
 		### Core Dependencies ###
 		('core', 'core'): {
-		
-			'backbone': {'min': True}, # Backbone.JS - site MVC core
-			'underscore': {'min': True}, # Underscore - fantastic JS toolkit
-			'amplify': {'min': True}, # AmplifyJS - for request, local storage + pubsub management
-			'modernizr': {'min': True}, # Modernizr - browser polyfill + compatibility testing
-			'yepnope': {'min': True} # YepNope: conditional async script loader
+
+			'config': {
+				'version_mode': 'getvar'
+			},
+			
+			'assets': {
+				'backbone': {'min': True, 'version': '0.5.1'}, # Backbone.JS - site MVC core
+				'amplify': {'min': True, 'version': '1.0.0'}, # AmplifyJS - for request, local storage + pubsub management
+				'modernizr': {'min': True, 'version': '2.0'}, # Modernizr - browser polyfill + compatibility testing
+				'yepnope': {'min': True, 'version': '1.0.1'} # YepNope: conditional async script loader
+			}
 		
 		},	
 		
+		### FatCatMap Platform Scripts ####
+		('fatcatmap', 'compiled'): {
+
+			'config': {
+				'version_mode': 'getvar'
+			},
+
+			'assets': {
+				'base': {'min': True, 'version': 0.1}, # milk (mustasche for coffee), _underscore, _root
+				'fcm': {'min': True, 'version': 0.1}, # init, framework, and client-side platform code
+				'layout': {'min': True, 'version': 0.1}, # contains code for manipulating page layout			
+				'interaction': {'min': True, 'version': 0.1}, # contains code for charting, visualization & graphing
+			}
+	
+		},
 
 		### FatCatMap Local Storage Drivers ###
-		('storage', 'compiled'): {
-		
-			'sql': {'path': 'storage/sql.js'}, # Web SQL Database driver
-			'indexed': {'path': 'storage/object.js'}, # IndexedDB Database driver
-			'session': {'path': 'storage/session.js'}, # SessionStorage driver
-			'local': {'path': 'storage/local.js'} # LocalStorage driver
+		('storage', 'compiled/storage'): {
+
+			'config': {
+				'version_mode': 'getvar'	
+			},
+	
+			'assets': {
+				'sql': {'min': True, 'version': 0.1}, # Web SQL Database driver
+				'indexed': {'min': True, 'version': 0.1}, # IndexedDB Database driver
+				'local': {'min': True, 'version': 0.1} # LocalStorage driver
+			}
 		
 		},
 
+		### FatCatMap Platform Plugins ###
+		('plugins', 'compiled/plugins'): {
+
+			'config': {
+				'version_mode': 'getvar'
+			},
+			
+			'assets': {
+				'geo': {'min': True, 'version': 0.1}, # contains code for geo-detection and geo-operations
+				'workers': {'min': True, 'version': 0.1}, # contains code for splitting intense tasks to workers
+			}
+		
+		},
 
 		### Browser feature Polyfills ###
-		('polyfills', 'core'): { 
-		
-			'json': {'path': 'polyfills/json2.js'}, # Adds JSON support to old IE and others that don't natively support it
-			'history': {'path': 'polyfills/history.js'}, # Adds support for history management to old browsers
-		
+		('polyfills', 'core/polyfills'): { 
+
+			'config': {
+				'version_mode': 'getvar'
+			},
+			
+			'assets': {
+				'json2': {'min': True}, # Adds JSON support to old IE and others that don't natively support it
+				'history': {'min': True}, # Adds support for history management to old browsers
+				'rgbcolor': {'min': True}, # Adds support for RGB color for CanVG
+				'canvg': {'min': True} # Renders SVG over canvas (good for &droid)
+			}
+
 		},
 		
-
 		### FatCatMap Developer Tools ###
 		('dev', 'util'): {
 		
@@ -68,40 +101,90 @@ config['momentum.fatcatmap.assets'] = {
 		
 		},						
 				
-
 		### jQuery Core & Plugins ###
 		('jquery', 'jquery'): { 
 		
-			'core': {'path': 'core/jquery.js', 'min': 'core/jquery.min.js'}, # jQuery Core
-			'ui': {'path': 'ui/jqui.js', 'min': 'ui/jqui.min.js'}, # jQuery UI
-			'tipsy': {'path': 'ui/tipsy.js'}, # Effect for slick, animated tooltips
-			'masonry': {'path': 'ui/masonry.min.js'}, # Special easy-on-the-eye layout styling
-			'fancybox': {'path': 'ui/fancybox.min.js'}, # Quick + clean lightbox-style dialogs
-			'easing': {'path': 'core/interaction/easing.min.js'}, # Easing transitions for smoother animations
-			'mousewheel': {'path': 'core/interaction/mousewheel.min.js'} # jQuery plugin for mousewheel events + interactions
+			'config': {
+				'version_mode': 'getvar'
+			},
+			
+			'assets': {
+				'core': {'name': 'jquery', 'min': True, 'version': '1.6.1'}, # jQuery Core
+				'easing': {'path': 'interaction/easing.min.js'}, # Easing transitions for smoother animations
+				'mousewheel': {'path': 'interaction/mousewheel.min.js'} # jQuery plugin for mousewheel events + interactions
+			}
 			
 		},
 		
+		### jQuery UI & Plugins ###
+		('jquery-ui', 'jquery/ui'): {
 
+			'config': {
+				'min': True,
+				'version_mode': 'getvar'
+			},
+			
+			'assets': {
+				'jqui': {'version': '1.8.9'}, # jQuery UI
+				'tipsy': {'version': '1.0.0a'}, # Effect for slick, animated tooltips
+				'masonry': {'version': '1.3.2'}, # Special easy-on-the-eye layout styling
+				'fancybox': {'version': '1.3.4'}, # Quick + clean lightbox-style dialogs		
+			}
+		
+		},
+		
+		### Zepto Core & Plugins ###
+		('zepto', 'zepto'): {
+
+			'config': {
+				'min': False,
+				'version_mode': 'getvar'
+			},
+
+			'assets': {
+				'core': {'name': 'zepto'}, # Zepto Core
+				'ajax': {}, # Ajax shim
+				'assets': {}, # Assets API
+				'detect': {}, # Feature detection
+				'event': {}, # Event framework
+				'fx': {}, # Effects framework
+				'gesture': {}, # Gestures framework
+				'polyfill': {}, # Feature polyfill for mobile
+				'touch': {} # Touch events support
+			}
+		
+		},
+		
 		### D3: Data Driven Diagrams ###	
 		('d3', 'd3'): {
 		
-			'core': {'path': 'd3.js'}, # D3 Core Library
-			'behavior': {'path': 'd3.behavior.js'}, # D3 Behaviors
-			'chart': {'path': 'd3.chart.js'}, # D3 Charting
-			'csv': {'path': 'd3.csv.js'}, # D3 CSV Parsing
-			'geo': {'path': 'd3.geo.js'}, # D3 Geo-related functions
-			'geom': {'path': 'd3.geom.js'}, # D3 Geo-map related functions
-			'layout': {'path': 'd3.layout.js'}, # D3 Layout
-			'time': {'path': 'd3.time.js'} # D3 Time/Date based functions
+			'config': {
+				'version_mode': 'getvar'
+			},
+		
+			'assets': {
+				'core': {'path': 'd3.js'}, # D3 Core Library
+				'behavior': {'path': 'd3.behavior.js'}, # D3 Behaviors
+				'chart': {'path': 'd3.chart.js'}, # D3 Charting
+				'csv': {'path': 'd3.csv.js'}, # D3 CSV Parsing
+				'geo': {'path': 'd3.geo.js'}, # D3 Geo-related functions
+				'geom': {'path': 'd3.geom.js'}, # D3 Geo-map related functions
+				'layout': {'path': 'd3.layout.js'}, # D3 Layout
+				'time': {'path': 'd3.time.js'} # D3 Time/Date based functions
+			}
 		
 		},
 				
-
 		### FatCatMap Interaction Libraries ###
 		('vis', 'interaction'): {
 
-			'protovis': {'min': True}, # Stanford Protovis: JS Visualization
+			'config': {
+				'version_mode': 'getvar'
+			},
+
+			'assets': {
+				'protovis': {'min': True}, # Stanford Protovis: JS Visualization			
+			}
 		
 		},
 
@@ -109,35 +192,63 @@ config['momentum.fatcatmap.assets'] = {
 	
 	},
 
+
 	# Cascading Style Sheets
 	'style': {
 		
-		('core', 'fcm'): { # FatCatMap Stylesheets
+		# Compiled (SASS) FCM Stylesheets
+		('compiled', 'compiled'): {
 		
-			'main': {'version': 0.3}, # Boilerplate stuff and reusable, site-wide CSS classes.
-			'reset': {'version': 0.2}, # Standard CSS reset stylesheet.
-			'fonts': {'version': 0.2}, # Standard CSS reset stylesheet.			
-			'layout': {'version': 0.4}, # Styles for FCM's layouts. Not page-specific.
-			'forms': {'version': 0.2}, # Styles forms on FCM. Links to sprite skins.			
-			'mobile': {'version': 0.3}, # HTML5 Boilerplate's stylesheet for mobile devices
-			'plugins': {'version': 0.1}, # Styles for JS plugins that FCM uses
-			'visualizer': {'version': 0.2} # Styles for the FCM visualizer
+			'config': {
+				'min': True,
+				'version_mode': 'getvar'
+			},
+		
+			'assets': {
+				'main': {'version': 0.3}, # reset, main, layout, forms
+				'interaction': {'version': 0.1}, # visualizer, charts
+				'ie': {'version': 0.1}, # fixes for internet explorer (grrr...)
+				'print': {'version': 0.1} # proper format for printing
+			}
 		
 		},
 		
-		('compiled', 'compiled'): { # Compiled FCM Stylesheets
+		# Content-section specific stylesheets
+		('site', 'compiled/site'): {
 		
-			'main': {'version': 0.3}, # reset, main, fonts, layout, forms, mobile + visualizer
-			'print': {'version': 0.2}, # alternate print stylesheet			
-			'plugins': {'version': 0.1}, # tipsy, uniform, masonry, jquery ui, etc
-			'browse': {'version': 0.1}, # content section: data browser
-			'search': {'version': 0.1}, # content section: data search
-			'map': {'version': 0.1}, # content section: data mapping
-			'interact': {'version': 0.1}, # content section: social interaction
-			'visualize': {'version': 0.1}, # content section: data visualization	
+			'config': {
+				'min': True,
+				'version_mode': 'getvar'
+			},
+			
+			'assets': {
+				'browse': {'version': 0.1}, # content section: data browser
+				'search': {'version': 0.1}, # content section: data search
+				'map': {'version': 0.1}, # content section: data mapping
+				'interact': {'version': 0.1}, # content section: social interaction
+				'visualize': {'version': 0.1}, # content section: data visualization				
+			}
+		
+		},
+		
+		# Static FCM Stylesheets
+		('core', 'fcm'): {
+			
+			'config': {
+				'min': False,
+				'version_mode': 'filename'
+			},
+			
+			'assets': {
+				'fonts': {'version': 0.3},
+				'mobile': {'version': 0.2},
+				'plugins': {'version': 0.1}
+			}
+			
 		}
 	
 	},
+
 	
 	# Other Assets
 	'ext': {

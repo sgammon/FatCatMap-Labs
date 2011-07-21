@@ -3,35 +3,42 @@ class FatCatMap
 	
 	constructor: (@config)  ->
 		
-		## Javascript API Methods
-		@api = new CoreAPIBridge
-			
-		## Agent Object
-		@agent = new CoreAgentAPI	
-		@agent.discover()
+		## Dev API
+		@dev = new CoreDevAPI(@)		
 		
-		## Client State Framework
-		@state = new CoreStateAPI
-		@state.events.registerEvent('CORE_INIT')
-		@state.events.registerEvent('RPC_INIT')
-		@state.events.registerEvent('API_INIT')
+		## Sys API
+		@sys = new CoreSysAPI(@)
+
+		## Agent API
+		@agent = new CoreAgentAPI(@)
+		@agent.discover()
+
+		## State API
+		@state = new CoreStateAPI(@)
+		@state.events.registerEvent('RPC_READY')
+		@state.events.registerEvent('API_READY')
 		@state.events.registerEvent('CORE_READY')
 		@state.events.registerEvent('DRIVER_REGISTERED')
 		@state.events.registerEvent('REGISTER_ELEMENT')
-		@state.events.registerEvent('PLATFORM_READY')		
-		
-		## Users API		
-		@user = new CoreUserAPI
+		@state.events.registerEvent('PLATFORM_READY')
+
+		## Model API
+		@model = new CoreModelAPI(@)
+
+		## Javascript API Methods
+		@api = new CoreAPIBridge(@)
+				
+		## Users API
+		@user = new CoreUserAPI(@)
 		
 		## RPC API
-		@rpc = new CoreRPCAPI
+		@rpc = new CoreRPCAPI(@)
 		
-		## SYS API
-		@sys = new CoreSysAPI
-
-		## Dev API
-		@dev = new CoreDevAPI
+		## Live API
+		@live = new CoreLiveAPI(@)
 		
 		return @
-		
+
+
 window.fatcatmap = new FatCatMap()
+window.fatcatmap.state.events.triggerEvent('CORE_READY')

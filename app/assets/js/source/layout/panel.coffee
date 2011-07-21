@@ -26,6 +26,7 @@ class SuperBar extends SuperPanel
 		)
 		return
 
+
 class SuperFooter extends SuperPanel
 	
 	register: (@id) ->

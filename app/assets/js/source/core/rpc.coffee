@@ -120,7 +120,14 @@ class RPCRequest
 ## Core RPC API
 class CoreRPCAPI extends CoreAPI
 	
-	constructor: ->
+	constructor: (fcm) ->
+
+		## Register FCM events
+		fcm.state.events.registerEvent('RPC_CREATE')
+		fcm.state.events.registerEvent('RPC_FULFILL')
+		fcm.state.events.registerEvent('RPC_SUCCESS')
+		fcm.state.events.registerEvent('RPC_ERROR')
+		fcm.state.events.registerEvent('RPC_COMPLETE')
 
 		@base_rpc_uri = '/_api/rpc'
 		@api =
@@ -189,6 +196,7 @@ class CoreRPCAPI extends CoreAPI
 			fulfillRPCRequest: (config, request, callbacks) ->
 
 				console.log('[RPC] Fulfill: ', config, request, callbacks)
+				
 				@lastRequest = request
 
 				@history[request.envelope.id] =
@@ -209,6 +217,12 @@ class CoreRPCAPI extends CoreAPI
 
 				if request.action is null or request.action is undefined
 					throw '[RPC] Error: Could not determine RPC action.'
+					
+				context =
+					config: config
+					request: request
+					callbacks: callbacks
+				fcm.state.events.triggerEvent('RPC_FULFILL', context)
 				
 				do (request, callbacks) ->
 					@request = request
@@ -239,7 +253,14 @@ class CoreRPCAPI extends CoreAPI
 							@fatcatmap.rpc.api.history[@request.envelope.id].xhr = xhr
 							@fatcatmap.rpc.api.history[@request.envelope.id].status = status
 							@fatcatmap.rpc.api.history[@request.envelope.id].failure = error
-							@callbacks.failure(data)
+							
+							context =
+								xhr: xhr
+								status: status
+								error: error
+							fcm.state.events.triggerEvent('RPC_ERROR', context)
+														
+							@callbacks?.failure(data)
 					
 						success: (data, status, xhr) =>
 							console.log('[RPC] Success: ', data, status, xhr)
@@ -247,11 +268,25 @@ class CoreRPCAPI extends CoreAPI
 							@fatcatmap.rpc.api.history[@request.envelope.id].xhr = xhr
 							@fatcatmap.rpc.api.history[@request.envelope.id].status = status
 							@fatcatmap.rpc.api.history[@request.envelope.id].response = data
-							@callbacks.success(data)
+
+							context =
+								xhr: xhr
+								status: status
+								data: data
+							fcm.state.events.triggerEvent('RPC_SUCCESS', context)
+
+							@callbacks?.success(data)
 					
 						complete: (xhr, status) =>
 							@fatcatmap.rpc.api.history[@request.envelope.id].xhr = xhr
 							@fatcatmap.rpc.api.history[@request.envelope.id].status = status
+							
+							context =
+								xhr: xhr
+								status: status
+							fcm.state.events.triggerEvent('RPC_COMPLETE', context)
+							@callbacks?.complete(xhr, status)
+							
 					
 						statusCode:
 					
@@ -282,6 +317,8 @@ class CoreRPCAPI extends CoreAPI
 			frame: new RPCAdapter('frame')
 		
 		@ext = null
+		
+		fcm.state.events.triggerEvent('RPC_READY')
 		
 		
 window.RPCAPI = RPCAPI

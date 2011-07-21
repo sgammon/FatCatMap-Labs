@@ -1,7 +1,7 @@
 ## CoffeeScript - FCM State Management Framework
 class CoreStateAPI extends CoreAPI
 	
-	constructor: ->
+	constructor: (@fcm) ->
 		
 		@events =
 			
@@ -9,9 +9,13 @@ class CoreStateAPI extends CoreAPI
 			callchain: {}
 			history: []
 			
-			registerEvent: (name) ->
-				@registry.push(name)
-				@callchain[name] = []
+			registerEvent: (name) =>
+				@events.registry.push(name)
+				@events.callchain[name] = []
+				
+				if @fcm.dev.debug.eventlog is true
+					@fcm.dev.verbose('EventLog', "Event Registered: "+name)
+				
 				return @
 				
 			registerHook: (_event, fn, once) ->
@@ -25,29 +29,33 @@ class CoreStateAPI extends CoreAPI
 						runonce: one
 					@callchain[_event].push(calltask)
 					
-			triggerEvent: (_event, context) ->
-				if typeof @callchain[_event] isnt null
-					if @callchain[_event].length > 0
-						for calltask in @callchain[_event]
-							if @callchain[_event][calltask].executed is true and @callchain[_event][calltask].runonce is true
+			triggerEvent: (_event, context) =>
+				
+				if @fcm.dev.debug.eventlog is true
+					console.log("[EventLog] Event Triggered: "+_event, context || '{no context}')
+									
+				if typeof @events.callchain[_event] isnt null
+					if @events.callchain[_event].length > 0
+						for calltask in @events.callchain[_event]
+							if @events.callchain[_event][calltask].executed is true and @events.callchain[_event][calltask].runonce is true
 								continue
 							else
 								try
-									result = @callchain[_event][calltask].callback(context)
+									result = @events.callchain[_event][calltask].callback(context)
 									result_calltask =
 										event: _event
 										context: context
-										task: @callchain[_event][calltask]
+										task: @events.callchain[_event][calltask]
 										result: result
 								catch error
 									result_calltask =
 										event: _event
 										context: context
-										task: @callchain[_event][calltask]
+										task: @events.callchain[_event][calltask]
 										error: error
 								finally
-									@history.push(result_calltask)
-									@callchain[_event][calltask].executed = true
+									@events.history.push(result_calltask)
+									@events.callchain[_event][calltask].executed = true
 									
 		@session = {}
 		@local = {}
@@ -88,9 +96,16 @@ class CoreStateAPI extends CoreAPI
 				return new _type(id, selector, config)
 					
 			
-			register: (id, element) ->
-				@registry[id] = element
-				return @registry[id]
+			register: (id, element) =>
+				@events.registry[id] = element
+
+				## Trigger REGISTER_ELEMENT event
+				context =
+					id: id
+					element: element
+				@fcm.state.events.triggerEvent('REGISTER_ELEMENT', context)
+
+				return @events.registry[id]
 				
 			_setState: (id, key, value) ->
 				if @registry[id] isnt null
