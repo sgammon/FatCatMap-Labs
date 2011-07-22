@@ -9,7 +9,37 @@ from werkzeug import cached_property
 
 from webapp2_extras import protorpc as proto
 
+from momentum.services.flags import audit
+from momentum.services.flags import caching
+from momentum.services.flags import security
+
+from ProvidenceClarity.struct.util import DictProxy
+
 _middleware_cache = {}
+
+
+## Expose service flags
+flags = DictProxy({
+
+	'audit': DictProxy({
+		'monitor': audit.Monitor,
+		'debug': audit.Debug,
+		'loglevel': audit.LogLevel,
+	}),
+	
+	'caching': DictProxy({
+		'local': caching.LocalCacheable,
+		'memcache': caching.MemCacheable,
+		'cacheable': caching.Cacheable,
+	}),
+	
+	'security': DictProxy({
+		'authorize': security.Authorize,
+		'authenticate': security.Authenticate,
+		'admin': security.AdminOnly
+	})
+
+})
 
 
 class MomentumService(remote.Service):
@@ -100,8 +130,6 @@ class MomentumServiceHandler(proto.ServiceHandler):
 		
 	def run_post_action_middleware(self, service):
 		
-		logging.info('RUNNING POST ACTION MIDDLEWARE!!! :)')
-		
 		global _middleware_cache
 		
 		middleware = self.servicesConfig.get('middleware', False)
@@ -119,7 +147,7 @@ class MomentumServiceHandler(proto.ServiceHandler):
 						middleware_object = middleware_class(debug=config['debug'], config=config.get('args', {}))
 						
 						if hasattr(middleware_object, 'after_request'):
-							self.service, self.request, self.response = middleware_object.after_request(self.service, self.request, self.response)
+							middleware_object.after_request(self.service, self.request, self.response)
 							continue
 						else:
 							self.log('Middleware '+str(name)+' does not have after_request method. Continuing.')

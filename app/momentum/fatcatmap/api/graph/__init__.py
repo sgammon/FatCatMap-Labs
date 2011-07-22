@@ -2,6 +2,7 @@ import logging
 import ndb as n
 from protorpc import remote
 
+from momentum.services import flags
 from momentum.fatcatmap import models as m
 
 from momentum.fatcatmap.api import FatCatMapAPIService
@@ -27,6 +28,7 @@ class GraphAPIService(FatCatMapAPIService):
 	configPath = 'services.graph.config'
 
 	@remote.method(GraphRequest, GraphResponse)
+	@flags.caching.cacheable('one', 'two')
 	def construct(self, request):
 		
 		logging.info('====== GRAPH API SERVICE =====')
