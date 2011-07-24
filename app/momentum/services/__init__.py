@@ -1,8 +1,8 @@
 import config
 import logging
-import protorpc
-
 import webapp2
+
+import protorpc
 
 from protorpc import remote
 from protorpc import webapp
