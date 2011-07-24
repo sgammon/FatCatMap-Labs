@@ -80,6 +80,7 @@ config['momentum.services'] = {
 					'default_ttl': None, ## Default Time-to-Live for cached items
 					
 					'activate': {
+						'local': False, ## Local browser-side caching, if supported
 						'request': False, ## Caching of full API responses by hashed API requests
 						'internal': False ## Caching inside the remote service object
 					}
@@ -93,6 +94,7 @@ config['momentum.services'] = {
 					'default_ttl': 60,
 				
 					'activate': {
+						'local': False,
 						'request': True,
 						'internal': True
 					},
@@ -105,6 +107,7 @@ config['momentum.services'] = {
 					'default_ttl': 60,
 					
 					'activate': {
+						'local': False,
 						'request': False,
 						'internal': True
 					}
@@ -117,6 +120,7 @@ config['momentum.services'] = {
 					'default_ttl': 120,
 					
 					'activate': {
+						'local': False,
 						'request': True,
 						'internal': True
 					}
