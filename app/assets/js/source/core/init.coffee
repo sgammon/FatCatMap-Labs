@@ -4,8 +4,8 @@ class FatCatMap
 	constructor: (@config)  ->
 		
 		## Dev API
-		@dev = new CoreDevAPI(@)		
-		
+		@dev = new CoreDevAPI(@)
+
 		## Sys API
 		@sys = new CoreSysAPI(@)
 
@@ -21,7 +21,7 @@ class FatCatMap
 		@state.events.registerEvent('DRIVER_REGISTERED')
 		@state.events.registerEvent('REGISTER_ELEMENT')
 		@state.events.registerEvent('PLATFORM_READY')
-
+		
 		## Model API
 		@model = new CoreModelAPI(@)
 
@@ -41,4 +41,6 @@ class FatCatMap
 
 
 window.fatcatmap = new FatCatMap()
+if $?
+	$.extend(fatcatmap: window.fatcatmap)
 window.fatcatmap.state.events.triggerEvent('CORE_READY')

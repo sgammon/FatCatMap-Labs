@@ -31,16 +31,25 @@ class JavascriptAPIDispatcher(WebHandler):
 		
 		## Generate list of services to expose to user
 		svcs = []
+		opts = {}
 
 		for name, config in self.fcmServicesConfig['services'].items():
 			if config['enabled'] is True:
 
 				security_profile = self.globalServicesConfig['middleware_config']['security']['profiles'].get(config['config']['security'], None)
+				
+				caching_profile = self.globalServicesConfig['middleware_config']['caching']['profiles'].get(config['config']['caching'], None)
 
 				if security_profile is None:
 
 					## Pull default profile if none is specified
 					security_profile = self.globalServicesConfig['middleware_config']['security']['profiles'][self.globalServicesConfig['defaults']['service']['config']['security']]
+
+				if caching_profile is None:
+					caching_profile = self.globalServicesConfig['middleware_config']['caching']['profiles'][self.globalServicesConfig['defaults']['service']['config']['caching']]
+
+				## Add caching to local opts
+				opts['caching'] = caching_profile['activate'].get('local', False)
 
 				## Grab prefix
 				service_action = self.fcmServicesConfig['config']['url_prefix'].split('/')
@@ -53,11 +62,11 @@ class JavascriptAPIDispatcher(WebHandler):
 
 				## Expose depending on security profile
 				if security_profile['expose'] == 'all':
-					svcs.append((name, service_action_url, config))
+					svcs.append((name, service_action_url, config, opts))
 
 				elif security_profile['expose'] == 'admin':
 					if users.is_current_user_admin():
-						svcs.append((name, service_action_url, config))
+						svcs.append((name, service_action_url, config, opts))
 						
 				elif security_profile['expose'] == 'none':
 					continue

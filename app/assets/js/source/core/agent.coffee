@@ -1,7 +1,7 @@
 ## Agent/Capabilities API
 class CoreAgentAPI extends CoreAPI
 	
-	constructor: (@fcm) ->
+	constructor: (fcm) ->
 		
 		@_data = {}		
 		@platform = {}

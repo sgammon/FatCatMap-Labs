@@ -4,7 +4,7 @@ export FCM_COFFEE_COMPILED="$FATCATMAP/app/assets/js/static/compiled"
 
 
 ## 1: Compile Core
-coffee --join "$FCM_COFFEE_COMPILED/base.js" --compile "$FCM_COFFEE_SOURCE/_root.coffee" "$FCM_COFFEE_SOURCE/_underscore.coffee" "$FCM_COFFEE_SOURCE/_milk.coffee"
+coffee --join "$FCM_COFFEE_COMPILED/base.js" --compile "$FCM_COFFEE_SOURCE/_root.coffee" "$FCM_COFFEE_SOURCE/_underscore.coffee"  "$FCM_COFFEE_SOURCE/_milk.coffee"
 
 
 ## 2: Compile FCM
