@@ -1,4 +1,5 @@
 import sys
+import ndb
 import config
 import logging
 import bootstrap
@@ -9,7 +10,9 @@ bootstrap.MomentumBootstrapper.prepareImports()
 import webapp2 as webapp
 from protorpc import registry
 from webapp2_extras import protorpc
+
 from google.appengine.ext.webapp import util
+from google.appengine.dist import use_library
 
 from momentum.services import MomentumServiceHandlerFactory
 
@@ -39,11 +42,18 @@ def generateServiceMappings(svc_cfg):
 		return service_mappings
 	else:
 		return None
-		
+		  
 
 def main():
 	
 	global services_config
+	
+	## Select Django 1.2
+	if not config.debug:
+		use_library('django', '1.2')
+		
+	ndb.debug = config.debug
+	
 	if services_config['enabled'] == True:
 		service_mappings = generateServiceMappings(services_config)
 		if service_mappings is not None:

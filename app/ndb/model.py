@@ -284,7 +284,7 @@ Key = ndb.key.Key  # For export.
 
 # NOTE: Property and Error classes are added later.
 __all__ = ['Key', 'ModelAdapter', 'ModelKey', 'MetaModel', 'Model', 'Expando',
-           'BlobKey', 'GeoPt',
+           'BlobKey', 'GeoPt', 'Rollback',
            'transaction', 'transaction_async',
            'in_transaction', 'transactional',
            'get_multi', 'get_multi_async',
@@ -296,9 +296,14 @@ __all__ = ['Key', 'ModelAdapter', 'ModelKey', 'MetaModel', 'Model', 'Expando',
 BlobKey = datastore_types.BlobKey
 GeoPt = datastore_types.GeoPt
 
+Rollback = datastore_errors.Rollback
+
 
 class KindError(datastore_errors.BadValueError):
-  """Raised when an implementation for a kind can't be found."""
+  """Raised when an implementation for a kind can't be found.
+
+  Also raised when the Kind is not an 8-bit string.
+  """
 
 
 class ComputedPropertyError(datastore_errors.Error):
@@ -318,11 +323,20 @@ class ModelAdapter(datastore_rpc.AbstractAdapter):
     """Constructor.
 
     Args:
-      default_model: If an implementation for the kind cannot be found, use this
-        model class. If none is specified, an exception will be thrown
+      default_model: If an implementation for the kind cannot be found, use
+        this model class.  If none is specified, an exception will be thrown
         (default).
     """
     self.default_model = default_model
+    self.want_pbs = 0
+
+  # Make this a context manager to request setting _orig_pb.
+
+  def __enter__(self):
+    self.want_pbs += 1
+
+  def __exit__(self, *args):
+    self.want_pbs -= 1
 
   def pb_to_key(self, pb):
     return Key(reference=pb)
@@ -341,7 +355,10 @@ class ModelAdapter(datastore_rpc.AbstractAdapter):
     modelclass = Model._kind_map.get(kind, self.default_model)
     if modelclass is None:
       raise KindError("No implementation found for kind '%s'" % kind)
-    return modelclass._from_pb(pb)
+    entity = modelclass._from_pb(pb)
+    if self.want_pbs:
+      entity._orig_pb = pb
+    return entity
 
   def entity_to_pb(self, ent):
     pb = ent._to_pb()
@@ -394,6 +411,8 @@ class Property(object):
                required=None, default=None, choices=None, validator=None):
     """Constructor.  For arguments see the module docstring."""
     if name is not None:
+      if isinstance(name, unicode):
+        name = name.encode('utf-8')
       assert '.' not in name  # The '.' is used elsewhere.
       self._name = name
     if indexed is not None:
@@ -441,6 +460,11 @@ class Property(object):
     return s
 
   def _datastore_type(self, value):
+    """Internal hook used by property filters.
+
+    Sometimes the low-level query interface needs a specific data type
+    in order for the right filter to be constructed.  See _comparison().
+    """
     return value
 
   def _comparison(self, op, value):
@@ -684,10 +708,11 @@ class Property(object):
         is a repeated Property.
     """
     value = self._retrieve_value(entity)
-    if value is None and self._repeated:
-      value = []
-    elif not isinstance(value, list):
+    if not self._repeated:
       value = [value]
+    elif value is None:
+      value = []
+    assert isinstance(value, list)
     for val in value:
       if self._repeated:
         # Re-validate repeated values, since the user could have
@@ -881,41 +906,166 @@ class StringProperty(Property):
       return raw
 
 
-class TextProperty(StringProperty):
+# A custom 'meaning' for compressed properties.
+_MEANING_URI_COMPRESSED = 'ZLIB'
+
+
+class _CompressedValue(str):
+  """Used as a flag for compressed values."""
+
+  def __repr__(self):
+    return '_CompressedValue(%s)' % super(_CompressedValue, self).__repr__()
+
+
+class CompressedPropertyMixin(object):
+  """A mixin to store the property value compressed using zlib."""
+
+  def _db_set_value(self, v, p, value):
+    """Sets the property value in the protocol buffer.
+
+    The value stored in entity._values[self._name] can be either:
+
+    - A _CompressedValue instance to indicate that the value is compressed.
+      This is used to lazily decompress and deserialize the property when
+      it is first accessed.
+    - The uncompressed and deserialized value, when it is set, when it was
+      not stored compressed or after it is lazily decompressed and
+      deserialized on first access.
+
+    Subclasses must override this if they need to set a different meaning
+    in the protocol buffer (the defaults are BYTESTRING or BLOB), and then
+    call _db_set_compressed_value() which will compress the value if needed.
+    """
+    if self._indexed:
+      p.set_meaning(entity_pb.Property.BYTESTRING)
+    else:
+      p.set_meaning(entity_pb.Property.BLOB)
+    self._db_set_compressed_value(v, p, value)
+
+  def _db_set_compressed_value(self, v, p, value):
+    """Sets the property value in the protocol buffer, compressed if needed."""
+    if self._compressed:
+      # Use meaning_uri because setting meaning to something else that is not
+      # BLOB or BYTESTRING will cause the value to be decoded from utf-8 in
+      # datastore_types.FromPropertyPb. That would break the compressed string.
+      p.set_meaning_uri(_MEANING_URI_COMPRESSED)
+      if not isinstance(value, _CompressedValue):
+        value = zlib.compress(self._serialize_value(value))
+    else:
+      value = self._serialize_value(value)
+    assert isinstance(value, str)
+    v.set_stringvalue(value)
+
+  def _db_get_value(self, v, p):
+    if not v.has_stringvalue():
+      return None
+    if p.meaning_uri() == _MEANING_URI_COMPRESSED:
+      # Return the value wrapped to flag it as compressed.
+      return _CompressedValue(v.stringvalue())
+    return self._deserialize_value(v.stringvalue())
+
+  def _get_value(self, entity):
+    value = super(CompressedPropertyMixin, self)._get_value(entity)
+    if self._repeated:
+      if value and isinstance(value[0], _CompressedValue):
+        # Decompress and deserialize each list item on first access.
+        for i in xrange(len(value)):
+          value[i] = self._deserialize_value(zlib.decompress(value[i]))
+    elif isinstance(value, _CompressedValue):
+      # Decompress and deserialize a single item on first access.
+      value = self._deserialize_value(zlib.decompress(value))
+      self._store_value(entity, value)
+    return value
+
+  def _serialize_value(self, value):
+    """Serializes the value, if needed.
+
+    Subclasses may override this to implement different serialization
+    mechanisms.
+    """
+    return value
+
+  def _deserialize_value(self, value):
+    """Deserializes the value, if needed.
+
+    Subclasses may override this to implement different deserialization
+    mechanisms.
+    """
+    return value
+
+
+class TextProperty(CompressedPropertyMixin, StringProperty):
   """An unindexed Property whose value is a text string of unlimited length."""
   # TODO: Maybe just use StringProperty(indexed=False)?
 
   _indexed = False
+  _compressed = False
 
-  def __init__(self, *args, **kwds):
-    super(TextProperty, self).__init__(*args, **kwds)
+  _attributes = StringProperty._attributes + ['_compressed']
+  _positional = 1
+
+  @datastore_rpc._positional(1 + _positional)
+  def __init__(self, compressed=False, **kwds):
+    super(TextProperty, self).__init__(**kwds)
     assert not self._indexed
+    self._compressed = compressed
+
+  def _validate(self, value):
+    if self._compressed and isinstance(value, _CompressedValue):
+      # A compressed value came from datastore and wasn't accessed, so it
+      # doesn't require validation.
+      return value
+    return super(TextProperty, self)._validate(value)
+
+  def _db_set_value(self, v, p, value):
+    if self._compressed:
+      p.set_meaning(entity_pb.Property.BLOB)
+    else:
+      p.set_meaning(entity_pb.Property.TEXT)
+    self._db_set_compressed_value(v, p, value)
+
+  def _serialize_value(self, value):
+    assert isinstance(value, basestring)
+    if isinstance(value, unicode):
+      return value.encode('utf-8')
+    return value
+
+  def _deserialize_value(self, value):
+    try:
+      return value.decode('utf-8')
+    except UnicodeDecodeError:
+      return value
 
 
-class BlobProperty(Property):
+class BlobProperty(CompressedPropertyMixin, Property):
   """A Property whose value is a byte string."""
   # TODO: Enforce size limit when indexed.
 
   _indexed = False
+  _compressed = False
+
+  _attributes = Property._attributes + ['_compressed']
+  _positional = 2
+
+  @datastore_rpc._positional(1 + _positional)
+  def __init__(self, name=None, compressed=False, **kwds):
+    super(BlobProperty, self).__init__(name=name, **kwds)
+    self._compressed = compressed
+    assert not (compressed and self._indexed)
 
   def _validate(self, value):
+    if self._compressed and isinstance(value, _CompressedValue):
+      return value
     if not isinstance(value, str):
       raise datastore_errors.BadValueError('Expected 8-bit string, got %r' %
                                            (value,))
     return value
 
-  def _db_set_value(self, v, p, value):
-    assert isinstance(value, str)
-    v.set_stringvalue(value)
-    if self._indexed:
-      p.set_meaning(entity_pb.Property.BYTESTRING)
-    else:
-      p.set_meaning(entity_pb.Property.BLOB)
-
-  def _db_get_value(self, v, p):
-    if not v.has_stringvalue():
-      return None
-    return v.stringvalue()
+  def _datastore_type(self, value):
+    # Since this is only used for queries, and queries imply an
+    # indexed property, check that, and always use ByteString.
+    assert self._indexed
+    return datastore_types.ByteString(value)
 
 
 class GeoPtProperty(Property):
@@ -1217,42 +1367,34 @@ class StructuredProperty(Property):
 
   def _comparison(self, op, value):
     if op != '=':
+      # TODO: 'in' might actually work.  But maybe it's been expanded
+      # already before we get here?
       raise datastore_errors.BadFilterError(
         'StructuredProperty filter can only use ==')
     # Import late to avoid circular imports.
     from ndb.query import FilterNode, ConjunctionNode, PostFilterNode
+    from ndb.query import RepeatedStructuredPropertyPredicate
     value = self._validate(value)  # None is not allowed!
     filters = []
+    match_keys = []
+    # TODO: Why not just iterate over value._values?
     for name, prop in value._properties.iteritems():
       val = prop._retrieve_value(value)
       if val is not None:
-        filters.append(FilterNode(self._name + '.' + name, op, val))
+        name = self._name + '.' + name
+        filters.append(FilterNode(name, op, val))
+        match_keys.append(name)
     if not filters:
       raise datastore_errors.BadFilterError(
         'StructuredProperty filter without any values')
     if len(filters) == 1:
       return filters[0]
-    filters.append(PostFilterNode(self._filter_func, value))
-    return ConjunctionNode(filters)
-
-  def _filter_func(self, value, entity):
-    if isinstance(entity, Key):
-      raise datastore_errors.BadQueryError(
-        'StructuredProperty filter cannot be used with keys_only query')
-    subentities = getattr(entity, self._code_name, None)
-    if subentities is None:
-      return False
-    if not isinstance(subentities, list):
-      subentities = [subentities]
-    for subentity in subentities:
-      for name, prop in value._properties.iteritems():
-        val = prop._retrieve_value(value)
-        if val is not None:
-          if prop._retrieve_value(subentity) != val:
-            break
-      else:
-        return True
-    return False
+    if self._repeated:
+      pb = value._to_pb(allow_partial=True)
+      pred = RepeatedStructuredPropertyPredicate(match_keys, pb,
+                                                 self._name + '.')
+      filters.append(PostFilterNode(pred))
+    return ConjunctionNode(*filters)
 
   def _validate(self, value):
     if not isinstance(value, self._modelclass):
@@ -1278,7 +1420,7 @@ class StructuredProperty(Property):
       # TODO: Avoid re-sorting for repeated values.
       for name, prop in sorted(value._properties.iteritems()):
         prop._serialize(value, pb, prefix + self._name + '.',
-                       self._repeated or parent_repeated)
+                        self._repeated or parent_repeated)
 
   def _deserialize(self, entity, p, depth=1):
     if not self._repeated:
@@ -1319,15 +1461,11 @@ class StructuredProperty(Property):
     prop._deserialize(subentity, p, depth + 1)
 
 
-# A custom 'meaning' for compressed blobs.
-_MEANING_URI_COMPRESSED = 'ZLIB'
-
-
-class LocalStructuredProperty(Property):
+class LocalStructuredProperty(BlobProperty):
   """Substructure that is serialized to an opaque blob.
 
   This looks like StructuredProperty on the Python side, but is
-  written to the datastore as a single opaque blob.  It is not indexed
+  written like a BlobProperty in the datastore.  It is not indexed
   and you cannot query for subproperties.  On the other hand, the
   on-disk representation is more efficient and can be made even more
   efficient by passing compressed=True, which compresses the blob
@@ -1335,89 +1473,35 @@ class LocalStructuredProperty(Property):
   """
 
   _indexed = False
-  _compressed = False
   _modelclass = None
 
-  _attributes = ['_modelclass'] + Property._attributes + ['_compressed']
+  _attributes = ['_modelclass'] + BlobProperty._attributes
   _positional = 2
 
   @datastore_rpc._positional(1 + _positional)
   def __init__(self, modelclass, name=None, compressed=False, **kwds):
-    super(LocalStructuredProperty, self).__init__(name=name, **kwds)
+    super(LocalStructuredProperty, self).__init__(name=name,
+                                                  compressed=compressed,
+                                                  **kwds)
     assert not self._indexed
-    if self._repeated:
-      assert not modelclass._has_repeated
     self._modelclass = modelclass
-    self._compressed = compressed
 
   def _validate(self, value):
-    # This is kind of a hack. Allow tuples because if the property comes from
-    # datastore *and* is unchanged *and* the property has repeated=True,
-    # _serialize() will call _do_validate() while the value is still a tuple.
-    if not isinstance(value, (self._modelclass, tuple)):
+    if self._compressed and isinstance(value, _CompressedValue):
+      return value
+    if not isinstance(value, self._modelclass):
       raise datastore_errors.BadValueError('Expected %s instance, got %r' %
                                            (self._modelclass.__name__, value))
     return value
 
-  def _db_set_value(self, v, p, value):
-    """Serializes the value to an entity_pb.
+  def _serialize_value(self, value):
+    pb = value._to_pb(set_key=False)
+    return pb.SerializePartialToString()
 
-    The value stored in entity._values[self._name] can be either:
-
-    - A tuple (serialized: bytes, compressed: bool), when the value comes
-      from datastore. This is the serialized model and a flag indicating if it
-      is compressed, used to lazily decompress and deserialize the property
-      when it is first accessed.
-    - An instance of self._modelclass, when the property value is set, or
-      after it is lazily decompressed and deserialized on first access.
-    """
-    if isinstance(value, tuple):
-      # Value didn't change and is still serialized, so we store it as it is.
-      serialized, compressed = value
-      assert compressed == self._compressed
-    else:
-      pb = value._to_pb()
-      serialized = pb.Encode()
-      compressed = self._compressed
-      if compressed:
-        p.set_meaning_uri(_MEANING_URI_COMPRESSED)
-        serialized = zlib.compress(serialized)
-    if compressed:
-      # Use meaning_uri because setting meaning to something else that is not
-      # BLOB or BYTESTRING will cause the value to be decoded from utf-8
-      # in datastore_types.FromPropertyPb. This breaks the compressed string.
-      p.set_meaning_uri(_MEANING_URI_COMPRESSED)
-    p.set_meaning(entity_pb.Property.BLOB)
-    v.set_stringvalue(serialized)
-
-  def _db_get_value(self, v, p):
-    if not v.has_stringvalue():
-      return None
-    # Return a tuple (serialized, bool) to be lazily processed later.
-    return v.stringvalue(), p.meaning_uri() == _MEANING_URI_COMPRESSED
-
-  def _decompress_unserialize_value(self, value):
-    serialized, compressed = value
-    if compressed:
-      serialized = zlib.decompress(serialized)
-    pb = entity_pb.EntityProto(serialized)
+  def _deserialize_value(self, value):
+    pb = entity_pb.EntityProto()
+    pb.MergePartialFromString(value)
     return self._modelclass._from_pb(pb, set_key=False)
-
-  def _get_value(self, entity):
-    value = super(LocalStructuredProperty, self)._get_value(entity)
-    if self._repeated:
-      if value and isinstance(value[0], tuple):
-        # Decompresses and deserializes each list item.
-        # Reuse the original list, cleaning it first.
-        values = list(value)
-        del value[:]
-        for v in values:
-          value.append(self._decompress_unserialize_value(v))
-    elif isinstance(value, tuple):
-      # Decompresses and deserializes a single item.
-      value = self._decompress_unserialize_value(value)
-      self._store_value(entity, value)
-    return value
 
 
 class GenericProperty(Property):
@@ -1668,6 +1752,14 @@ class Model(object):
     self._values = {}
     self._set_attributes(kwds)
 
+  def __getstate__(self):
+    return self._to_pb().Encode()
+
+  def __setstate__(self, serialized_pb):
+    pb = entity_pb.EntityProto(serialized_pb)
+    self.__init__()
+    self.__class__._from_pb(pb, set_key=False, ent=self)
+
   def _populate(self, **kwds):
     """Populate an instance from keyword arguments.
 
@@ -1791,27 +1883,29 @@ class Model(object):
       return NotImplemented
     return not eq
 
-  def _to_pb(self, pb=None):
+  def _to_pb(self, pb=None, allow_partial=False, set_key=True):
     """Internal helper to turn an entity into an EntityProto protobuf."""
-    self._check_initialized()
+    if not allow_partial:
+      self._check_initialized()
     if pb is None:
       pb = entity_pb.EntityProto()
 
-    # TODO: Move the key stuff into ModelAdapter.entity_to_pb()?
-    key = self._key
-    if key is None:
-      pairs = [(self._get_kind(), None)]
-      ref = ndb.key._ReferenceFromPairs(pairs, reference=pb.mutable_key())
-    else:
-      ref = key._reference()  # Don't copy
-      pb.mutable_key().CopyFrom(ref)
-    group = pb.mutable_entity_group()  # Must initialize this.
-    # To work around an SDK issue, only set the entity group if the
-    # full key is complete.  TODO: Remove the top test once fixed.
-    if key is not None and key.id():
-      elem = ref.path().element(0)
-      if elem.id() or elem.name():
-        group.add_element().CopyFrom(elem)
+    if set_key:
+      # TODO: Move the key stuff into ModelAdapter.entity_to_pb()?
+      key = self._key
+      if key is None:
+        pairs = [(self._get_kind(), None)]
+        ref = ndb.key._ReferenceFromPairs(pairs, reference=pb.mutable_key())
+      else:
+        ref = key._reference()  # Don't copy
+        pb.mutable_key().CopyFrom(ref)
+      group = pb.mutable_entity_group()  # Must initialize this.
+      # To work around an SDK issue, only set the entity group if the
+      # full key is complete.  TODO: Remove the top test once fixed.
+      if key is not None and key.id():
+        elem = ref.path().element(0)
+        if elem.id() or elem.name():
+          group.add_element().CopyFrom(elem)
 
     for name, prop in sorted(self._properties.iteritems()):
       prop._serialize(self, pb)
@@ -1819,14 +1913,17 @@ class Model(object):
     return pb
 
   @classmethod
-  def _from_pb(cls, pb, set_key=True):
+  def _from_pb(cls, pb, set_key=True, ent=None):
     """Internal helper to create an entity from an EntityProto protobuf."""
     assert isinstance(pb, entity_pb.EntityProto)
-    ent = cls()
+    if ent is None:
+      ent = cls()
 
-    # TODO: Move the key stuff into ModelAdapter.pb_to_entity()?
-    if set_key and pb.has_key():
-      ent._key = Key(reference=pb.key())
+    if pb.has_key():
+      key = Key(reference=pb.key())
+      # If set_key is not set, skip a trivial incomplete key.
+      if set_key or key.id() or key.parent():
+        ent._key = key
 
     indexed_properties = pb.property_list()
     unindexed_properties = pb.raw_property_list()
@@ -1874,6 +1971,18 @@ class Model(object):
     Note: This is called by MetaModel, but may also be called manually
     after dynamically updating a model class.
     """
+    # Verify that _get_kind() returns an 8-bit string.
+    kind = cls._get_kind()
+    if not isinstance(kind, basestring):
+      raise KindError('Class %s defines a _get_kind() method that returns '
+                      'a non-string (%r)' % (cls.__name__, kind))
+    if not isinstance(kind, str):
+      try:
+        kind = kind.encode('ascii')  # ASCII contents is okay.
+      except UnicodeEncodeError:
+        raise KindError('Class %s defines a _get_kind() method that returns '
+                        'a Unicode string (%r); please encode using utf-8' %
+                        (cls.__name__, kind))
     cls._properties = {}  # Map of {name: Property}
     if cls.__module__ == __name__:  # Skip the classes in *this* file.
       return
@@ -1911,7 +2020,7 @@ class Model(object):
     return qry
   query = _query
 
-  def _put(self):
+  def _put(self, **ctx_options):
     """Write this entity to the datastore.
 
     If the operation creates or completes a key, the entity's key
@@ -1920,25 +2029,26 @@ class Model(object):
     Returns:
       The key for the entity.  This is always a complete key.
     """
-    return self._put_async().get_result()
+    return self._put_async(**ctx_options).get_result()
   put = _put
 
-  def _put_async(self):
+  def _put_async(self, **ctx_options):
     """Write this entity to the datastore.
 
     This is the asynchronous version of Model._put().
     """
     from ndb import tasklets
-    return tasklets.get_context().put(self)
+    return tasklets.get_context().put(self, **ctx_options)
   put_async = _put_async
 
   @classmethod
-  def _get_or_insert(cls, name, parent=None, **kwds):
+  def _get_or_insert(cls, name, parent=None, context_options=None, **kwds):
     """Transactionally retrieves an existing entity or creates a new one.
 
     Args:
       name: Key name to retrieve or create.
       parent: Parent entity key, if any.
+      context_options: ContextOptions object (not keyword args!) or None.
       **kwds: Keyword arguments to pass to the constructor of the model class
         if an instance for the specified key name does not already exist. If
         an instance with the supplied key_name and parent already exists,
@@ -1949,22 +2059,25 @@ class Model(object):
       or a new one that has just been created.
     """
     return cls._get_or_insert_async(name=name, parent=parent,
+                                    context_options=context_options,
                                     **kwds).get_result()
   get_or_insert = _get_or_insert
 
   @classmethod
-  def _get_or_insert_async(cls, name, parent=None, **kwds):
+  def _get_or_insert_async(cls, name, parent=None, context_options=None,
+                           **kwds):
     """Transactionally retrieves an existing entity or creates a new one.
 
     This is the asynchronous version of Model._get_or_insert().
     """
     from ndb import tasklets
     ctx = tasklets.get_context()
-    return ctx.get_or_insert(cls, name=name, parent=parent, **kwds)
+    return ctx.get_or_insert(cls, name=name, parent=parent,
+                             context_options=context_options, **kwds)
   get_or_insert_async = _get_or_insert_async
 
   @classmethod
-  def _allocate_ids(cls, size=None, max=None, parent=None):
+  def _allocate_ids(cls, size=None, max=None, parent=None, **ctx_options):
     """Allocates a range of key IDs for this model class.
 
     Args:
@@ -1973,48 +2086,52 @@ class Model(object):
       max: Maximum ID to allocate. Either size or max can be specified,
         not both.
       parent: Parent key for which the IDs will be allocated.
+      **ctx_options: Context options.
 
     Returns:
       A tuple with (start, end) for the allocated range, inclusive.
     """
-    return cls._allocate_ids_async(size=size, max=max,
-                                   parent=parent).get_result()
+    return cls._allocate_ids_async(size=size, max=max, parent=parent,
+                                   **ctx_options).get_result()
   allocate_ids = _allocate_ids
 
   @classmethod
-  def _allocate_ids_async(cls, size=None, max=None, parent=None):
+  def _allocate_ids_async(cls, size=None, max=None, parent=None,
+                          **ctx_options):
     """Allocates a range of key IDs for this model class.
 
     This is the asynchronous version of Model._allocate_ids().
     """
     from ndb import tasklets
     key = Key(cls._get_kind(), None, parent=parent)
-    return tasklets.get_context().allocate_ids(key, size=size, max=max)
+    return tasklets.get_context().allocate_ids(key, size=size, max=max,
+                                               **ctx_options)
   allocate_ids_async = _allocate_ids_async
 
   @classmethod
-  def _get_by_id(cls, id, parent=None):
+  def _get_by_id(cls, id, parent=None, **ctx_options):
     """Returns a instance of Model class by ID.
 
     Args:
       id: A string or integer key ID.
       parent: Parent key of the model to get.
+      **ctx_options: Context options.
 
     Returns:
       A model instance or None if not found.
     """
-    return cls._get_by_id_async(id, parent=parent).get_result()
+    return cls._get_by_id_async(id, parent=parent, **ctx_options).get_result()
   get_by_id = _get_by_id
 
   @classmethod
-  def _get_by_id_async(cls, id, parent=None):
+  def _get_by_id_async(cls, id, parent=None, **ctx_options):
     """Returns a instance of Model class by ID.
 
     This is the asynchronous version of Model._get_by_id().
     """
     from ndb import tasklets
     key = Key(cls._get_kind(), id, parent=parent)
-    return tasklets.get_context().get(key)
+    return tasklets.get_context().get(key, **ctx_options)
   get_by_id_async = _get_by_id_async
 
 
@@ -2023,6 +2140,10 @@ class Expando(Model):
 
   See the module docstring for details.
   """
+
+  # Set this to False (in an Expando subclass or entity) to make
+  # properties default to unindexed.
+  _default_indexed = True
 
   def _set_attributes(self, kwds):
     for name, value in kwds.iteritems():
@@ -2044,7 +2165,9 @@ class Expando(Model):
     if isinstance(value, Model):
       prop = StructuredProperty(Model, name)
     else:
-      prop = GenericProperty(name)
+      repeated = isinstance(value, list)
+      indexed = self._default_indexed
+      prop = GenericProperty(name, repeated=repeated, indexed=indexed)
     prop._code_name = name
     self._properties[name] = prop
     prop._set_value(self, value)
@@ -2061,7 +2184,7 @@ class Expando(Model):
 
 
 @datastore_rpc._positional(1)
-def transaction(callback, retry=None, entity_group=None):
+def transaction(callback, retry=None, entity_group=None, **ctx_options):
   """Run a callback in a transaction.
 
   Args:
@@ -2071,6 +2194,7 @@ def transaction(callback, retry=None, entity_group=None):
     entity_group: Optional root key to use as transaction entity group
       (keyword only; defaults to the root part of the first key used
       in the transaction).
+    **ctx_options: Context options.
 
   Returns:
     Whatever callback() returns.
@@ -2085,18 +2209,18 @@ def transaction(callback, retry=None, entity_group=None):
         ...
       transaction(lambda: my_callback(Key(...), 1))
   """
-  fut = transaction_async(callback, retry=retry, entity_group=entity_group)
+  fut = transaction_async(callback, retry=retry, entity_group=entity_group,
+                          **ctx_options)
   return fut.get_result()
 
 
 @datastore_rpc._positional(1)
-def transaction_async(callback, retry=None, entity_group=None):
+def transaction_async(callback, retry=None, entity_group=None, **kwds):
   """Run a callback in a transaction.
 
   This is the asynchronous version of transaction().
   """
   from ndb import tasklets
-  kwds = {}
   if retry is not None:
     kwds['retry'] = retry
   if entity_group is not None:
@@ -2117,8 +2241,8 @@ def transactional(func):
   If we're already in a transaction this is a no-op.
 
   Note: If you need to override the retry count or the entity group,
-  or if you want some kind of async behavior, use the transaction()
-  function above.
+  or if you want some kind of async behavior, or pass Context options,
+  use the transaction() function above.
   """
   @utils.wrapping(func)
   def transactional_wrapper(*args, **kwds):
@@ -2129,72 +2253,87 @@ def transactional(func):
   return transactional_wrapper
 
 
-def get_multi_async(keys):
+def get_multi_async(keys, **ctx_options):
   """Fetches a sequence of keys.
 
   Args:
     keys: A sequence of keys.
+    **ctx_options: Context options.
 
   Returns:
     A list of futures.
   """
-  return [key.get_async() for key in keys]
+  return [key.get_async(**ctx_options) for key in keys]
 
 
-def get_multi(keys):
+def get_multi(keys, **ctx_options):
   """Fetches a sequence of keys.
 
   Args:
     keys: A sequence of keys.
+    **ctx_options: Context options.
 
   Returns:
     A list whose items are either a Model instance or None if the key wasn't
     found.
   """
-  return [future.get_result() for future in get_multi_async(keys)]
+  return [future.get_result()
+          for future in get_multi_async(keys, **ctx_options)]
 
 
-def put_multi_async(models):
+def put_multi_async(entities, **ctx_options):
   """Stores a sequence of Model instances.
 
   Args:
-    models: A sequence of Model instances.
+    entities: A sequence of Model instances.
+    **ctx_options: Context options.
 
   Returns:
     A list of futures.
   """
-  return [model.put_async() for model in models]
+  return [entity.put_async(**ctx_options) for entity in entities]
 
 
-def put_multi(models):
+def put_multi(entities, **ctx_options):
   """Stores a sequence of Model instances.
 
   Args:
-    models: A sequence of Model instances.
+    entities: A sequence of Model instances.
+    **ctx_options: Context options.
 
   Returns:
     A list with the stored keys.
   """
-  return [future.get_result() for future in put_multi_async(models)]
+  return [future.get_result()
+          for future in put_multi_async(entities, **ctx_options)]
 
 
-def delete_multi_async(keys):
+def delete_multi_async(keys, **ctx_options):
   """Deletes a sequence of keys.
+
+  Args:
+    keys: A sequence of keys.
+    **ctx_options: Context options.
 
   Returns:
     A list of futures.
   """
-  return [key.delete_async() for key in keys]
+  return [key.delete_async(**ctx_options) for key in keys]
 
 
-def delete_multi(keys):
+def delete_multi(keys, **ctx_options):
   """Deletes a sequence of keys.
+
+  Args:
+    keys: A sequence of keys.
+    **ctx_options: Context options.
 
   Args:
     keys: A sequence of keys.
   """
   # A list full of Nones!!!
-  return [future.get_result() for future in delete_multi_async(keys)]
+  return [future.get_result()
+          for future in delete_multi_async(keys, **ctx_options)]
 
 
 # Update __all__ to contain all Property and Exception subclasses.

@@ -2,6 +2,7 @@
 """WSGI app setup."""
 import os
 import sys
+import ndb
 import config
 import logging
 import bootstrap
@@ -10,6 +11,8 @@ bootstrap.MomentumBootstrapper.prepareImports()
 
 from tipfy import Tipfy
 from urls import get_rules
+
+from google.appengine.dist import use_library
 	
 
 def enable_appstats(app):
@@ -53,8 +56,13 @@ def main():
 
 	global run
 
+	## Select Django 1.2 (avoids deprecation warning)
+	if not config.debug:
+		use_library('django', '1.2')
+
 	## Grab debug and system config
 	debug = config.debug
+	ndb.debug = debug
 	sys_config = config.config.get('momentum.system')
 	
 	## Create the app, get it ready for middleware

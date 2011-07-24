@@ -2,7 +2,11 @@ import config
 import logging
 import protorpc
 
+import webapp2
+
 from protorpc import remote
+from protorpc import webapp
+from protorpc.webapp import service_handlers
 
 from werkzeug import import_string
 from werkzeug import cached_property
@@ -13,24 +17,57 @@ global_debug = config.debug
 _middleware_cache = {}
 
 
+
+## Expose service flags (middleware decorators)
+flags = DictProxy({
+
+	'audit': DictProxy({
+		'monitor': audit.Monitor,
+		'debug': audit.Debug,
+		'loglevel': audit.LogLevel,
+	}),
+	
+	'caching': DictProxy({
+		'local': caching.LocalCacheable,
+		'memcache': caching.MemCacheable,
+		'cacheable': caching.Cacheable,
+	}),
+	
+	'security': DictProxy({
+		'authorize': security.Authorize,
+		'authenticate': security.Authenticate,
+		'admin': security.AdminOnly
+	})
+
+})
+
+
+## Top-Level Service Class
 class MomentumService(remote.Service):
 	
 	''' Top-level parent class for ProtoRPC-based API services. '''
 	
-	state = {'request': None, 'opts': None, 'service': None}
-	config = {'global': None, 'module': None, 'service': None}
+	middleware = {}
+	state = {'request': {}, 'opts': {}, 'service': {}}
+	config = {'global': {}, 'module': {}, 'service': {}}
 
 	@cached_property
 	def globalConfig(self):
 		return config.config.get('momentum.services')
+		
+	def __init__(self, *args, **kwargs):
+		super(MomentumService, self).__init__(*args, **kwargs)
+		
+	def initiate_request_state(self, state):
+		super(MomentumService, self).initiate_request_state(state)
 
 	def _initializeMomentumService(self):
 
 		##### ==== Step 1: Copy over global, module, and service configuration ==== ####
 		
 		## Copy global config
-		self.config['global'] = self.globalConfig			
-
+		self.config['global'] = self.globalConfig
+		
 		## Module configuration
 		if hasattr(self, 'moduleConfigPath'):
 			self.config['module'] = config.config.get(getattr(self, 'moduleConfigPath', '__null__'), {})
@@ -69,9 +106,6 @@ class MomentumService(remote.Service):
 		##### ==== Step 2: Check for an initialize hook ==== ####
 		if hasattr(self, 'initialize'):
 			self.initialize()
-
-	def initialize_request_state(self, state):
-		self.state['request'] = dict([(item, getattr(state, item, None)) for item in ('headers', 'http_method', 'service_path', 'remote_host', 'remote_address', 'server_host', 'server_port')])
 		
 	def _setstate(self, key, value):
 		self.state['service'][key] = value
@@ -80,9 +114,25 @@ class MomentumService(remote.Service):
 		if key in self.state['service']:
 			return self.state['service'][key]
 		else: return default
+		
+	def _delstate(self, key):
+		if key in self.state['service']:
+			del self.state['service'][key]
+		
+	def __setitem__(self, key, value):
+		self._setstate(key, value)
+		
+	def __getitem__(self, key):
+		return self._getstate(key, None)
+		
+	def __delitem__(self, key):
+		self._delstate(key)
 
+	def __repr__(self):
+		return '<MomentumService::'+'.'.join(self.__module__.split('.')+[self.__class__.__name__])+'>'
+		
 
-class MomentumServiceHandler(proto.ServiceHandler):
+class MomentumServiceHandler(webapp2.RequestHandler, service_handlers.ServiceHandler):
 
 	@cached_property
 	def servicesConfig(self):
@@ -98,7 +148,7 @@ class MomentumServiceHandler(proto.ServiceHandler):
 
 	def error(self, message):
 		logging.error('ServiceHandler ERROR: '+str(message))
-		
+				
 	def run_post_action_middleware(self, service):
 		
 		global global_debug
@@ -106,33 +156,24 @@ class MomentumServiceHandler(proto.ServiceHandler):
 		
 		middleware = self.servicesConfig.get('middleware', False)
 		if middleware is not False and len(middleware) > 0:
-			for name, config in middleware:
+			
+			for name, middleware_object in service.middleware.items():
 				self.log('Considering '+str(name)+' middleware...')
-				if config['enabled'] is True:
-					try:
-						if name not in _middleware_cache or config.debug:
-							middleware_class = import_string(config['path'])
-						else:
-							middleware_class = _middleware_cache[name]
-							
-						middleware_object = middleware_class(debug=config['debug'], config=config.get('args', {}))
+				try:
 						
-						if hasattr(middleware_object, 'after_request'):
-							middleware_object.after_request(self.service, self.request, self.response)
-							continue
-						else:
-							self.log('Middleware '+str(name)+' does not have after_request method. Continuing.')
-							continue
+					if hasattr(middleware_object, 'after_request'):
+						middleware_object.after_request(self.service, self.request, self.response)
+						continue
+					else:
+						self.log('Middleware '+str(name)+' does not have after_request method. Continuing.')
+						continue
 						
-					except Exception, e:
-						self.error('Middleware "'+str(name)+'" raised an unhandled exception of type "'+str(e)+'".')
-						if global_debug:
-							raise e
-						else:
-							continue
-				else:
-					self.log('Middleware '+str(name)+' is disabled.')
+				except Exception, e:
+					self.error('Middleware "'+str(name)+'" raised an unhandled exception of type "'+str(e)+'".')
+					if config.debug:
+						raise
 					continue
+
 		else:
 			self.log('Middleware is none or 0.')
 			
@@ -178,10 +219,13 @@ class MomentumServiceHandlerFactory(proto.ServiceHandlerFactory):
 	def error(self, message):
 		logging.error('ServiceHandlerFactory ERROR: '+str(message))
 	
-	def __call__(self, request, response):
+	def __call__(self, request, remote_path, remote_method):
 		
 		global global_debug
 		global _middleware_cache
+		
+		## Extract response
+		response = request.response
 
 		## Manufacture service + handler
 		service = self.service_factory()
@@ -191,16 +235,17 @@ class MomentumServiceHandlerFactory(proto.ServiceHandlerFactory):
 		middleware = self.servicesConfig.get('middleware', False)
 		if middleware is not False and len(middleware) > 0:
 			
-			for name, config in middleware:
+			for name, cfg in middleware:
 				self.log('Considering '+str(name)+' middleware...')
-				if config['enabled'] is True:
+				if cfg['enabled'] is True:
 					try:
 						if name not in _middleware_cache or config.debug:
-							middleware_class = import_string(config['path'])
+							middleware_class = import_string(cfg['path'])
 						else:
 							middleware_class = _middleware_cache[name]
 							
-						middleware_object = middleware_class(debug=config['debug'], config=config.get('args', {}))
+						middleware_object = middleware_class(debug=cfg['debug'], config=self.servicesConfig, opts=cfg.get('args', {}))
+						service.middleware[name] = middleware_object
 						
 						if hasattr(middleware_object, 'before_request'):
 							service, request, response = middleware_object.before_request(service, request, response)
@@ -211,8 +256,8 @@ class MomentumServiceHandlerFactory(proto.ServiceHandlerFactory):
 						
 					except Exception, e:
 						self.error('Middleware "'+str(name)+'" raise an unhandled exception of type "'+str(e)+'".')
-						if global_debug:
-							raise e
+						if config.debug:
+							raise
 						else:
 							continue
 						

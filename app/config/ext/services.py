@@ -76,11 +76,12 @@ config['momentum.services'] = {
 			
 				## No caching
 				'none': {
-				
+					
+					'localize': False,					
 					'default_ttl': None, ## Default Time-to-Live for cached items
 					
 					'activate': {
-						'request': False, ## Caching of full API responses by hashed API requests
+						'response': False, ## Caching of full API responses by hashed API requests
 						'internal': False ## Caching inside the remote service object
 					}
 				
@@ -89,11 +90,12 @@ config['momentum.services'] = {
 			
 				## Cache things as they are pulled/used by clients
 				'lazy': {
-				
+					
+					'localize': False,
 					'default_ttl': 60,
 				
 					'activate': {
-						'request': True,
+						'response': True,
 						'internal': True
 					},
 
@@ -102,10 +104,11 @@ config['momentum.services'] = {
 				## Cache things as they are used, but set low timeouts to avoid stale data
 				'safe': {
 				
+					'localize': False,
 					'default_ttl': 60,
 					
 					'activate': {
-						'request': False,
+						'response': False,
 						'internal': True
 					}
 				
@@ -113,11 +116,12 @@ config['momentum.services'] = {
 				
 				## Cache things before they are accessed, predictively, and with long timeouts
 				'aggressive': {
-				
+
+					'localize': False,				
 					'default_ttl': 120,
 					
 					'activate': {
-						'request': True,
+						'response': True,
 						'internal': True
 					}
 				
@@ -278,7 +282,7 @@ config['momentum.fatcatmap.services'] = {
 			'methods': ['construct', 'constructFromNode', 'constructFromObject'],
 
 			'config': {
-				'caching': 'none',
+				'caching': 'lazy',
 				'security': 'none',
 				'recording': 'none'
 			}

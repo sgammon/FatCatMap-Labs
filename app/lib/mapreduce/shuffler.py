@@ -1,6 +1,18 @@
 #!/usr/bin/env python
 #
-# Copyright 2011 Google Inc. All Rights Reserved.
+# Copyright 2011 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 """Mapreduce shuffler implementation."""
 
@@ -91,17 +103,16 @@ def _sort_records(records):
   l = len(records)
   proto_records = [None] * l
 
-  # TODO(user): demote these log statements.
-  logging.info("parsing")
+  logging.debug("Parsing")
   for i in range(l):
     proto = file_service_pb.KeyValue()
     proto.ParseFromString(records[i])
     proto_records[i] = proto
 
-  logging.info("sorting")
+  logging.debug("Sorting")
   proto_records.sort(cmp=_compare_keys)
 
-  logging.info("writing")
+  logging.debug("Writing")
   blob_file_name = (ctx.mapreduce_spec.name + "-" +
                     ctx.mapreduce_id + "-output")
   output_path = files.blobstore.create(
@@ -110,8 +121,9 @@ def _sort_records(records):
     for proto in proto_records:
       pool.append(proto.Encode())
 
-  logging.info("finalizing")
+  logging.debug("Finalizing")
   files.finalize(output_path)
+  time.sleep(1)  # TODO(user): Hack for HR datastore replication delay.
   output_path = files.blobstore.get_file_name(
       files.blobstore.get_blob_key(output_path))
 
