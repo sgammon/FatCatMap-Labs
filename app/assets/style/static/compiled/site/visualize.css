@@ -1,0 +1,107 @@
+/* line 1, ../../../source/site/visualize.sass */
+#landingWrapper {
+  overflow: hidden;
+}
+/* line 5, ../../../source/site/visualize.sass */
+#landingWrapper #newsmapHeader {
+  font-family: "Lekton";
+  position: absolute;
+  left: 10px;
+  height: 50px;
+  right: 10px;
+  line-height: 75px;
+  border-bottom: 1px solid #444444;
+}
+/* line 15, ../../../source/site/visualize.sass */
+#landingWrapper #newsmapHeader a {
+  text-decoration: none;
+}
+/* line 18, ../../../source/site/visualize.sass */
+#landingWrapper #newsmapHeader h1 {
+  float: left;
+  font-family: "Cabin";
+  font-size: 22pt;
+  display: inline;
+}
+/* line 25, ../../../source/site/visualize.sass */
+#landingWrapper #newsmapHeader span {
+  line-height: 85px;
+}
+/* line 29, ../../../source/site/visualize.sass */
+#landingWrapper #newsmapHeader .contentStatus {
+  float: right;
+}
+/* line 32, ../../../source/site/visualize.sass */
+#landingWrapper #newsmapHeader .contentNavbar {
+  float: left;
+  margin-left: 20px;
+}
+/* line 37, ../../../source/site/visualize.sass */
+#landingWrapper #newsmapHeader .contentNavbar b {
+  font-weight: bold;
+}
+
+/* line 41, ../../../source/site/visualize.sass */
+.nbHalf {
+  width: 200px;
+}
+
+/* line 45, ../../../source/site/visualize.sass */
+.nbFull {
+  width: 440px;
+}
+
+/* line 49, ../../../source/site/visualize.sass */
+#newsmap {
+  padding: 0;
+  top: 55px;
+  position: absolute;
+}
+
+/* line 55, ../../../source/site/visualize.sass */
+.newsbox {
+  margin: 10px;
+  display: block;
+  text-align: left;
+  padding: 10px;
+  border-radius: 10px;
+  float: left;
+}
+/* line 64, ../../../source/site/visualize.sass */
+.newsbox h3 {
+  font-size: 14pt;
+}
+/* line 67, ../../../source/site/visualize.sass */
+.newsbox p {
+  padding: 5px;
+}
+/* line 70, ../../../source/site/visualize.sass */
+.newsbox a {
+  padding: 5px;
+}
+
+/* === News Types === */
+/* line 75, ../../../source/site/visualize.sass */
+.worldNews {
+  background: #be5758;
+}
+
+/* line 78, ../../../source/site/visualize.sass */
+.nationalNews {
+  background: #cec828;
+}
+
+/* line 81, ../../../source/site/visualize.sass */
+.businessNews {
+  background: #8cb531;
+}
+
+/* line 84, ../../../source/site/visualize.sass */
+.sportsNews {
+  background: #196a88;
+}
+
+/* line 87, ../../../source/site/visualize.sass */
+.techNews {
+  background: teal;
+}

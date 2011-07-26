@@ -1,6 +1,6 @@
 class CoreDevAPI extends CoreAPI
 
-	constructor: (@fcm) ->
+	constructor: (fcm) ->
 
 		@config = {}
 		@environment = {}

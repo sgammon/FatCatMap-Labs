@@ -139,12 +139,10 @@
   }
   CoreDevAPI = (function() {
     function CoreDevAPI(fcm) {
-      this.fcm = fcm;
       this.verbose = __bind(this.verbose, this);;
       this.error = __bind(this.error, this);;
       this.log = __bind(this.log, this);;
-      this.setDebug = __bind(this.setDebug, this);;
-      this.config = {};
+      this.setDebug = __bind(this.setDebug, this);;      this.config = {};
       this.environment = {};
       this.performance = {
         tools: {
@@ -208,7 +206,6 @@
   })();
   CoreSysAPI = (function() {
     function CoreSysAPI(fcm) {
-      this.fcm = fcm;
       this.version = {
         minor: null,
         major: null,
@@ -221,32 +218,78 @@
       };
       this.drivers = {
         registry: {},
-        register: function(module, name, fn, initialized, callback) {
+        register: __bind(function(module, name, hook, preference, initialized, callback) {
           var context;
-          if (typeof this.registry[module] === null) {
-            this.registry[module] = {};
+          if (!(this.drivers.registry[module] != null)) {
+            this.drivers.registry[module] = {};
           }
-          this.registry[module][name] = {
+          this.drivers.registry[module][name] = {
             initialized: initialized,
+            preference: preference,
             registered: true,
-            hook_point: fn,
+            hook_point: hook,
             init_callback: callback
           };
           context = {
             module: module,
             name: name,
-            hook: fn
+            hook: hook
           };
-          this.fcm.state.events.triggerEvent('DRIVER_REGISTERED', context);
-        },
+          fcm.state.events.triggerEvent('DRIVER_REGISTERED', context);
+        }, this),
         resolve: function(module, name) {
-          if (typeof this.registry[module] === null) {
+          var cp, option, option_name, preference, selection, _default;
+          if (!(this.registry[module] != null)) {
             return false;
           } else {
-            if (typeof this.registry[module][name] === null) {
-              return false;
+            if (name != null) {
+              if (!(this.registry[module][name] != null)) {
+                return false;
+              } else {
+                return this.registry[module][name].hook_point;
+              }
             } else {
-              return this.registry[module][name].hook_point;
+              _default = null;
+              selection = null;
+              preference = 0;
+              for (option_name in this.registry[module]) {
+                option = this.registry[module][option_name];
+                if (option.preference != null) {
+                  if (typeof option.preference === 'function') {
+                    if (typeof $ !== "undefined" && $ !== null) {
+                      cp = option.preference($.fatcatmap);
+                    } else {
+                      cp = option.preference(window.fatcatmap);
+                    }
+                  } else {
+                    cp = option.preference;
+                  }
+                  if (cp !== null && typeof cp !== 'boolean') {
+                    if (cp > preference) {
+                      selection = option;
+                    }
+                  } else {
+                    if (cp === false) {
+                      continue;
+                    } else if (cp === true) {
+                      selection = option;
+                    } else {
+                      continue;
+                    }
+                  }
+                } else {
+                  _default = option;
+                }
+              }
+              if (selection !== null) {
+                return selection.hook_point;
+              } else {
+                if (_default !== null) {
+                  return _default.hook_point;
+                } else {
+                  return null;
+                }
+              }
             }
           }
         }
@@ -257,7 +300,6 @@
   })();
   CoreAgentAPI = (function() {
     function CoreAgentAPI(fcm) {
-      this.fcm = fcm;
       this._data = {};
       this.platform = {};
       this.capabilities = {};
@@ -411,7 +453,6 @@
   })();
   CoreStateAPI = (function() {
     function CoreStateAPI(fcm) {
-      this.fcm = fcm;
       this.events = {
         registry: [],
         callchain: {},
@@ -419,42 +460,44 @@
         registerEvent: __bind(function(name) {
           this.events.registry.push(name);
           this.events.callchain[name] = [];
-          if (this.fcm.dev.debug.eventlog === true) {
-            this.fcm.dev.verbose('EventLog', "Event Registered: " + name);
+          if (fcm.dev.debug.eventlog === true) {
+            fcm.dev.verbose('EventLog', "Event Registered: " + name);
           }
           return this;
         }, this),
-        registerHook: function(_event, fn, once) {
+        registerHook: __bind(function(_event, fn, once) {
           var calltask;
           if (typeof once === null) {
             once = false;
           }
-          try {
-            calltask = {
-              executed: false,
-              callback: function(context) {
-                return fn(context);
-              },
-              runonce: one
-            };
-            return this.callchain[_event].push(calltask);
-          } catch (_e) {}
-        },
+          calltask = {
+            executed: false,
+            callback: function(context) {
+              return fn(context);
+            },
+            runonce: once
+          };
+          this.events.callchain[_event].push(calltask);
+          if (fcm.dev.debug.eventlog === true && fcm.dev.debug.verbose === true) {
+            return console.log("[EventLog] Hook Registered: ", fn, "on event", _event);
+          }
+        }, this),
         triggerEvent: __bind(function(_event, context) {
-          var calltask, result, result_calltask, _i, _len, _ref, _results;
-          if (this.fcm.dev.debug.eventlog === true) {
+          var calltask, result, result_calltask, _results;
+          if (fcm.dev.debug.eventlog === true) {
             console.log("[EventLog] Event Triggered: " + _event, context || '{no context}');
           }
           if (typeof this.events.callchain[_event] !== null) {
             if (this.events.callchain[_event].length > 0) {
-              _ref = this.events.callchain[_event];
               _results = [];
-              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                calltask = _ref[_i];
+              for (calltask in this.events.callchain[_event]) {
                 if (this.events.callchain[_event][calltask].executed === true && this.events.callchain[_event][calltask].runonce === true) {
                   continue;
                 } else {
                   try {
+                    if (fcm.dev.debug.eventlog === true && fcm.dev.debug.verbose === true) {
+                      console.log("[EventLog] Callchain: ", calltask, this.events.callchain[_event]);
+                    }
                     result = this.events.callchain[_event][calltask].callback(context);
                     result_calltask = {
                       event: _event,
@@ -524,7 +567,7 @@
             id: id,
             element: element
           };
-          this.fcm.state.events.triggerEvent('REGISTER_ELEMENT', context);
+          fcm.state.events.triggerEvent('REGISTER_ELEMENT', context);
           return this.events.registry[id];
         }, this),
         _setState: function(id, key, value) {
@@ -578,13 +621,12 @@
   })();
   CoreModelAPI = (function() {
     function CoreModelAPI(fcm) {
-      this.fcm = fcm;
-      this.fcm.state.events.registerEvent('MODEL_DEFINE');
-      this.fcm.state.events.registerEvent('MODEL_SYNC');
-      this.fcm.state.events.registerEvent('ENTITY_CREATE');
-      this.fcm.state.events.registerEvent('ENTITY_PUT');
-      this.fcm.state.events.registerEvent('ENTITY_GET');
-      this.fcm.state.events.registerEvent('ENTITY_DELETE');
+      fcm.state.events.registerEvent('MODEL_DEFINE');
+      fcm.state.events.registerEvent('MODEL_SYNC');
+      fcm.state.events.registerEvent('ENTITY_CREATE');
+      fcm.state.events.registerEvent('ENTITY_PUT');
+      fcm.state.events.registerEvent('ENTITY_GET');
+      fcm.state.events.registerEvent('ENTITY_DELETE');
       this.local = {
         schema: {}
       };
@@ -594,10 +636,15 @@
     }
     __extends(CoreModelAPI, CoreAPI);
     CoreModelAPI.prototype.sync = function(method, model, options) {
-      var config, failure_callback, success_callback;
+      var config, failure_callback, fcm, success_callback;
+      if (typeof $ !== "undefined" && $ !== null) {
+        fcm = $.fatcatmap;
+      } else {
+        fcm = window.fatcatmap;
+      }
       switch (method) {
         case "create":
-          this.fcm.state.events.triggerEvent('ENTITY_CREATE', {
+          fcm.state.events.triggerEvent('ENTITY_CREATE', {
             model: model,
             options: options
           });
@@ -609,7 +656,7 @@
             failure: failure_callback
           }, config);
         case "read":
-          this.fcm.state.events.triggerEvent('ENTITY_GET', {
+          fcm.state.events.triggerEvent('ENTITY_GET', {
             model: model,
             options: options
           });
@@ -621,7 +668,7 @@
             failure: failure_callback
           }, config);
         case "update":
-          this.fcm.state.events.triggerEvent('ENTITY_PUT', {
+          fcm.state.events.triggerEvent('ENTITY_PUT', {
             model: model,
             options: options
           });
@@ -634,7 +681,7 @@
             failure: failure_callback
           }, config);
         case "delete":
-          this.fcm.state.events.triggerEvent('ENTITY_DELETE', {
+          fcm.state.events.triggerEvent('ENTITY_DELETE', {
             model: model,
             options: options
           });
@@ -658,7 +705,7 @@
         local: {
           _driver: null,
           _resolveDriver: __bind(function() {
-            return this._driver = this.fcm.sys.drivers.resolve('storage', 'local');
+            return this._driver = this.fcm.sys.drivers.resolve('localstorage');
           }, this),
           getValue: __bind(function(key) {
             if (this._driver !== null) {
@@ -685,7 +732,7 @@
         session: {
           _driver: null,
           _resolveDriver: function() {
-            return this._driver = this.fcm.sys.drivers.resolve('storage', 'session');
+            return this._driver = this.fcm.sys.drivers.resolve('sessionstorage');
           },
           getValue: function(key) {
             if (this._driver !== null) {
@@ -712,7 +759,7 @@
         object: {
           _driver: null,
           _resolveDriver: function() {
-            return this._driver = this.fcm.sys.drivers.resolve('storage', 'object');
+            return this._driver = this.fcm.sys.drivers.resolve('objectstorage');
           },
           getValue: function(key) {
             if (this._driver !== null) {
@@ -739,7 +786,7 @@
         sql: {
           _driver: null,
           _resolveDriver: function() {
-            return this._driver = this.fcm.sys.drivers.resolve('storage', 'sql');
+            return this._driver = this.fcm.sys.drivers.resolve('sqlstorage');
           },
           getValue: function(key) {
             if (this._driver !== null) {
@@ -777,8 +824,7 @@
   })();
   CoreUserAPI = (function() {
     function CoreUserAPI(fcm) {
-      this.fcm = fcm;
-      this.fcm.state.events.registerEvent('USER_CHANGE');
+      fcm.state.events.registerEvent('USER_CHANGE');
       this.current_user = null;
       this.is_user_admin = null;
       this.login_url = null;
@@ -786,19 +832,30 @@
     }
     __extends(CoreUserAPI, CoreAPI);
     CoreUserAPI.prototype.setUserInfo = function(user_properties) {
+      var context, fcm;
+      context = {};
       if (user_properties['current_user'] !== null) {
         this.current_user = user_properties['current_user'];
+        context.current_user = this.current_user;
       }
       if (user_properties['is_user_admin'] !== null) {
         this.is_user_admin = user_properties['is_user_admin'];
+        context.is_user_admin = this.is_user_admin;
       }
       if (user_properties['login_url'] !== null) {
         this.login_url = user_properties['login_url'];
+        context.login_url = this.login_url;
       }
       if (user_properties['logout_url'] !== null) {
         this.logout_url = user_properties['logout_url'];
+        context.logout_url = this.logout_url;
       }
-      return this.fcm.state.events.triggerEvent('USER_CHANGE');
+      if (typeof $ !== "undefined" && $ !== null) {
+        fcm = $.fatcatmap;
+      } else {
+        fcm = window.fatcatmap;
+      }
+      return fcm.state.events.triggerEvent('USER_CHANGE', context);
     };
     return CoreUserAPI;
   })();
@@ -813,11 +870,11 @@
         _ref = this.methods;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           method = _ref[_i];
-          this[method] = this._buildRPCMethod(method);
+          this[method] = this._buildRPCMethod(method, base_uri, config);
         }
       }
     }
-    RPCAPI.prototype._buildRPCMethod = function(method) {
+    RPCAPI.prototype._buildRPCMethod = function(method, base_uri, config) {
       var api, rpcMethod;
       api = this.name;
       rpcMethod = __bind(function(params, callbacks, async, opts) {
@@ -834,12 +891,12 @@
           opts = {};
         }
         return __bind(function(params, callbacks, async, opts) {
-          var request;
+          var fcm, request;
           if (params == null) {
             params = {};
           }
           if (callbacks == null) {
-            callbacks = {};
+            callbacks = null;
           }
           if (async == null) {
             async = false;
@@ -847,20 +904,30 @@
           if (opts == null) {
             opts = {};
           }
-          request = window.fatcatmap.rpc.api.createRPCRequest({
+          if (typeof $ !== "undefined" && $ !== null) {
+            fcm = $.fatcatmap;
+          } else {
+            fcm = window.fatcatmap;
+          }
+          request = fcm.rpc.api.createRPCRequest({
             method: method,
             api: api,
             params: params || {},
             opts: opts || {},
             async: async || false
           });
-          if (callbacks != null) {
+          if (callbacks !== null) {
             return request.fulfill(callbacks);
           } else {
             return request;
           }
         }, this)(params, callbacks, async, opts);
       }, this);
+      if (typeof $ !== "undefined" && $ !== null) {
+        $.fatcatmap.rpc.registerAPIMethod(api, method, base_uri, config);
+      } else {
+        window.fatcatmap.rpc.registerAPIMethod(api, method, base_uri, config);
+      }
       return rpcMethod;
     };
     return RPCAPI;
@@ -898,7 +965,8 @@
         http_method: 'POST',
         crossDomain: false,
         ifModified: false,
-        dataType: 'json'
+        dataType: 'json',
+        contentType: 'application/json'
       };
       if (id != null) {
         this.envelope.id = id;
@@ -991,6 +1059,10 @@
       fcm.state.events.registerEvent('RPC_SUCCESS');
       fcm.state.events.registerEvent('RPC_ERROR');
       fcm.state.events.registerEvent('RPC_COMPLETE');
+      if (window.amplify != null) {
+        fcm.dev.verbose('RPC', 'AmplifyJS detected. Registering.');
+        fcm.sys.drivers.register('transport', 'amplify', window.amplify, true, true);
+      }
       this.base_rpc_uri = '/_api/rpc';
       this.api = {
         lastRequest: null,
@@ -1036,6 +1108,9 @@
             return 1;
           }
         },
+        decodeRPCResponse: function(data, status, xhr, success, error) {
+          return success(data, status);
+        },
         createRPCRequest: function(config) {
           var request;
           request = new RPCRequest(this.provisionRequestID());
@@ -1060,13 +1135,21 @@
           if (config.async != null) {
             request.setAsync(config.async);
           }
-          console.log('[RPC] Request: ', request, config);
+          if (typeof $ !== "undefined" && $ !== null) {
+            $.fatcatmap.dev.log('RPC', 'New Request', request, config);
+          } else {
+            window.fatcatmap.dev.log('RPC', 'New Request', request, config);
+          }
           request.setAction(this._assembleRPCURL(request.method, request.api, this.action_prefix, this.base_rpc_uri));
           return request;
         },
         fulfillRPCRequest: function(config, request, callbacks) {
           var context;
-          console.log('[RPC] Fulfill: ', config, request, callbacks);
+          if (typeof $ !== "undefined" && $ !== null) {
+            $.fatcatmap.dev.log('RPC', 'Fulfill', config, request, callbacks);
+          } else {
+            window.fatcatmap.dev.log('RPC', 'Fulfill', config, request, callbacks);
+          }
           this.lastRequest = request;
           this.history[request.envelope.id] = {
             request: request,
@@ -1097,82 +1180,92 @@
           };
           fcm.state.events.triggerEvent('RPC_FULFILL', context);
           (function(request, callbacks) {
-            var xhr;
-            this.request = request;
-            this.callbacks = callbacks;
-            this.fatcatmap = window.fatcatmap;
-            return xhr = $.ajax({
-              url: this.request.action,
-              data: JSON.stringify(this.request.payload()),
-              async: this.request.ajax.async,
-              cache: this.request.ajax.cache,
-              global: this.request.ajax.global,
-              type: this.request.ajax.http_method,
-              crossDomain: this.request.ajax.crossDomain,
-              dataType: this.request.ajax.dataType,
+            var amplify, fatcatmap, xhr, xhr_action, xhr_settings;
+            fatcatmap = window.fatcatmap;
+            xhr_settings = {
+              resourceId: request.api + '.' + request.method,
+              url: request.action,
+              data: JSON.stringify(request.payload()),
+              async: request.ajax.async,
+              global: request.ajax.global,
+              type: request.ajax.http_method,
+              crossDomain: request.ajax.crossDomain,
+              dataType: request.ajax.dataType,
               processData: false,
-              ifModified: this.request.ajax.ifModified,
-              contentType: 'application/json',
+              ifModified: request.ajax.ifModified,
+              contentType: request.ajax.contentType,
               beforeSend: __bind(function(xhr, settings) {
-                this.fatcatmap.rpc.api.history[this.request.envelope.id].xhr = xhr;
+                fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr;
                 return xhr;
               }, this),
               error: __bind(function(xhr, status, error) {
-                var _ref;
-                console.log('[RPC] Error: ', data, status, xhr);
-                this.fatcatmap.rpc.api.lastFailure = error;
-                this.fatcatmap.rpc.api.history[this.request.envelope.id].xhr = xhr;
-                this.fatcatmap.rpc.api.history[this.request.envelope.id].status = status;
-                this.fatcatmap.rpc.api.history[this.request.envelope.id].failure = error;
+                fatcatmap.dev.error('RPC', 'Error: ', {
+                  data: data,
+                  status: status,
+                  xhr: xhr
+                });
+                fatcatmap.rpc.api.lastFailure = error;
+                fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr;
+                fatcatmap.rpc.api.history[request.envelope.id].status = status;
+                fatcatmap.rpc.api.history[request.envelope.id].failure = error;
                 context = {
                   xhr: xhr,
                   status: status,
                   error: error
                 };
-                fcm.state.events.triggerEvent('RPC_ERROR', context);
-                return (_ref = this.callbacks) != null ? _ref.failure(data) : void 0;
+                fatcatmap.state.events.triggerEvent('RPC_ERROR', context);
+                return callbacks != null ? callbacks.failure(data) : void 0;
               }, this),
               success: __bind(function(data, status, xhr) {
-                var _ref;
-                console.log('[RPC] Success: ', data, status, xhr);
-                this.fatcatmap.rpc.api.lastResponse = data;
-                this.fatcatmap.rpc.api.history[this.request.envelope.id].xhr = xhr;
-                this.fatcatmap.rpc.api.history[this.request.envelope.id].status = status;
-                this.fatcatmap.rpc.api.history[this.request.envelope.id].response = data;
+                fatcatmap.dev.log('RPC', 'Success', data, status, xhr);
+                fatcatmap.rpc.api.lastResponse = data;
+                fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr;
+                fatcatmap.rpc.api.history[request.envelope.id].status = status;
+                fatcatmap.rpc.api.history[request.envelope.id].response = data;
                 context = {
                   xhr: xhr,
                   status: status,
                   data: data
                 };
                 fcm.state.events.triggerEvent('RPC_SUCCESS', context);
-                return (_ref = this.callbacks) != null ? _ref.success(data) : void 0;
+                fatcatmap.dev.verbose('RPC', 'Success callback', callbacks);
+                return callbacks != null ? callbacks.success(data) : void 0;
               }, this),
               complete: __bind(function(xhr, status) {
-                var _ref;
-                this.fatcatmap.rpc.api.history[this.request.envelope.id].xhr = xhr;
-                this.fatcatmap.rpc.api.history[this.request.envelope.id].status = status;
+                fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr;
+                fatcatmap.rpc.api.history[request.envelope.id].status = status;
                 context = {
                   xhr: xhr,
                   status: status
                 };
-                fcm.state.events.triggerEvent('RPC_COMPLETE', context);
-                return (_ref = this.callbacks) != null ? _ref.complete(xhr, status) : void 0;
+                fatcatmap.state.events.triggerEvent('RPC_COMPLETE', context);
+                return callbacks != null ? callbacks.complete(xhr, status) : void 0;
               }, this),
               statusCode: {
                 404: function() {
-                  console.log('[RPC]: 404');
+                  fatcatmap.dev.error('RPC', 'HTTP/404', 'Could not resolve RPC action URI.');
                   return alert('RPC 404: Could not resolve RPC action URI.');
                 },
                 403: function() {
-                  console.log('[RPC]: 403');
+                  fatcatmap.dev.error('RPC', 'HTTP/403', 'Not authorized to access the specified endpoint.');
                   return alert('RPC 403: Not authorized to access the specified endpoint.');
                 },
                 500: function() {
-                  console.log('[RPC]: 500');
+                  fatcatmap.dev.error('RPC', 'HTTP/500', 'Internal server error.');
                   return alert('RPC 500: Woops! Something went wrong. Please try again.');
                 }
               }
-            });
+            };
+            amplify = fatcatmap.sys.drivers.resolve('transport', 'amplify');
+            if (amplify != null) {
+              fatcatmap.dev.verbose('RPC', 'Fulfilling with AmplifyJS adapter.');
+              xhr_action = amplify.request;
+              xhr = xhr_action(xhr_settings);
+            } else {
+              fatcatmap.dev.verbose('RPC', 'Fulfilling with AJAX adapter.');
+              xhr = $.ajax(xhr_settings);
+            }
+            return fatcatmap.dev.verbose('RPC', 'Resulting XHR: ', xhr);
           })(request, callbacks);
           return {
             id: request.envelope.id,
@@ -1192,6 +1285,34 @@
       fcm.state.events.triggerEvent('RPC_READY');
     }
     __extends(CoreRPCAPI, CoreAPI);
+    CoreRPCAPI.prototype.registerAPIMethod = function(api, name, base_uri, config) {
+      var amplify, base_settings, fcm, resourceId;
+      if (typeof $ !== "undefined" && $ !== null) {
+        fcm = $.fatcatmap;
+      } else {
+        fcm = window.fatcatmap;
+      }
+      amplify = fcm.sys.drivers.resolve('transport', 'amplify');
+      if (amplify !== false) {
+        fcm.dev.log('RPCAPI', 'Registering request procedure "' + api + '.' + name + '" with AmplifyJS.');
+        resourceId = api + '.' + name;
+        base_settings = {
+          type: 'POST',
+          dataType: 'json',
+          contentType: 'application/json',
+          url: this.api._assembleRPCURL(name, api, null, base_uri),
+          decoder: this.api.decodeRPCResponse
+        };
+        if (config.caching != null) {
+          if (config.caching === true) {
+            base_settings.caching = 'persist';
+          }
+          return amplify.request.define(resourceId, "ajax", base_settings);
+        } else {
+          return amplify.request.define(resourceId, "ajax", base_settings);
+        }
+      }
+    };
     return CoreRPCAPI;
   })();
   window.RPCAPI = RPCAPI;
@@ -1287,5 +1408,10 @@
     return FatCatMap;
   })();
   window.fatcatmap = new FatCatMap();
+  if (typeof $ !== "undefined" && $ !== null) {
+    $.extend({
+      fatcatmap: window.fatcatmap
+    });
+  }
   window.fatcatmap.state.events.triggerEvent('CORE_READY');
 }).call(this);

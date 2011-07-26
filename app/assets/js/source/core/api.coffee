@@ -12,7 +12,7 @@ class CoreAPIBridge extends CoreAPI
 				_driver: null
 
 				_resolveDriver: =>
-					@_driver = @fcm.sys.drivers.resolve('storage', 'local')
+					@_driver = @fcm.sys.drivers.resolve('localstorage')
 
 				getValue: (key) =>
 					if @_driver isnt null
@@ -38,7 +38,7 @@ class CoreAPIBridge extends CoreAPI
 				_driver: null
 
 				_resolveDriver: ->
-					@_driver = @fcm.sys.drivers.resolve('storage', 'session')
+					@_driver = @fcm.sys.drivers.resolve('sessionstorage')
 
 				getValue: (key) ->
 					if @_driver isnt null
@@ -64,7 +64,7 @@ class CoreAPIBridge extends CoreAPI
 				_driver: null
 
 				_resolveDriver: ->
-					@_driver = @fcm.sys.drivers.resolve('storage', 'object')
+					@_driver = @fcm.sys.drivers.resolve('objectstorage')
 
 				getValue: (key) ->
 					if @_driver isnt null
@@ -90,7 +90,7 @@ class CoreAPIBridge extends CoreAPI
 				_driver: null
 
 				_resolveDriver: ->
-					@_driver = @fcm.sys.drivers.resolve('storage', 'sql')
+					@_driver = @fcm.sys.drivers.resolve('sqlstorage')
 
 				getValue: (key) ->
 					if @_driver isnt null

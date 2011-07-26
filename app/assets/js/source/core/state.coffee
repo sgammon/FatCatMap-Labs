@@ -1,7 +1,7 @@
 ## CoffeeScript - FCM State Management Framework
 class CoreStateAPI extends CoreAPI
 	
-	constructor: (@fcm) ->
+	constructor: (fcm) ->
 		
 		@events =
 			
@@ -13,34 +13,38 @@ class CoreStateAPI extends CoreAPI
 				@events.registry.push(name)
 				@events.callchain[name] = []
 				
-				if @fcm.dev.debug.eventlog is true
-					@fcm.dev.verbose('EventLog', "Event Registered: "+name)
+				if fcm.dev.debug.eventlog is true
+					fcm.dev.verbose('EventLog', "Event Registered: "+name)
 				
 				return @
 				
-			registerHook: (_event, fn, once) ->
+			registerHook: (_event, fn, once) =>
+								
 				if typeof once is null
 					once = false
-				try
-					calltask =
-						executed: false
-						callback: (context) ->
-							return fn(context)
-						runonce: one
-					@callchain[_event].push(calltask)
+				calltask =
+					executed: false
+					callback: (context) ->
+						return fn(context)
+					runonce: once
+				@events.callchain[_event].push(calltask)
+				if fcm.dev.debug.eventlog is true and fcm.dev.debug.verbose is true
+					console.log("[EventLog] Hook Registered: ", fn, "on event", _event)			
 					
 			triggerEvent: (_event, context) =>
 				
-				if @fcm.dev.debug.eventlog is true
+				if fcm.dev.debug.eventlog is true
 					console.log("[EventLog] Event Triggered: "+_event, context || '{no context}')
 									
 				if typeof @events.callchain[_event] isnt null
 					if @events.callchain[_event].length > 0
-						for calltask in @events.callchain[_event]
+						for calltask of @events.callchain[_event]
 							if @events.callchain[_event][calltask].executed is true and @events.callchain[_event][calltask].runonce is true
 								continue
 							else
 								try
+									if fcm.dev.debug.eventlog is true and fcm.dev.debug.verbose is true
+										console.log("[EventLog] Callchain: ", calltask, @events.callchain[_event])
 									result = @events.callchain[_event][calltask].callback(context)
 									result_calltask =
 										event: _event
@@ -103,7 +107,7 @@ class CoreStateAPI extends CoreAPI
 				context =
 					id: id
 					element: element
-				@fcm.state.events.triggerEvent('REGISTER_ELEMENT', context)
+				fcm.state.events.triggerEvent('REGISTER_ELEMENT', context)
 
 				return @events.registry[id]
 				

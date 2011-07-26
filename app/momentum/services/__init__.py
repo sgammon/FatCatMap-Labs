@@ -13,6 +13,12 @@ from werkzeug import cached_property
 
 from webapp2_extras import protorpc as proto
 
+from ProvidenceClarity.struct.util import DictProxy
+
+from momentum.services.flags import audit
+from momentum.services.flags import caching
+from momentum.services.flags import security
+
 global_debug = config.debug
 _middleware_cache = {}
 

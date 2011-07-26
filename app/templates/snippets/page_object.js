@@ -5,8 +5,8 @@
 fatcatmap = window.fatcatmap;
 
 {% if services %}
-	{% for service, action, config in services %}	
-		fatcatmap.rpc.api.factory('{{ service }}', '{{ action }}', [{% for method in config.methods %}'{{ method }}',{% endfor %}]);
+	{% for service, action, config, opts in services %}	
+		fatcatmap.rpc.api.factory('{{ service }}', '{{ action }}', [{% for method in config.methods %}'{{ method }}',{% endfor %}], {% autoescape false %}{{ util.converters.json.dumps(opts) }}{% endautoescape %});
 	{% endfor %}
 	
 		fatcatmap.state.events.triggerEvent('API_READY');

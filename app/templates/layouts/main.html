@@ -5,13 +5,13 @@
 {% block content %}
 
 {% if not page.standalone %}
-	<div id='contentHeader' class='{% block content_header_class %}content_header{% endblock %} hidden'>
+	<div id='contentHeader' class='{% block content_headerheader_class %}content_header{% endblock %} hidden'>
 		{% block content_header %}
 			<div class='extendedNav'>
 
 				<div id='browsePane' class='navpane hidden' data-navref='browse'>
 
-					<div class='floatleft fullheight tenthwidth'>		
+					<div class='floatleft fullheight tenthwidth'>
 						<a href="{{ link('browse:landing') }}" title='browse raw data, in context and with easy connections to related information'><img src='/assets/img/static/layout/headers/browse.png' alt='fatcatmap: browse' width='124' height='90' /></a>
 					</div>
 				
@@ -157,7 +157,7 @@
 						<b>BUILD:</b> {{ util.config.fcm.version.major }}.{{ util.config.fcm.version.minor }}.{{ util.config.fcm.version.minor }}.{{ util.config.fcm.version.micro }}-{{ util.config.fcm.version.release }}<br /><b>APP:<b> {{ util.env.get('CURRENT_VERSION_ID') }} // <b>NAMESPACE:</b> {% if api.multitenancy.get_namespace() == '' %}None{% else %}{{ api.multitenancy.get_namespace() }}{% endif %}
 						<br />
 						<b>DATACENTER:</b> {{ util.env.get('DATACENTER') }} // <b>R(hash):</b> {{ util.env.get('REQUEST_ID_HASH') }} // <b>S(hash):</b> None<br />
-						<b>LAYER:</b> {% if api.backends.get_backend() == none %}Frontend{% else %}Backend{% endif %} // <b>BACKEND:</b> {{ api.backends.get_backend() }} // <b>INSTANCE:</b> {{ api.backends.get_instance() }}
+						<b>LAYER:</b> {% if api.backends.get_backend() == none %}Frontend{% else %}Backend{% endif %} // <b>BACKEND:</b> {{ api.backends.get_backend() }} // <b>INSTANCE:</b> {{ util.env.get('INSTANCE_ID', '0') }}
 						
 						<br />
 						<br />

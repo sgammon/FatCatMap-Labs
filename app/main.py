@@ -2,17 +2,23 @@
 """WSGI app setup."""
 import os
 import sys
+
+import bootstrap
+bootstrap.MomentumBootstrapper.prepareImports()
+
 import ndb
 import config
 import logging
-import bootstrap
-
-bootstrap.MomentumBootstrapper.prepareImports()
 
 from tipfy import Tipfy
 from urls import get_rules
 
 from google.appengine.dist import use_library
+
+rules = get_rules()
+
+if not config.debug:
+	use_library('django', '1.2')
 	
 
 def enable_appstats(app):
@@ -46,7 +52,7 @@ def enable_jinja2_debugging():
 def run(app):
 
 	""" Default run case - no profiler. """
-
+	
 	app.run()
 
 
@@ -55,52 +61,58 @@ def main():
 	""" INCEPTION! :) """
 
 	global run
-
-	## Select Django 1.2 (avoids deprecation warning)
-	if not config.debug:
-		use_library('django', '1.2')
-
+	global rules
+	
+	if config.debug:
+		rules = get_rules()
+	
 	## Grab debug and system config
 	debug = config.debug
 	ndb.debug = debug
 	sys_config = config.config.get('momentum.system')
 	
 	## Create the app, get it ready for middleware
-	app = Tipfy(rules=get_rules(), config=config.config, debug=debug)
+	app = Tipfy(rules=rules, config=config.config, debug=debug)
 
 	## By default, just run the app
 	action = run
 
-	## If we're in debug mode, automatically activate some stuff
-	if debug:
-		logging.info('CORE: Jinja2 debugging enabled.')
-		enable_jinja2_debugging()
+	try:
+		## If we're in debug mode, automatically activate some stuff
+		if debug:
+			logging.info('CORE: Jinja2 debugging enabled.')
+			enable_jinja2_debugging()
 
-	## Consider system hooks
-	if sys_config.get('hooks', False) != False:
+		## Consider system hooks
+		if sys_config.get('hooks', False) != False:
 		
-		## First up - appstats (RPC tracking)
-		if sys_config['hooks'].get('appstats', False) != False:
-			if sys_config['hooks']['appstats']['enabled'] == True:
-				logging.info('CORE: AppStats enabled.')		
-				app = enable_appstats(app)
+			## First up - appstats (RPC tracking)
+			if sys_config['hooks'].get('appstats', False) != False:
+				if sys_config['hooks']['appstats']['enabled'] == True:
+					logging.info('CORE: AppStats enabled.')		
+					app = enable_appstats(app)
 				
-		## Next up - apptrace (Memory footprint tracking)
-		if sys_config['hooks'].get('apptrace', False) != False:
-			if sys_config['hooks']['apptrace']['enabled'] == True:
-				logging.info('CORE: AppTrace enabled.')
-				app = enable_apptrace(app)
+			## Next up - apptrace (Memory footprint tracking)
+			if sys_config['hooks'].get('apptrace', False) != False:
+				if sys_config['hooks']['apptrace']['enabled'] == True:
+					logging.info('CORE: AppTrace enabled.')
+					app = enable_apptrace(app)
 
-		## Execution tree + CPU time tracking
-		if sys_config['hooks']['profiler']['enabled'] == True:
-			import cProfile
-			def profile_run(app):
-				logging.info('CORE: Profiling enabled.')
-				enable_jinja2_debugging()
-				cProfile.runctx("run()", globals(), locals(), filename="FatCatMap.profile")
-			action = profile_run ## Set our action to the profiler
-
-	action(app)
+			## Execution tree + CPU time tracking
+			if sys_config['hooks']['profiler']['enabled'] == True:
+				import cProfile
+				def profile_run(app):
+					logging.info('CORE: Profiling enabled.')
+					enable_jinja2_debugging()
+					cProfile.runctx("run()", globals(), locals(), filename="FatCatMap.profile")
+				action = profile_run ## Set our action to the profiler
+	except Exception, e:
+		logging.critical('CORE: CRITICAL FAILURE: Unhandled exception in main: "'+str(e)+'".')
+		if config.debug:
+			raise
+	
+	else:
+		action(app)
 
 
 if __name__ == '__main__':

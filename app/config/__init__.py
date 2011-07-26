@@ -106,7 +106,7 @@ def systemLog(message, _type='debug'):
 	if _config['momentum.system']['debug'] is True or _type in ('error', 'critical'):
 		if _type == 'debug' or debug is True:
 			logging.debug(prefix+message)
-		elif _type == 'info' or debug is True:
+		elif _type == 'info':
 			logging.info(prefix+message)
 		elif _type == 'error':
 			logging.error(prefix+message)

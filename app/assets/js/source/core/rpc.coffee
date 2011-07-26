@@ -5,28 +5,36 @@ class RPCAPI
 
 		if @methods.length > 0
 			for method in @methods
-				@[method] = @_buildRPCMethod(method)
+				@[method] = @_buildRPCMethod(method, base_uri, config)
 				
 				
-	_buildRPCMethod: (method) ->
+	_buildRPCMethod: (method, base_uri, config) ->
 		api = @name
 		rpcMethod = (params={}, callbacks=null, async=false, opts={}) =>
-			do (params={}, callbacks={}, async=false, opts={}) =>
-				request = window.fatcatmap.rpc.api.createRPCRequest({
+			do (params={}, callbacks=null, async=false, opts={}) =>
+				if $?
+					fcm = $.fatcatmap
+				else
+					fcm = window.fatcatmap
+				request = fcm.rpc.api.createRPCRequest({
 			
 					method: method
 					api: api
 					params: params || {}
 					opts: opts || {}
 					async: async || false
-			
+					
 				})
 				
-				if callbacks?
+				if callbacks isnt null
 					return request.fulfill(callbacks)
 				else
 					return request
 		
+		if $?
+			$.fatcatmap.rpc.registerAPIMethod(api, method, base_uri, config)
+		else
+			window.fatcatmap.rpc.registerAPIMethod(api, method, base_uri, config)
 		return rpcMethod
 
 
@@ -66,6 +74,7 @@ class RPCRequest
 			crossDomain: false
 			ifModified: false
 			dataType: 'json'
+			contentType: 'application/json'
 
 		if id?
 			@envelope.id = id
@@ -128,8 +137,14 @@ class CoreRPCAPI extends CoreAPI
 		fcm.state.events.registerEvent('RPC_SUCCESS')
 		fcm.state.events.registerEvent('RPC_ERROR')
 		fcm.state.events.registerEvent('RPC_COMPLETE')
+		
+		## Use amplify, if we can
+		if window.amplify?
+			fcm.dev.verbose('RPC', 'AmplifyJS detected. Registering.')
+			fcm.sys.drivers.register('transport', 'amplify', window.amplify, true, true)
 
 		@base_rpc_uri = '/_api/rpc'
+		
 		@api =
 			
 			lastRequest: null
@@ -162,6 +177,9 @@ class CoreRPCAPI extends CoreAPI
 				else
 					@used_ids.push(1)
 					return 1
+											
+			decodeRPCResponse: (data, status, xhr, success, error) ->
+				success(data, status)
 					
 			createRPCRequest: (config) ->
 
@@ -188,15 +206,22 @@ class CoreRPCAPI extends CoreAPI
 				if config.async?
 					request.setAsync(config.async)
 				
-				console.log('[RPC] Request: ', request, config)
+				if $?
+					$.fatcatmap.dev.log('RPC', 'New Request', request, config)
+				else
+					window.fatcatmap.dev.log('RPC', 'New Request', request, config)
+				
 				request.setAction(@_assembleRPCURL(request.method, request.api, @action_prefix, @base_rpc_uri))
 						
 				return request
 				
 			fulfillRPCRequest: (config, request, callbacks) ->
 
-				console.log('[RPC] Fulfill: ', config, request, callbacks)
-				
+				if $?
+					$.fatcatmap.dev.log('RPC', 'Fulfill', config, request, callbacks)
+				else
+					window.fatcatmap.dev.log('RPC', 'Fulfill', config, request, callbacks)
+
 				@lastRequest = request
 
 				@history[request.envelope.id] =
@@ -225,49 +250,45 @@ class CoreRPCAPI extends CoreAPI
 				fcm.state.events.triggerEvent('RPC_FULFILL', context)
 				
 				do (request, callbacks) ->
-					@request = request
-					@callbacks = callbacks
-					@fatcatmap = window.fatcatmap
+					fatcatmap = window.fatcatmap
 					
-					xhr = $.ajax({
-			
-						url: @request.action
-						data: JSON.stringify @request.payload()
-						async: @request.ajax.async
-						cache: @request.ajax.cache
-						global: @request.ajax.global
-						type: @request.ajax.http_method
-						crossDomain: @request.ajax.crossDomain
-						dataType: @request.ajax.dataType
+					xhr_settings =
+						resourceId: request.api+'.'+request.method
+						url: request.action
+						data: JSON.stringify request.payload()
+						async: request.ajax.async
+						global: request.ajax.global
+						type: request.ajax.http_method
+						crossDomain: request.ajax.crossDomain
+						dataType: request.ajax.dataType
 						processData: false
-						ifModified: @request.ajax.ifModified
-						contentType: 'application/json'
-				
+						ifModified: request.ajax.ifModified
+						contentType: request.ajax.contentType
+			
 						beforeSend: (xhr, settings) =>
-							@fatcatmap.rpc.api.history[@request.envelope.id].xhr = xhr;
+							fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr;
 							return xhr
-					
+				
 						error: (xhr, status, error) =>
-							console.log('[RPC] Error: ', data, status, xhr)
-							@fatcatmap.rpc.api.lastFailure = error
-							@fatcatmap.rpc.api.history[@request.envelope.id].xhr = xhr
-							@fatcatmap.rpc.api.history[@request.envelope.id].status = status
-							@fatcatmap.rpc.api.history[@request.envelope.id].failure = error
-							
+							fatcatmap.dev.error('RPC', 'Error: ', {data: data, status: status, xhr: xhr})
+							fatcatmap.rpc.api.lastFailure = error
+							fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr
+							fatcatmap.rpc.api.history[request.envelope.id].status = status
+							fatcatmap.rpc.api.history[request.envelope.id].failure = error
+						
 							context =
 								xhr: xhr
 								status: status
 								error: error
-							fcm.state.events.triggerEvent('RPC_ERROR', context)
-														
-							@callbacks?.failure(data)
-					
+							fatcatmap.state.events.triggerEvent('RPC_ERROR', context)
+							callbacks?.failure(data)
+				
 						success: (data, status, xhr) =>
-							console.log('[RPC] Success: ', data, status, xhr)
-							@fatcatmap.rpc.api.lastResponse = data
-							@fatcatmap.rpc.api.history[@request.envelope.id].xhr = xhr
-							@fatcatmap.rpc.api.history[@request.envelope.id].status = status
-							@fatcatmap.rpc.api.history[@request.envelope.id].response = data
+							fatcatmap.dev.log('RPC', 'Success', data, status, xhr)
+							fatcatmap.rpc.api.lastResponse = data
+							fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr
+							fatcatmap.rpc.api.history[request.envelope.id].status = status
+							fatcatmap.rpc.api.history[request.envelope.id].response = data
 
 							context =
 								xhr: xhr
@@ -275,35 +296,45 @@ class CoreRPCAPI extends CoreAPI
 								data: data
 							fcm.state.events.triggerEvent('RPC_SUCCESS', context)
 
-							@callbacks?.success(data)
-					
+							fatcatmap.dev.verbose('RPC', 'Success callback', callbacks)
+							callbacks?.success(data)
+				
 						complete: (xhr, status) =>
-							@fatcatmap.rpc.api.history[@request.envelope.id].xhr = xhr
-							@fatcatmap.rpc.api.history[@request.envelope.id].status = status
-							
+							fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr
+							fatcatmap.rpc.api.history[request.envelope.id].status = status
+						
 							context =
 								xhr: xhr
 								status: status
-							fcm.state.events.triggerEvent('RPC_COMPLETE', context)
-							@callbacks?.complete(xhr, status)
-							
-					
-						statusCode:
-					
-							404: ->
-								console.log('[RPC]: 404')
-								alert 'RPC 404: Could not resolve RPC action URI.'
+							fatcatmap.state.events.triggerEvent('RPC_COMPLETE', context)
+							callbacks?.complete(xhr, status)
 						
-							403: ->
-								console.log('[RPC]: 403')
-								alert 'RPC 403: Not authorized to access the specified endpoint.'
-						
-							500: ->
-								console.log('[RPC]: 500')							
-								alert 'RPC 500: Woops! Something went wrong. Please try again.'
-			
-					})
 				
+						statusCode:
+				
+							404: ->
+								fatcatmap.dev.error('RPC', 'HTTP/404', 'Could not resolve RPC action URI.')
+								alert 'RPC 404: Could not resolve RPC action URI.'
+					
+							403: ->
+								fatcatmap.dev.error('RPC', 'HTTP/403', 'Not authorized to access the specified endpoint.')
+								alert 'RPC 403: Not authorized to access the specified endpoint.'
+					
+							500: ->
+								fatcatmap.dev.error('RPC', 'HTTP/500', 'Internal server error.')
+								alert 'RPC 500: Woops! Something went wrong. Please try again.'
+				
+					amplify = fatcatmap.sys.drivers.resolve('transport', 'amplify')
+					if amplify?
+						fatcatmap.dev.verbose('RPC', 'Fulfilling with AmplifyJS adapter.')
+						xhr_action = amplify.request
+						xhr = xhr_action(xhr_settings)
+					else
+						fatcatmap.dev.verbose('RPC', 'Fulfilling with AJAX adapter.')
+						xhr = $.ajax(xhr_settings)
+						
+					fatcatmap.dev.verbose('RPC', 'Resulting XHR: ', xhr)
+					
 				return {id: request.envelope.id, request: request}
 						
 
@@ -319,6 +350,31 @@ class CoreRPCAPI extends CoreAPI
 		@ext = null
 		
 		fcm.state.events.triggerEvent('RPC_READY')
+		
+	registerAPIMethod: (api, name, base_uri, config) ->
+		if $?
+			fcm = $.fatcatmap
+		else
+			fcm = window.fatcatmap
+		amplify = fcm.sys.drivers.resolve('transport', 'amplify')
+		if amplify isnt false
+			fcm.dev.log('RPCAPI', 'Registering request procedure "'+api+'.'+name+'" with AmplifyJS.')
+
+			resourceId = api+'.'+name
+			base_settings =
+				type: 'POST'
+				dataType: 'json'
+				contentType: 'application/json'
+				url: @api._assembleRPCURL(name, api, null, base_uri)
+				decoder: @api.decodeRPCResponse
+
+			if config.caching?
+				if config.caching == true
+					base_settings.caching = 'persist'
+				amplify.request.define(resourceId, "ajax", base_settings)
+			else
+				amplify.request.define(resourceId, "ajax", base_settings)
+
 		
 		
 window.RPCAPI = RPCAPI

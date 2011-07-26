@@ -31,9 +31,9 @@
 		
 	</div>
 	
-	<!-- The newsmap -->
+	<!-- The newsmap! :) -->
 	<div id='newsmap' class='alignmiddle textcenter'>
-		
+	
 		<div class='newsbox worldNews nbHalf'>
 			<h3>News headline 1 here</h3>
 			<p>{{ lipsum(util.random.randrange(1, 2)) }} <a href='#'>Read more...</a></p>
@@ -68,42 +68,42 @@
 			<h3>News headline 7 here</h3>
 			<p>{{ lipsum(util.random.randrange(1, 2)) }} <a href='#'>Read more...</a></p>
 		</div>
-		
+	
 		<div class='newsbox worldNews nbHalf'>
 			<h3>News headline 8 here</h3>
 			<p>{{ lipsum(util.random.randrange(1, 2)) }} <a href='#'>Read more...</a></p>
 		</div>
-		
+	
 		<div class='newsbox sportsNews nbHalf'>
 			<h3>News headline 9 here</h3>
 			<p>{{ lipsum(util.random.randrange(1, 2)) }} <a href='#'>Read more...</a></p>
 		</div>
-		
+	
 		<div class='newsbox nationalNews nbFull'>
 			<h3>News headline 10 here</h3>
 			<p>{{ lipsum(util.random.randrange(1, 2)) }} <a href='#'>Read more...</a></p>
 		</div>
-		
+	
 		<div class='newsbox nationalNews nbHalf'>
 			<h3>News headline 11 here</h3>
 			<p>{{ lipsum(util.random.randrange(1, 2)) }} <a href='#'>Read more...</a></p>
 		</div>
-		
+	
 		<div class='newsbox nationalNews nbHalf'>
 			<h3>News headline 12 here</h3>
 			<p>{{ lipsum(util.random.randrange(1, 2)) }} <a href='#'>Read more...</a></p>
 		</div>
-		
+	
 		<div class='newsbox worldNews nbHalf'>
 			<h3>News headline 13 here</h3>
 			<p>{{ lipsum(util.random.randrange(1, 2)) }} <a href='#'>Read more...</a></p>
 		</div>
-		
+	
 		<div class='newsbox sportsNews nbFull'>
 			<h3>News headline 14 here</h3>
 			<p>{{ lipsum(util.random.randrange(1, 2)) }} <a href='#'>Read more...</a></p>
 		</div>
-		
+	
 	</div>
 	
 	<!-- Treemap -->
@@ -127,9 +127,10 @@
 		$('#newsmap').masonry({
 		
 			itemSelector: '.newsbox',
-			columnWidth: 240,
 			isFitWidth: true,
 			isResizable: true,
+			isAnimated: true,
+			animationOptions: { queue: false, duration: 500 }
 			
 		});
 		

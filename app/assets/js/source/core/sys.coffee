@@ -1,6 +1,6 @@
 class CoreSysAPI extends CoreAPI
 	
-	constructor: (@fcm) ->
+	constructor: (fcm) ->
 		
 		@version =
 			minor: null
@@ -12,30 +12,79 @@ class CoreSysAPI extends CoreAPI
 		@drivers =
 		
 			registry: {}
-		
-			register: (module, name, fn, initialized, callback) ->
-				if typeof @registry[module] is null
-					@registry[module] = {}
-				@registry[module][name] = 
+			
+			register: (module, name, hook, preference, initialized, callback) =>
+				if not @drivers.registry[module]?
+					@drivers.registry[module] = {}
+				@drivers.registry[module][name] = 
 					initialized: initialized
+					preference: preference
 					registered: true
-					hook_point: fn
+					hook_point: hook
 					init_callback: callback
 				
 				## Trigger DRIVER_REGISTERED
 				context =
 					module: module
 					name: name
-					hook: fn
-				
-				@fcm.state.events.triggerEvent('DRIVER_REGISTERED', context)
+					hook: hook
+
+				fcm.state.events.triggerEvent('DRIVER_REGISTERED', context)
 				return
 		
 			resolve: (module, name) ->
-				if typeof @registry[module] is null
+				
+				## Check module existence
+				if not @registry[module]?
 					return false
 				else
-					if typeof @registry[module][name] is null
-						return false
+					
+					## If we have the name of the driver we want to load...
+					if name?
+						
+						## If there's no such driver...
+						if not @registry[module][name]?
+							return false
+						
+						## Load if so
+						else
+							return @registry[module][name].hook_point
 					else
-						return @registry[module][name].hook_point
+						
+						_default = null					
+						selection = null						
+						preference = 0
+						for option_name of @registry[module]
+							option = @registry[module][option_name]
+							
+							## If no preference is defined, it's set as the new default. Thus, load drivers in the order of preference you *want*, and it'll climb the ladder.
+							if option.preference?
+								if typeof(option.preference) == 'function'
+									if $?
+										cp = option.preference($.fatcatmap)
+									else
+										cp = option.preference(window.fatcatmap)
+								else
+									cp = option.preference
+									
+								
+								if cp isnt null and typeof(cp) isnt 'boolean'
+									if cp > preference
+										selection = option
+								else
+									if cp is false
+										continue
+									else if cp is true
+										selection = option
+									else 
+										continue
+							else
+								_default = option
+
+						if selection isnt null
+							return selection.hook_point
+						else
+							if _default isnt null
+								return _default.hook_point
+							else
+								return null

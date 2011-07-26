@@ -10,6 +10,8 @@ config = {}
 # Installed Assets
 config['momentum.fatcatmap.assets'] = {
 
+	'debug': False, ## Output log messages about what's going on.
+	'verbose': False, ## Raise debug-level messages to 'info'.
 
 	# JavaScript Libraries & Includes
 	'js': {
@@ -161,14 +163,14 @@ config['momentum.fatcatmap.assets'] = {
 			},
 		
 			'assets': {
-				'core': {'path': 'd3.js'}, # D3 Core Library
-				'behavior': {'path': 'd3.behavior.js'}, # D3 Behaviors
-				'chart': {'path': 'd3.chart.js'}, # D3 Charting
-				'csv': {'path': 'd3.csv.js'}, # D3 CSV Parsing
-				'geo': {'path': 'd3.geo.js'}, # D3 Geo-related functions
-				'geom': {'path': 'd3.geom.js'}, # D3 Geo-map related functions
-				'layout': {'path': 'd3.layout.js'}, # D3 Layout
-				'time': {'path': 'd3.time.js'} # D3 Time/Date based functions
+				'core': {'name': 'd3', 'min': True}, # D3 Core Library
+				'behavior': {'name': 'd3.behavior', 'min': True}, # D3 Behaviors
+				'chart': {'name': 'd3.chart', 'min': True}, # D3 Charting
+				'csv': {'name': 'd3.csv', 'min': True}, # D3 CSV Parsing
+				'geo': {'name': 'd3.geo', 'min': True}, # D3 Geo-related functions
+				'geom': {'name': 'd3.geom', 'min': True}, # D3 Geo-map related functions
+				'layout': {'name': 'd3.layout', 'min': True}, # D3 Layout
+				'time': {'name': 'd3.time', 'min': True} # D3 Time/Date based functions
 			}
 		
 		},
@@ -230,7 +232,7 @@ config['momentum.fatcatmap.assets'] = {
 		},
 		
 		# Static FCM Stylesheets
-		('core', 'core'): {
+		('core', 'fcm'): {
 			
 			'config': {
 				'min': False,

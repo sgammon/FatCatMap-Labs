@@ -11,8 +11,8 @@ config['momentum.fatcatmap'] = {
 
 	'version': {
 		'major': 1,
-		'minor': 2,
-		'micro': 20110705,
+		'minor': 3,
+		'micro': 20110724,
 		'release': 'ALPHA'
 	}
 
@@ -78,7 +78,7 @@ config['momentum.fatcatmap.cache'] = {
 config['momentum.fatcatmap.output.template_loader'] = {
 
 	'force': True, ## Force enable template loader even on Dev server
-	'debug': False,  ## Enable dev logging
+	'debug': True,  ## Enable dev logging
 	'use_memory_cache': False, ## Use handler in-memory cache for template source
 	'use_memcache': False, ## Use Memcache API for template source
 

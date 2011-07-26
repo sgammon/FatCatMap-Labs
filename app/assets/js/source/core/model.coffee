@@ -12,15 +12,15 @@ class RemoteModel extends Backbone.Model
 	
 class CoreModelAPI extends CoreAPI
 	
-	constructor: (@fcm) ->
+	constructor: (fcm) ->
 		
 		## Bind events
-		@fcm.state.events.registerEvent('MODEL_DEFINE')
-		@fcm.state.events.registerEvent('MODEL_SYNC')
-		@fcm.state.events.registerEvent('ENTITY_CREATE')
-		@fcm.state.events.registerEvent('ENTITY_PUT')
-		@fcm.state.events.registerEvent('ENTITY_GET')
-		@fcm.state.events.registerEvent('ENTITY_DELETE')
+		fcm.state.events.registerEvent('MODEL_DEFINE')
+		fcm.state.events.registerEvent('MODEL_SYNC')
+		fcm.state.events.registerEvent('ENTITY_CREATE')
+		fcm.state.events.registerEvent('ENTITY_PUT')
+		fcm.state.events.registerEvent('ENTITY_GET')
+		fcm.state.events.registerEvent('ENTITY_DELETE')
 		
 		@local =
 			schema: {}
@@ -31,25 +31,30 @@ class CoreModelAPI extends CoreAPI
 	
 	sync: (method, model, options) ->
 		
+		if $?
+			fcm = $.fatcatmap
+		else
+			fcm = window.fatcatmap
+		
 		switch method
 			
 			when "create"
-				@fcm.state.events.triggerEvent('ENTITY_CREATE', {model: model, options: options})
+				fcm.state.events.triggerEvent('ENTITY_CREATE', {model: model, options: options})
 				[success_callback, failure_callback, config...] = options
 				return @fcm.rpc.api.data.create({object: model.toJSON()}).fulfill({success: success_callback, failure: failure_callback}, config)
 				
 			when "read"
-				@fcm.state.events.triggerEvent('ENTITY_GET', {model: model, options: options})
+				fcm.state.events.triggerEvent('ENTITY_GET', {model: model, options: options})
 				[success_callback, failure_callback, config...] = options
 				return @fcm.rpc.api.data.get({key: model.id}).fulfill({success: success_callback, failure: failure_callback}, config)
 				
 			when "update"
-				@fcm.state.events.triggerEvent('ENTITY_PUT', {model:model, options:options})
+				fcm.state.events.triggerEvent('ENTITY_PUT', {model:model, options:options})
 				[success_callback, failure_callback, config...] = options
 				return @fcm.rpc.api.data.update({key: model.id, object: model.toJSON()}).fulfill({success: success_callback, failure: failure_callback}, config)
 				
 			when "delete"
-				@fcm.state.events.triggerEvent('ENTITY_DELETE', {model:model, options:options})
+				fcm.state.events.triggerEvent('ENTITY_DELETE', {model:model, options:options})
 				[success_callback, failure_callback, config...] = options
 				return @fcm.rpc.api.data.delete({key: model.id}).fulfill({success: success_callback, failure: failure_callback}, config)
 		

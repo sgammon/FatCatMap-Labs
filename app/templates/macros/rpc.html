@@ -3,7 +3,7 @@
 		<script type='text/javascript'>
 	{% endif %}
 
-	fatcatmap.rpc.api.{{ module }}.{{ method }}({% autoescape false %}{{ util.converters.json.dumps(params) }}{% endautoescape %}, {
+	fatcatmap.rpc.api.{{ module }}.{{ method }}({% autoescape false %}{{ util.converters.json.dumps(params) }}{% endautoescape %}).fulfill({
 		
 		success: function (response) {
 			{{ success }}(response);
@@ -14,7 +14,7 @@
 			{{ failure }}(response);
 		}
 		
-	}, {% if async == true %}true{% else %}false{% endif %});
+	}, {async: {% if async == true %}true{% else %}false{% endif %}});
 
 	{% if tags == true %}
 		</script>

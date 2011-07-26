@@ -1,10 +1,12 @@
+import os
 import sys
+
+import bootstrap
+bootstrap.MomentumBootstrapper.prepareImports()
+
 import ndb
 import config
 import logging
-import bootstrap
-
-bootstrap.MomentumBootstrapper.prepareImports()
 
 ## App Engine Imports
 import webapp2 as webapp
