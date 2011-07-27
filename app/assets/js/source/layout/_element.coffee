@@ -1,4 +1,4 @@
-class LayoutElement
+class LayoutElement extends Backbone.View
 
 	id: null
 	state: {}

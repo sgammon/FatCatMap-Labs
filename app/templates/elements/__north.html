@@ -13,105 +13,18 @@
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-<!-- jQuery
+<!-- jQuery via CDN -->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script> 
-
-<script type="text/javascript">
-	window.jQuery || document.write("<script src='{{ script_url('core','jquery') }}' type='text/javascript'></script>");
-</script>-->
-
 
 <!-- Core Dependencies -->
 <script src="{{ script_url('base', 'fatcatmap') }}"></script>
 <script src="{{ script_url('core', 'jquery') }}"></script>
 <script src="{{ script_url('backbone', 'core') }}"></script>
 <script src="{{ script_url('amplify', 'core') }}"></script>
-<script src="{{ script_url('modernizr', 'core') }}"></script>
 <script src="{{ script_url('yepnope', 'core') }}"></script>
+<script src="{{ script_url('modernizr', 'core') }}"></script>
 
-{% if sys.output.assets.optimize %}
-<script type="text/javascript">
-
-yepnope([
-	{
-		// Load core FCM
-		load: ["{{ script_url('fcm', 'fatcatmap') }}", "{{ link('js-api') }}", "{{ script_url('layout', 'fatcatmap') }}", "{{ script_url('interaction', 'fatcatmap') }}", "{{ script_url('protovis', 'vis') }}"]
-		
-	},
-	{
-		// Load visual plugins
-		test: typeof(window.jQuery) == 'function',
-		nope: "{{ script_url('core','jquery') }}",
-		complete: function () { yepnope(["{{ script_url('tipsy', 'jquery') }}", "{{ script_url('masonry','jquery') }}", "{{ script_url('fancybox', 'jquery') }}", "{{ script_url('easing', 'jquery') }}", "{{ script_url('mousewheel','jquery') }}"]); }
-		
-	},
-	{
-		// Polyfill JSON Support
-		test : window.JSON && window.JSON.parse,
-		nope: "{{ script_url('json', 'polyfills') }}",
-		callback: function () {
-			console.log("JSON polyfill loaded.");
-		}
-	},
-	{
-		// Load IndexedDB
-		test: Modernizr.indexeddb,
-		yep: ["{{ script_url('indexed', 'storage') }}"]
-	},
-	{
-		// Load WebSQL
-		test: Modernizr.websqldatabase,
-		yep: ["{{ script_url('sql', 'storage') }}"]
-	},	
-	{
-		// Load LocalStorage
-		test: Modernizr.localstorage,
-		yep: ["{{ script_url('local', 'storage') }}"]
-	},
-	{
-		// Load SessionStorage
-		test: Modernizr.sessionstorage,
-		yep: ["{{ script_url('session', 'storage') }}"]
-	}
-]);
-
-</script>
-{% else %}
-
-<!-- Visualization Dependencies -->
-<script src="{{ script_url('protovis', 'vis') }}"></script>
-
-<!-- FCM Platform -->
-<script src="{{ script_url('fcm','fatcatmap') }}"></script>
-<script src="{{ script_url('layout','fatcatmap') }}"></script>
-<script src="{{ script_url('interaction','fatcatmap') }}"></script>
-
-<!-- JS API -->
-<script src="{{ link('js-api') }}"></script>
-
-<!-- jQuery Plugins -->
-<script src="{{ script_url('easing','jquery') }}"></script>
-<script src="{{ script_url('mousewheel','jquery') }}"></script>
-<script src="{{ script_url('tipsy', 'jquery-ui') }}"></script>
-<script src="{{ script_url('masonry','jquery-ui') }}"></script>
-<script src="{{ script_url('fancybox','jquery-ui') }}"></script>
-
-
-<script type='text/javascript'>
-
-$(document).ready(function loadPlatform()
-{
-	superbar = new SuperBar('#momentumSuperbar');
-	fatcatmap.api.layout.register('superbar', superbar);
-	
-	supernav = new Navigation('#topnav');
-	fatcatmap.api.layout.register('supernav', supernav);
-	
-	superfooter = new SuperFooter('#momentumSuperfooter');
-	fatcatmap.api.layout.register('superfooter', superfooter);
-	
-	fatcatmap.state.events.triggerEvent('PLATFORM_READY');
-});
-
-</script>
-{% endif %}
+<!-- FatCatMap Platform -->
+<script src="{{ script_url('fcm', 'fatcatmap') }}"></script>
+<script src="{{ script_url('layout', 'fatcatmap') }}"></script>
+<script src="{{ script_url('interaction', 'fatcatmap') }}"></script>

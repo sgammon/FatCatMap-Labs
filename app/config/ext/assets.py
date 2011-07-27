@@ -58,7 +58,7 @@ config['momentum.fatcatmap.assets'] = {
 	
 			'assets': {
 				'sql': {'min': True, 'version': 0.1}, # Web SQL Database driver
-				'indexed': {'min': True, 'version': 0.1}, # IndexedDB Database driver
+				'object': {'min': True, 'version': 0.1}, # IndexedDB Database driver
 				'local': {'min': True, 'version': 0.1} # LocalStorage driver
 			}
 		
@@ -125,10 +125,10 @@ config['momentum.fatcatmap.assets'] = {
 			},
 			
 			'assets': {
-				'jqui': {'version': '1.8.9'}, # jQuery UI
-				'tipsy': {'version': '1.0.0a'}, # Effect for slick, animated tooltips
-				'masonry': {'version': '1.3.2'}, # Special easy-on-the-eye layout styling
-				'fancybox': {'version': '1.3.4'}, # Quick + clean lightbox-style dialogs		
+				'jqui': {'min': True, 'version': '1.8.9'}, # jQuery UI
+				'tipsy': {'min': True, 'version': '1.0.0a'}, # Effect for slick, animated tooltips
+				'masonry': {'min': True, 'version': '1.3.2'}, # Special easy-on-the-eye layout styling
+				'fancybox': {'min': True, 'version': '1.3.4'}, # Quick + clean lightbox-style dialogs		
 			}
 		
 		},

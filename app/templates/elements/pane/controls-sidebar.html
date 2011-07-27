@@ -1,8 +1,10 @@
 <div id='controlsPane' class='sidebar sb-right folded' data-element='controls_sidebar' data-element-type='LayoutElement'>
 	
 	<script type="text/javascript">
+	$(document).ready(function initControlsPane() {
 		controlspane = new Sidebar('#controlsPane');
 		fatcatmap.api.layout.register('controlspane', controlspane);
+	});
 	</script>
 	
 	<div class='paneButtonBox'>

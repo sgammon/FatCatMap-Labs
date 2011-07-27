@@ -1,8 +1,10 @@
 <div id='detailsPane' class='sidebar sb-left folded' data-element='details_sidebar' data-element-type='LayoutElement'>
 
 	<script type="text/javascript">
+	$(document).ready(function initDetailsPane() {	
 		detailspane = new Sidebar('#detailsPane');
 		fatcatmap.api.layout.register('detailspane', detailspane);
+	});
 	</script>
 		
 	<div class='paneButtonBox'>

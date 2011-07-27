@@ -121,7 +121,7 @@ class CoreAssetsAPI(MomentumCoreAPI):
 				filename = []
 				query_string = {}
 				asset_url = ['assets', _type, prefix, module_path, ('.', filename)]
-				minify = minify or self._OutputConfig.get('minify', False)
+				minify = minify or self._OutputConfig['assets'].get('minified', False)
 			
 			
 				## 1: Consider absolute assets

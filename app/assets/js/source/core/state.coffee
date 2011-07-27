@@ -62,6 +62,7 @@ class CoreStateAPI extends CoreAPI
 									@events.callchain[_event][calltask].executed = true
 									
 		@session = {}
+
 		@local = {}
 		
 		@elements =

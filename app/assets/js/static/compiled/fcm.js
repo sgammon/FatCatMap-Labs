@@ -1,18 +1,18 @@
 (function() {
-  var CoreAPI, CoreAPIBridge, CoreAgentAPI, CoreDevAPI, CoreLiveAPI, CoreModelAPI, CoreRPCAPI, CoreStateAPI, CoreSysAPI, CoreUserAPI, FatCatMap, InteractiveWidget, LayoutElement, LocalModel, RPCAPI, RPCAdapter, RPCRequest, RemoteModel, SiteSection;
-  var __indexOf = Array.prototype.indexOf || function(item) {
-    for (var i = 0, l = this.length; i < l; i++) {
-      if (this[i] === item) return i;
-    }
-    return -1;
-  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var AdvancedStorageDriver, CoreAPI, CoreAPIBridge, CoreAgentAPI, CoreDevAPI, CoreLiveAPI, CoreModelAPI, CoreRPCAPI, CoreStateAPI, CoreSysAPI, CoreUserAPI, FatCatMap, LocalModel, ModelCollection, RPCAPI, RPCAdapter, RPCRequest, RemoteModel, SiteSection, StorageDriver;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  }, __slice = Array.prototype.slice;
+  }, __slice = Array.prototype.slice, __indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (this[i] === item) return i;
+    }
+    return -1;
+  };
   CoreAPI = (function() {
     function CoreAPI(name, path, config) {
       this.name = name;
@@ -21,122 +21,6 @@
     }
     return CoreAPI;
   })();
-  LayoutElement = (function() {
-    LayoutElement.prototype.id = null;
-    LayoutElement.prototype.state = {};
-    LayoutElement.prototype.config = {};
-    LayoutElement.prototype.classes = [];
-    LayoutElement.prototype.element = null;
-    LayoutElement.prototype.defaults = null;
-    LayoutElement.prototype.selector = null;
-    LayoutElement.prototype.registered = false;
-    function LayoutElement(selector, config) {
-      this.selector = selector;
-      this.config = config != null ? config : {};
-    }
-    LayoutElement.prototype.register = function(id) {
-      this.id = id;
-    };
-    LayoutElement.prototype._setState = function(key, value) {
-      this.state[key] = value;
-      return this;
-    };
-    LayoutElement.prototype._getState = function(key, default_value) {
-      if (default_value == null) {
-        default_value = null;
-      }
-      if (this.state[key] === void 0) {
-        return default_value;
-      } else {
-        return this.state[key];
-      }
-    };
-    LayoutElement.prototype._deleteState = function(key) {
-      return delete this.state[key];
-    };
-    LayoutElement.prototype._loadState = function(state, classes) {
-      this.state = state;
-      this.classes = classes;
-      return this._refreshState();
-    };
-    LayoutElement.prototype._flushState = function() {
-      var finalState;
-      finalState = {
-        state: this.state,
-        classes: this.classes
-      };
-      return finalState;
-    };
-    LayoutElement.prototype._refreshState = function() {
-      var classname, _i, _len, _ref, _results;
-      _ref = this.classes;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        classname = _ref[_i];
-        _results.push(this.get().addClass(classname));
-      }
-      return _results;
-    };
-    LayoutElement.prototype.get = function() {
-      if (this.element === null) {
-        this.element = $(this.selector);
-      }
-      return this.element;
-    };
-    LayoutElement.prototype.addClass = function(classname) {
-      this.classes.push(classname);
-      this.get().addClass(classname);
-      return this;
-    };
-    LayoutElement.prototype.removeClass = function(classname) {
-      if (__indexOf.call(this.classes, classname) >= 0) {
-        this.classes.remove(classname);
-      }
-      this.get().removeClass(classname);
-      return this;
-    };
-    LayoutElement.prototype.toggleClass = function(classname) {
-      if (__indexOf.call(this.classes, classname) >= 0) {
-        this.classes.remove(classname);
-      } else {
-        this.classes.push(classname);
-      }
-      this.get().toggleClass(classname);
-      return this;
-    };
-    LayoutElement.prototype.hide = function(duration, easing, callback) {
-      this._setState('visible', false);
-      this.get().hide(duration, easing, callback);
-      return this;
-    };
-    LayoutElement.prototype.show = function(duration, easing, callback) {
-      this._setState('visible', true);
-      return this.get().show(duration, easing, callback);
-    };
-    LayoutElement.prototype.showhide = function(duration, easing, callback) {
-      if (this._getState('visible', false) !== false) {
-        this.get().hide(duration, easing, callback);
-      } else {
-        this.get().show(duration, easing, callback);
-      }
-      return this;
-    };
-    LayoutElement.prototype.css = function(properties) {
-      this.get().css(properties);
-      return this;
-    };
-    LayoutElement.prototype.animate = function(properties, options) {
-      if (options == null) {
-        options = {};
-      }
-      this.get().animate(properties, options);
-      return this;
-    };
-    return LayoutElement;
-  })();
-  if (typeof window !== "undefined" && window !== null) {
-    window.LayoutElement = LayoutElement;
-  }
   CoreDevAPI = (function() {
     function CoreDevAPI(fcm) {
       this.verbose = __bind(this.verbose, this);;
@@ -181,18 +65,18 @@
     CoreDevAPI.prototype.log = function() {
       var context, message, module;
       module = arguments[0], message = arguments[1], context = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
-      if (context != null) {
+      if (!(context != null)) {
         context = '{no context}';
       }
       if (this.debug.logging === true) {
-        console.log("[" + module + "] INFO: " + message, context);
+        console.log.apply(console, ["[" + module + "] INFO: " + message].concat(__slice.call(context)));
       }
     };
     CoreDevAPI.prototype.error = function() {
       var context, message, module;
       module = arguments[0], message = arguments[1], context = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
       if (this.debug.logging === true) {
-        console.log("[" + module + "] ERROR: " + message, context);
+        console.log.apply(console, ["[" + module + "] ERROR: " + message].concat(__slice.call(context)));
       }
     };
     CoreDevAPI.prototype.verbose = function() {
@@ -619,6 +503,14 @@
     };
     return RemoteModel;
   })();
+  ModelCollection = (function() {
+    function ModelCollection() {
+      ModelCollection.__super__.constructor.apply(this, arguments);
+    }
+    __extends(ModelCollection, Backbone.Collection);
+    ModelCollection.prototype._noop = function() {};
+    return ModelCollection;
+  })();
   CoreModelAPI = (function() {
     function CoreModelAPI(fcm) {
       fcm.state.events.registerEvent('MODEL_DEFINE');
@@ -633,155 +525,647 @@
       this.remote = {
         schema: {}
       };
+      this.sync = {
+        _backboneSync: __bind(function(method, model, options) {
+          var config, error, failure_callback, success, success_callback;
+          success = options[0], error = options[1], config = 3 <= options.length ? __slice.call(options, 2) : [];
+          switch (method) {
+            case "create":
+              fcm.state.events.triggerEvent('ENTITY_CREATE', {
+                model: model,
+                options: options
+              });
+              return fcm.rpc.api.data.create({
+                object: model
+              }).fulfill({
+                success: success_callback,
+                failure: failure_callback
+              }, config);
+            case "read":
+              fcm.state.events.triggerEvent('ENTITY_GET', {
+                model: model,
+                options: options
+              });
+              success_callback = options[0], failure_callback = options[1], config = 3 <= options.length ? __slice.call(options, 2) : [];
+              return fcm.rpc.api.data.get({
+                key: model.id
+              }).fulfill({
+                success: success_callback,
+                failure: failure_callback
+              }, config);
+            case "update":
+              fcm.state.events.triggerEvent('ENTITY_PUT', {
+                model: model,
+                options: options
+              });
+              success_callback = options[0], failure_callback = options[1], config = 3 <= options.length ? __slice.call(options, 2) : [];
+              return fcm.rpc.api.data.update({
+                key: model.id,
+                object: model.toJSON()
+              }).fulfill({
+                success: success_callback,
+                failure: failure_callback
+              }, config);
+            case "delete":
+              fcm.state.events.triggerEvent('ENTITY_DELETE', {
+                model: model,
+                options: options
+              });
+              success_callback = options[0], failure_callback = options[1], config = 3 <= options.length ? __slice.call(options, 2) : [];
+              return fcm.rpc.api.data["delete"]({
+                key: model.id
+              }).fulfill({
+                success: success_callback,
+                failure: failure_callback
+              }, config);
+            default:
+              return fcm.rpc.dev.error('Model', 'Backbone bridge model sync got an unrecognized method.', {
+                method: method,
+                model: model,
+                options: options
+              });
+          }
+        }, this)
+      };
+      Backbone.sync = this.sync;
     }
     __extends(CoreModelAPI, CoreAPI);
-    CoreModelAPI.prototype.sync = function(method, model, options) {
-      var config, failure_callback, fcm, success_callback;
-      if (typeof $ !== "undefined" && $ !== null) {
-        fcm = $.fatcatmap;
-      } else {
-        fcm = window.fatcatmap;
-      }
-      switch (method) {
-        case "create":
-          fcm.state.events.triggerEvent('ENTITY_CREATE', {
-            model: model,
-            options: options
-          });
-          success_callback = options[0], failure_callback = options[1], config = 3 <= options.length ? __slice.call(options, 2) : [];
-          return this.fcm.rpc.api.data.create({
-            object: model.toJSON()
-          }).fulfill({
-            success: success_callback,
-            failure: failure_callback
-          }, config);
-        case "read":
-          fcm.state.events.triggerEvent('ENTITY_GET', {
-            model: model,
-            options: options
-          });
-          success_callback = options[0], failure_callback = options[1], config = 3 <= options.length ? __slice.call(options, 2) : [];
-          return this.fcm.rpc.api.data.get({
-            key: model.id
-          }).fulfill({
-            success: success_callback,
-            failure: failure_callback
-          }, config);
-        case "update":
-          fcm.state.events.triggerEvent('ENTITY_PUT', {
-            model: model,
-            options: options
-          });
-          success_callback = options[0], failure_callback = options[1], config = 3 <= options.length ? __slice.call(options, 2) : [];
-          return this.fcm.rpc.api.data.update({
-            key: model.id,
-            object: model.toJSON()
-          }).fulfill({
-            success: success_callback,
-            failure: failure_callback
-          }, config);
-        case "delete":
-          fcm.state.events.triggerEvent('ENTITY_DELETE', {
-            model: model,
-            options: options
-          });
-          success_callback = options[0], failure_callback = options[1], config = 3 <= options.length ? __slice.call(options, 2) : [];
-          return this.fcm.rpc.api.data["delete"]({
-            key: model.id
-          }).fulfill({
-            success: success_callback,
-            failure: failure_callback
-          }, config);
-      }
-    };
     return CoreModelAPI;
   })();
   window.LocalModel = LocalModel;
   window.RemoteModel = RemoteModel;
+  window.ModelCollection = ModelCollection;
   CoreAPIBridge = (function() {
     function CoreAPIBridge(fcm) {
-      this.fcm = fcm;
+      fcm.state.events.registerEvent('STORAGE_READ');
+      fcm.state.events.registerEvent('STORAGE_WRITE');
+      fcm.state.events.registerEvent('STORAGE_CLEAR');
+      fcm.state.events.registerEvent('STORAGE_DELETE');
+      fcm.state.events.registerEvent('STORAGE_DB_LOAD');
+      fcm.state.events.registerEvent('STORAGE_DB_CLOSE');
+      fcm.state.events.registerEvent('STORAGE_DB_QUERY');
+      fcm.state.events.registerEvent('STORAGE_DB_CREATE');
+      fcm.state.events.registerEvent('STORAGE_DB_DELETE');
+      fcm.state.events.registerEvent('STORAGE_DB_SETVERSION');
+      fcm.state.events.registerEvent('STORAGE_DB_TRANSACTION');
+      fcm.state.events.registerEvent('STORAGE_COLLECTION_CLEAR');
+      fcm.state.events.registerEvent('STORAGE_COLLECTION_CREATE');
+      fcm.state.events.registerEvent('STORAGE_COLLECTION_DELETE');
       this.storage = {
         local: {
           _driver: null,
           _resolveDriver: __bind(function() {
-            return this._driver = this.fcm.sys.drivers.resolve('localstorage');
+            return this.storage.local._driver = fcm.sys.drivers.resolve('localstorage');
           }, this),
-          getValue: __bind(function(key) {
-            if (this._driver !== null) {
-              return this._driver.getValueByKey(key);
+          get: __bind(function(key) {
+            if (this.storage.local._driver !== null) {
+              fcm.state.events.triggerEvent('STORAGE_READ', {
+                type: 'local',
+                mode: 'key',
+                key: key
+              });
+              return this.storage.local._driver.getValueByKey(key);
             } else {
-              return false;
+              return null;
             }
           }, this),
-          setValue: __bind(function(key, value) {
-            if (this._driver !== null) {
-              return this._driver.setValueByKey(key, value);
+          set: __bind(function(key, value) {
+            if (this.storage.local._driver !== null) {
+              fcm.state.events.triggerEvent('STORAGE_WRITE', {
+                type: 'local',
+                key: key,
+                value: value
+              });
+              return this.storage.local._driver.setValueByKey(key, value);
             } else {
-              return false;
+              return null;
             }
           }, this),
-          clearValues: __bind(function() {
-            if (this._driver !== null) {
-              return this._driver.allValues();
+          "delete": __bind(function(key) {
+            if (this.storage.local._driver !== null) {
+              fcm.state.events.triggerEvent('STORAGE_DELETE', {
+                type: 'local',
+                key: key
+              });
+              return this.storage.local._driver.deleteByKey(key);
             } else {
-              return false;
+              return null;
+            }
+          }, this),
+          clear: __bind(function() {
+            if (this.storage.local._driver !== null) {
+              fcm.state.events.triggerEvent('STORAGE_CLEAR', {
+                type: 'local'
+              });
+              return this._driver.nuke();
+            } else {
+              return null;
+            }
+          }, this),
+          all: __bind(function() {
+            if (this.storage.local._driver !== null) {
+              fcm.state.events.triggerEvent('STORAGE_READ', {
+                type: 'local',
+                mode: 'all'
+              });
+              return this.storage.local._driver.allValues();
+            } else {
+              return null;
             }
           }, this)
         },
         session: {
           _driver: null,
-          _resolveDriver: function() {
-            return this._driver = this.fcm.sys.drivers.resolve('sessionstorage');
-          },
-          getValue: function(key) {
-            if (this._driver !== null) {
-              return this._driver.getValueByKey(key);
+          _resolveDriver: __bind(function() {
+            return this.storage.session._driver = fcm.sys.drivers.resolve('sessionstorage');
+          }, this),
+          get: __bind(function(key) {
+            if (this.storage.session._driver !== null) {
+              fcm.state.events.triggerEvent('STORAGE_READ', {
+                type: 'session',
+                mode: 'key',
+                key: key
+              });
+              return this.storage.session._driver.getValueByKey(key);
             } else {
-              return false;
+              return null;
             }
-          },
-          setValue: function(key, value) {
-            if (this._driver !== null) {
-              return this._driver.setValueByKey(key, value);
+          }, this),
+          set: __bind(function(key, value) {
+            if (this.storage.session._driver !== null) {
+              fcm.state.events.triggerEvent('STORAGE_WRITE', {
+                type: 'session',
+                key: key,
+                value: value
+              });
+              return this.storage.session._driver.setValueByKey(key, value);
             } else {
-              return false;
+              return null;
             }
-          },
-          clearValues: function() {
-            if (this._driver !== null) {
-              return this._driver.allValues();
+          }, this),
+          "delete": __bind(function(key) {
+            if (this.storage.session._driver !== null) {
+              this.fcm.state.events.triggerEvent('STORAGE_DELETE', {
+                type: 'session',
+                key: key
+              });
+              return this.storage.session._driver.deleteByKey(key);
             } else {
-              return false;
+              return null;
             }
-          }
+          }, this),
+          clear: __bind(function() {
+            if (this.storage.session._driver !== null) {
+              fcm.state.events.triggerEvent('STORAGE_CLEAR', {
+                type: 'session'
+              });
+              return this.storage.session._driver.nuke();
+            } else {
+              return null;
+            }
+          }, this),
+          all: __bind(function() {
+            if (this.storage.session._driver !== null) {
+              fcm.state.events.triggerEvent('STORAGE_READ', {
+                type: 'session',
+                mode: 'all'
+              });
+              return this.storage.session._driver.allValues();
+            } else {
+              return null;
+            }
+          }, this)
         },
         object: {
+          _db: null,
           _driver: null,
-          _resolveDriver: function() {
-            return this._driver = this.fcm.sys.drivers.resolve('objectstorage');
+          _resolveDriver: __bind(function() {
+            return this.storage.object._driver = this.fcm.sys.drivers.resolve('objectstorage');
+          }, this),
+          _setDB: function(event) {
+            return this._db = event.target.result;
           },
-          getValue: function(key) {
-            if (this._driver !== null) {
-              return this._driver.getValueByKey(key);
+          _unsetDB: function(event) {
+            return this._db = null;
+          },
+          _dbError: __bind(function(event) {
+            return fcm.dev.error('Storage', 'Error encountered in OBJECT storage.', event);
+          }, this),
+          db: {
+            load: __bind(function(name, success, error) {
+              var request;
+              if (this.storage.object._driver !== null) {
+                fcm.state.events.triggerEvent('STORAGE_DB_LOAD', {
+                  type: 'object',
+                  name: name
+                });
+                ({
+                  dbLoadSuccess: __bind(function(event) {
+                    this.storage.object._setDB(event);
+                    return success(event.target.db);
+                  }, this),
+                  dbLoadError: __bind(function(event) {
+                    this.storage.object._dbError(event);
+                    return error(event);
+                  }, this)
+                });
+                request = this.storage.object._driver.openDatabase(name, {
+                  success: dbLoadSuccess,
+                  error: dbLoadError
+                });
+                return request;
+              } else {
+                return null;
+              }
+            }, this),
+            "delete": __bind(function(success, error) {
+              var request;
+              if (this.storage.object._driver !== null) {
+                if (this.storage.object._db !== null) {
+                  fcm.state.events.triggerEvent('STORAGE_DB_DELETE', {
+                    type: 'object',
+                    db: this.storage.object._db
+                  });
+                  ({
+                    dbDeleteSuccess: __bind(function(event) {
+                      this.storage.object._unsetDB(event);
+                      return success(event);
+                    }, this),
+                    dbDeleteError: __bind(function(event) {
+                      this.storage.object._dbError(event);
+                      return error(event);
+                    }, this)
+                  });
+                  request = this.storage.object._driver.deleteDatabase(this.storage.object._db, {
+                    success: dbDeleteSuccess,
+                    error: dbDeleteError
+                  });
+                  return request;
+                } else {
+                  fcm.dev.error('Storage', 'Cannot delete database before it is loaded.');
+                  throw "Must open a database before it can be deleted.";
+                }
+              } else {
+                return null;
+              }
+            }, this),
+            setVersion: __bind(function(version, success, error) {
+              var request;
+              if (this.storage.object._driver !== null) {
+                if (this.storage.object._db !== null) {
+                  fcm.state.events.triggerEvent('STORAGE_DB_SETVERSION', {
+                    type: 'object',
+                    version: version,
+                    db: this.storage.object._db
+                  });
+                  ({
+                    dbSetVersionSuccess: __bind(function(event) {
+                      return success(event);
+                    }, this),
+                    dbSetVersionError: __bind(function(event) {
+                      return error(event);
+                    }, this)
+                  });
+                  request = this.storage.object._driver.setDatabaseVersion(this.storage.object._db, version, {
+                    success: dbSetVersionSuccess,
+                    error: dbSetVersionError
+                  });
+                  return request;
+                } else {
+                  fcm.dev.error('Storage', 'Cannot set database version before it is loaded.');
+                  throw "Must open a database before its version can be set.";
+                }
+              } else {
+                return null;
+              }
+            }, this),
+            close: __bind(function(success, error) {
+              var request;
+              if (this.storage.object._driver !== null) {
+                if (this.storage.object._db !== null) {
+                  fcm.state.events.triggerEvent('STORAGE_DB_CLOSE', {
+                    type: 'object',
+                    db: this.storage.object.db
+                  });
+                  ({
+                    dbCloseSuccess: __bind(function(event) {
+                      return success(event);
+                    }, this),
+                    dbCloseError: __bind(function(event) {
+                      return error(event);
+                    }, this)
+                  });
+                  request = this.storage.object._driver.closeDatabase(this.storage.object._db, {
+                    success: dbCloseSuccess,
+                    error: dbCloseError
+                  });
+                  return request;
+                } else {
+                  fcm.dev.error('Storage', 'Cannot close database before it is loaded.');
+                  throw "Must open a database before it can be closed.";
+                }
+              } else {
+                return null;
+              }
+            }, this)
+          },
+          collection: {
+            create: __bind(function(name, key_path, auto_increment, success, error) {
+              var request;
+              if (key_path == null) {
+                key_path = null;
+              }
+              if (auto_increment == null) {
+                auto_increment = true;
+              }
+              if (success == null) {
+                success = null;
+              }
+              if (error == null) {
+                error = null;
+              }
+              if (this.storage.object._driver !== null) {
+                if (this.storage.object._db !== null) {
+                  fcm.state.events.triggerEvent('STORAGE_COLLECION_CREATE', {
+                    type: 'object',
+                    db: this.storage.object._db
+                  });
+                  ({
+                    collectionCreateSuccess: __bind(function(event) {
+                      if (success !== null) {
+                        return success(event);
+                      }
+                    }, this),
+                    collectionCreateError: __bind(function(event) {
+                      if (error !== null) {
+                        return error(event);
+                      }
+                    }, this)
+                  });
+                  request = this.storage.object._driver.createCollection(this.storage.object._db, name, key_path, auto_increment, {
+                    success: collectionCreateSuccess,
+                    error: collectionCreateError
+                  });
+                  return request;
+                } else {
+                  fcm.dev.error('Storage', 'Cannot call createCollection before loadDB.');
+                  throw "Must open a database before creating a collection.";
+                }
+              } else {
+                return null;
+              }
+            }, this),
+            "delete": __bind(function(name, success, error) {
+              var request;
+              if (success == null) {
+                success = null;
+              }
+              if (error == null) {
+                error = null;
+              }
+              if (this.storage.object._driver !== null) {
+                if (this.storage.object._db !== null) {
+                  fcm.state.events.triggerEvent('STORAGE_COLLECTION_DELETE', {
+                    type: 'object',
+                    name: name,
+                    db: this.storage.object._db
+                  });
+                  ({
+                    collectionDeleteSuccess: __bind(function(event) {
+                      if (success !== null) {
+                        return success(event);
+                      }
+                    }, this),
+                    collectionDeleteError: __bind(function(event) {
+                      if (error !== null) {
+                        return error(event);
+                      }
+                    }, this)
+                  });
+                  request = this.storage.object._driver.deleteCollection(this.storage.object._db, name, {
+                    success: collectionDeleteSuccess,
+                    error: collectionDeleteError
+                  });
+                  return request;
+                } else {
+                  fcm.dev.error('Storage', 'Cannot call deleteCollection before loadDB.');
+                  throw "Must open a database before deleting a collection.";
+                }
+              } else {
+                return null;
+              }
+            }, this),
+            clear: __bind(function(name, success, error) {
+              var request;
+              if (success == null) {
+                success = null;
+              }
+              if (error == null) {
+                error = null;
+              }
+              if (this.storage.object._driver !== null) {
+                if (this.storage.object._db !== null) {
+                  fcm.state.events.triggerEvent('STORAGE_COLLECTION_CLEAR', {
+                    type: 'object',
+                    name: name,
+                    db: this.storage.object._db
+                  });
+                  ({
+                    collectionClearSuccess: __bind(function(event) {
+                      if (success !== null) {
+                        return success(event);
+                      }
+                    }, this),
+                    collectionClearError: __bind(function(event) {
+                      if (error !== null) {
+                        return error(event);
+                      }
+                    }, this)
+                  });
+                  request = this.storage.object._driver.clearCollection(this.storage.object._db, name, {
+                    success: collectionDeleteSuccess,
+                    error: collectionDeleteError
+                  });
+                  return request;
+                } else {
+                  fcm.dev.error('Storage', 'Cannot call clearCollection before loadDB.');
+                  throw "Must open a database before clearing a collection.";
+                }
+              } else {
+                return null;
+              }
+            }, this)
+          },
+          get: __bind(function(kind, key, success, error) {
+            var request;
+            if (success == null) {
+              success = null;
+            }
+            if (error == null) {
+              error = null;
+            }
+            if (this.storage.object._driver !== null) {
+              if (this.storage.object._db !== null) {
+                fcm.state.events.triggerEvent('STORAGE_READ', {
+                  type: 'object',
+                  mode: 'key',
+                  collection: kind,
+                  db: this.storage.object._db,
+                  key: key
+                });
+                ({
+                  entityGetSuccess: __bind(function(event) {
+                    if (success !== null) {
+                      return success(event);
+                    }
+                  }, this),
+                  entityGetError: __bind(function(event) {
+                    if (error !== null) {
+                      return error(event);
+                    }
+                  }, this)
+                });
+                request = this.storage.object._driver.getValueByKey(this.storage.object._db, kind, key, {
+                  success: entityGetSuccess,
+                  error: entityGetError
+                });
+                return request;
+              } else {
+                fcm.dev.error('Storage', 'Cannot call get before loadDB.');
+                throw "Must open a database connection before keys can be retrieved.";
+              }
+            } else {
+              return null;
+            }
+          }, this),
+          add: __bind(function(value, kind, key, success, error) {
+            var request;
+            if (key == null) {
+              key = null;
+            }
+            if (success == null) {
+              success = null;
+            }
+            if (error == null) {
+              error = null;
+            }
+            if (this.storage.object._driver !== null) {
+              if (this.storage.object._db !== null) {
+                fcm.state.events.triggerEvent('STORAGE_WRITE', {
+                  type: 'object',
+                  mode: 'add',
+                  collection: kind,
+                  db: this.storage.object._db,
+                  key: key
+                });
+                ({
+                  entityAddSuccess: __bind(function(event) {
+                    if (success !== null) {
+                      return success(event);
+                    }
+                  }, this),
+                  entityAddError: __bind(function(event) {
+                    if (error !== null) {
+                      return error(event);
+                    }
+                  }, this)
+                });
+                request = this.storage.object._driver.addValueByKey(this.storage.object._db, kind, key, value, {
+                  success: entityAddSuccess,
+                  error: entityAddError
+                });
+                return request;
+              } else {
+                fcm.dev.error('Storage', 'Cannot call add before loadDB.');
+                throw "Must open a database connection before keys can be added.";
+              }
+            } else {
+              return null;
+            }
+          }, this),
+          put: __bind(function(value, kind, key, success, error) {
+            var request;
+            if (key == null) {
+              key = null;
+            }
+            if (success == null) {
+              success = null;
+            }
+            if (error == null) {
+              error = null;
+            }
+            if (this.storage.object._driver !== null) {
+              if (this.storage.object._db !== null) {
+                fcm.state.events.triggerEvent('STORAGE_WRITE', {
+                  type: 'object',
+                  mode: 'put',
+                  collection: kind,
+                  db: this.storage.object._db,
+                  key: key
+                });
+                ({
+                  entityPutSuccess: __bind(function(event) {
+                    if (success !== null) {
+                      return success(event);
+                    }
+                  }, this),
+                  entityPutError: __bind(function(event) {
+                    if (error !== null) {
+                      return error(event);
+                    }
+                  }, this)
+                });
+                request = this.storage.object._driver.setValueByKey(this.storage.object._db, kind, key, value, {
+                  success: entityPutSuccess,
+                  error: entityPutError
+                });
+                return request;
+              } else {
+                fcm.dev.error('Storage', 'Cannot call get before loadDB.');
+                throw "Must open a database connection before keys can be retrieved.";
+              }
+            } else {
+              return null;
+            }
+          }, this),
+          "delete": __bind(function(kind, key, success, error) {
+            var request;
+            if (success == null) {
+              success = null;
+            }
+            if (error == null) {
+              error = null;
+            }
+            if (this.storage.object._driver !== null) {
+              if (this.storage.object._db !== null) {
+                fcm.state.events.triggerEvent('STORAGE_DELETE', {
+                  type: 'object',
+                  collection: kind,
+                  db: this.storage.object._db,
+                  key: key
+                });
+                ({
+                  entityDeleteSuccess: __bind(function(event) {
+                    if (success !== null) {
+                      return success(event);
+                    }
+                  }, this),
+                  entityDeleteError: __bind(function(event) {
+                    if (error !== null) {
+                      return error(event);
+                    }
+                  }, this)
+                });
+                request = this.storage.object._driver.deleteByKey(this.storage.object._db, kind, key, {
+                  success: entityDeleteSuccess,
+                  error: entityDeleteError
+                });
+                return request;
+              }
             } else {
               return false;
             }
-          },
-          setValue: function(key, value) {
-            if (this._driver !== null) {
-              return this._driver.setValueByKey(key, value);
-            } else {
-              return false;
-            }
-          },
-          clearValues: function() {
-            if (this._driver !== null) {
-              return this._driver.allValues();
-            } else {
-              return false;
-            }
-          }
+          }, this)
         },
         sql: {
           _driver: null,
@@ -814,7 +1198,12 @@
       this.layout = {
         register: __bind(function(id, element) {
           element.register(id);
-          return this.fcm.state.elements.register(id, element);
+          return fcm.state.elements.register(id, element);
+        }, this),
+        render: __bind(function(id, element) {}, this),
+        renderTemplate: __bind(function() {
+          var context, id;
+          id = arguments[0], context = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
         }, this)
       };
       this.visualizer = {};
@@ -1318,14 +1707,6 @@
   window.RPCAPI = RPCAPI;
   window.RPCAdapter = RPCAdapter;
   window.RPCRequest = RPCRequest;
-  InteractiveWidget = (function() {
-    function InteractiveWidget(name, path, config) {
-      this.name = name;
-      this.path = path;
-      this.config = config;
-    }
-    return InteractiveWidget;
-  })();
   SiteSection = (function() {
     function SiteSection(name, path, config) {
       this.name = name;
@@ -1384,6 +1765,44 @@
     };
     return CoreLiveAPI;
   })();
+  StorageDriver = (function() {
+    function StorageDriver(name, config) {
+      var fcm;
+      this.name = name;
+      this.config = config;
+      if (typeof $ !== "undefined" && $ !== null) {
+        fcm = $.fatcatmap;
+      } else {
+        fcm = window.fatcatmap;
+      }
+      fcm.sys.drivers.register(this.name, 'native', this, 999, true);
+    }
+    StorageDriver.prototype.getValueByKey = function(key) {};
+    StorageDriver.prototype.setValueByKey = function(key, value) {};
+    StorageDriver.prototype.addValueByKey = function(key, value) {};
+    StorageDriver.prototype.deleteByKey = function(key) {};
+    StorageDriver.prototype.nuke = function() {};
+    StorageDriver.prototype.allValues = function() {};
+    return StorageDriver;
+  })();
+  AdvancedStorageDriver = (function() {
+    function AdvancedStorageDriver() {
+      AdvancedStorageDriver.__super__.constructor.apply(this, arguments);
+    }
+    __extends(AdvancedStorageDriver, StorageDriver);
+    AdvancedStorageDriver.prototype.openDatabase = function(name, callbacks) {};
+    AdvancedStorageDriver.prototype.deleteDatabase = function(name, callbacks) {};
+    AdvancedStorageDriver.prototype.setDatabaseVerison = function(db, version, callbacks) {};
+    AdvancedStorageDriver.prototype.closeDatabase = function(db, callbacks) {};
+    AdvancedStorageDriver.prototype.createCollection = function(db, name, key_path, auto_increment, callbacks) {};
+    AdvancedStorageDriver.prototype.deleteCollection = function(db, name, callbacks) {};
+    AdvancedStorageDriver.prototype.clearCollection = function(db, name, callbacks) {};
+    return AdvancedStorageDriver;
+  })();
+  if (typeof window !== "undefined" && window !== null) {
+    window.StorageDriver = StorageDriver;
+    window.AdvancedStorageDriver = AdvancedStorageDriver;
+  }
   FatCatMap = (function() {
     function FatCatMap(config) {
       this.config = config;

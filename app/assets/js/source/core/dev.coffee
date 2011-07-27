@@ -43,15 +43,15 @@ class CoreDevAPI extends CoreAPI
 		console.log("[CoreDev] Debug has been set.", @debug)
 		
 	log: (module, message, context...) =>
-		if context?
+		if not context?
 			context = '{no context}'
 		if @debug.logging is true
-			console.log("["+module+"] INFO: "+message, context)
+			console.log "["+module+"] INFO: "+message, context...
 		return
 			
 	error: (module, message, context...) =>
 		if @debug.logging is true
-			console.log "["+module+"] ERROR: "+message, context
+			console.log "["+module+"] ERROR: "+message, context...
 		return
 			
 	verbose: (module, message, context...) =>

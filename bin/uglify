@@ -1,5 +1,5 @@
+export FATCATMAP="/Users/Sam/Workspace/FatCatMap Labs"
 export UGLIFY="/Users/Sam/node_modules/uglify-js/bin/uglifyjs"
-
 export FCM_COFFEE_SOURCE="$FATCATMAP/app/assets/js/source"
 export FCM_COFFEE_COMPILED="$FATCATMAP/app/assets/js/static/compiled"
 

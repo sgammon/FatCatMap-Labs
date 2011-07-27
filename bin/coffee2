@@ -4,11 +4,11 @@ export FCM_COFFEE_COMPILED="$FATCATMAP/app/assets/js/static/compiled"
 
 
 ## 1: Compile Core
-coffee --join "$FCM_COFFEE_COMPILED/base.js" --compile "$FCM_COFFEE_SOURCE/_root.coffee" "$FCM_COFFEE_SOURCE/_underscore.coffee"  "$FCM_COFFEE_SOURCE/_milk.coffee"
+coffee --join "$FCM_COFFEE_COMPILED/base.js" --compile "$FCM_COFFEE_SOURCE/_root.coffee"
 
 
 ## 2: Compile FCM
-coffee --join "$FCM_COFFEE_COMPILED/fcm.js" --compile "$FCM_COFFEE_SOURCE/core/_core.coffee" "$FCM_COFFEE_SOURCE/layout/_element.coffee" "$FCM_COFFEE_SOURCE/core/dev.coffee"  "$FCM_COFFEE_SOURCE/core/sys.coffee" "$FCM_COFFEE_SOURCE/core/agent.coffee" "$FCM_COFFEE_SOURCE/core/state.coffee" "$FCM_COFFEE_SOURCE/core/model.coffee" "$FCM_COFFEE_SOURCE/core/api.coffee" "$FCM_COFFEE_SOURCE/core/user.coffee" "$FCM_COFFEE_SOURCE/core/rpc.coffee"  "$FCM_COFFEE_SOURCE/interaction/_widget.coffee" "$FCM_COFFEE_SOURCE/site/_section.coffee" "$FCM_COFFEE_SOURCE/core/live.coffee" "$FCM_COFFEE_SOURCE/core/init.coffee"
+coffee --join "$FCM_COFFEE_COMPILED/fcm.js" --compile "$FCM_COFFEE_SOURCE/core/_core.coffee" "$FCM_COFFEE_SOURCE/core/dev.coffee"  "$FCM_COFFEE_SOURCE/core/sys.coffee" "$FCM_COFFEE_SOURCE/core/agent.coffee" "$FCM_COFFEE_SOURCE/core/state.coffee" "$FCM_COFFEE_SOURCE/core/model.coffee" "$FCM_COFFEE_SOURCE/core/api.coffee" "$FCM_COFFEE_SOURCE/core/user.coffee" "$FCM_COFFEE_SOURCE/core/rpc.coffee" "$FCM_COFFEE_SOURCE/site/_section.coffee" "$FCM_COFFEE_SOURCE/core/live.coffee" "$FCM_COFFEE_SOURCE/storage/_driver.coffee" "$FCM_COFFEE_SOURCE/core/init.coffee"
 
 
 ## 3: Compile Storage
@@ -21,11 +21,11 @@ coffee --require "$FCM_COFFEE_SOURCE/storage/_driver.coffee" --output "$FCM_COFF
 
 
 ## 4: Compile Layout
-coffee --require "$FCM_COFFEE_SOURCE/layout/_element.coffee" --join "$FCM_COFFEE_COMPILED/layout.js" --compile "$FCM_COFFEE_SOURCE/layout/panel.coffee" "$FCM_COFFEE_SOURCE/layout/dialog.coffee" "$FCM_COFFEE_SOURCE/layout/navigation.coffee"
+coffee --require "$FCM_COFFEE_SOURCE/core/_core.coffee" --join "$FCM_COFFEE_COMPILED/layout.js" --compile "$FCM_COFFEE_SOURCE/layout/_element.coffee" "$FCM_COFFEE_SOURCE/layout/panel.coffee" "$FCM_COFFEE_SOURCE/layout/dialog.coffee" "$FCM_COFFEE_SOURCE/layout/navigation.coffee"
 
 
 ## 5: Compile Interaction
-coffee --require "$FCM_COFFEE_SOURCE/interaction/_widget.coffee" --join "$FCM_COFFEE_COMPILED/interaction.js" --compile "$FCM_COFFEE_SOURCE/interaction/chart.coffee" "$FCM_COFFEE_SOURCE/interaction/graph.coffee" "$FCM_COFFEE_SOURCE/interaction/grid.coffee" "$FCM_COFFEE_SOURCE/interaction/form.coffee"
+coffee --require "$FCM_COFFEE_SOURCE/core/_core.coffee" --join "$FCM_COFFEE_COMPILED/interaction.js" --compile "$FCM_COFFEE_SOURCE/interaction/_widget.coffee" "$FCM_COFFEE_SOURCE/interaction/chart.coffee" "$FCM_COFFEE_SOURCE/interaction/graph.coffee" "$FCM_COFFEE_SOURCE/interaction/grid.coffee" "$FCM_COFFEE_SOURCE/interaction/form.coffee"
 
 
 ## 6: Compile Misc. Plugins

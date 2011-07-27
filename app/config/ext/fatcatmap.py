@@ -11,8 +11,8 @@ config['momentum.fatcatmap'] = {
 
 	'version': {
 		'major': 1,
-		'minor': 3,
-		'micro': 20110724,
+		'minor': 4,
+		'micro': 20110726,
 		'release': 'ALPHA'
 	}
 
@@ -36,8 +36,7 @@ config['momentum.fatcatmap.output'] = {
 	},
 
 	'assets':{
-		'optimize': False,
-		'compiled': True,
+		'minified': False
 	}
 
 }
