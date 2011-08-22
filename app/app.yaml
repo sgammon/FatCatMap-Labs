@@ -1,9 +1,9 @@
-application: fatcatmap
-version: 1-3-alpha
+application: momentum-labs
+version: fatcatmap
 runtime: python
 api_version: 1
 
-default_expiration: "0m"
+default_expiration: "1s"
 
 #### ===== Files to Skip
 skip_files:

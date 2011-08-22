@@ -3,6 +3,7 @@ import datetime
 from config import config
 
 from werkzeug import cached_property
+from google.appengine.api import memcache
 from google.appengine.api import namespace_manager
 from momentum.fatcatmap.core.api import MomentumCoreAPI
 
@@ -198,6 +199,18 @@ class FastcacheAdapter(CacheAdapter):
 		return		
 		
 	
+	def dumpAllValues(self, namespace=False):
+		global _fast_cache
+		namespace = self.resolveNamespace(namespace)
+		
+		if namespace is False:
+			return _fast_cache
+		else:
+			if namespace in _fast_cache:
+				return _fast_cache[namespace]
+		return
+			
+	
 	def clearAllValues(self, namespace=False):
 		global _fast_cache
 		namespace = self.resolveNamespace(namespace)
@@ -218,7 +231,9 @@ class MemcacheAdapter(CacheAdapter):
 	
 	def getByKey(self, key, namespace=None, default_value=None):
 		namespace = self.resolveNamespace(namespace)
-		result = memcache.get(key, namespace)
+		logging.info('GETTING KEY "'+str(key)+'" from namespace "'+str(namespace)+'"')
+		result = memcache.get(key, namespace=namespace)
+		logging.info('RESULT '+str(result))
 		if result is not None:
 			return result
 		else:
@@ -232,7 +247,8 @@ class MemcacheAdapter(CacheAdapter):
 		namespace = self.resolveNamespace(namespace)
 		if ttl is None:
 			ttl = self.config['default_ttl']
-		return memcache.set(key, value, ttl, namespace)
+		logging.info('SETTING KEY "'+str(key)+'" to namespace "'+str(namespace)+'" to value "'+str(value)+'"')
+		return memcache.set(key, value, ttl, namespace=namespace)
 		
 	def setMulti(self, mapping, prefix=None, ttl=None, namespace=None):
 		namespace = self.resolveNamespace(namespace)

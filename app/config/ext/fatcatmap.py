@@ -11,9 +11,9 @@ config['momentum.fatcatmap'] = {
 
 	'version': {
 		'major': 1,
-		'minor': 4,
-		'micro': 20110726,
-		'release': 'ALPHA'
+		'minor': 5,
+		'micro': 20110802,
+		'release': 'BETA'
 	}
 
 }
@@ -32,11 +32,13 @@ config['momentum.fatcatmap.output'] = {
 
 	'appcache': {
 		'enable': False,
-		'manifest': 'scaffolding-v1.1.manifest'
+		'manifest': 'production-v1.1.manifest'
 	},
 
 	'assets':{
-		'minified': False
+		'minified': False,
+		'serving_mode': 'local', ## 'local' or 'cdn' (CDN prefixes all assets with an absolute URL)
+		'cdn_prefix': 'cdn.static.labs.momentum.io'
 	}
 
 }
@@ -77,7 +79,7 @@ config['momentum.fatcatmap.cache'] = {
 config['momentum.fatcatmap.output.template_loader'] = {
 
 	'force': True, ## Force enable template loader even on Dev server
-	'debug': True,  ## Enable dev logging
+	'debug': False,  ## Enable dev logging
 	'use_memory_cache': False, ## Use handler in-memory cache for template source
 	'use_memcache': False, ## Use Memcache API for template source
 
@@ -86,7 +88,7 @@ config['momentum.fatcatmap.output.template_loader'] = {
 # FCM Pipelines Configuration
 config['momentum.fatcatmap.pipelines'] = {
 
-    'debug': True, # Enable basic serverlogs
+    'debug': False, # Enable basic serverlogs
 	'logging': {
 	
 		'enable': True, # Enable the pipeline logging subsystem

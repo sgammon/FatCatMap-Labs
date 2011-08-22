@@ -1,3 +1,114 @@
+{% macro d3grapher(selector, config={}, fn=none, tags=false) %}
+{% if tags %}
+<script type='text/javascript'>
+{% endif %}
+
+{% if fn != none %}
+{{ fn }} = function (nodes, edges, hints)
+{
+{% endif %}
+
+	/* Render Graph
+	var w = $("{{ selector }}").width(),
+	    h = $("{{ selector }}").height(),
+		colors = d3.scale.category20();
+		
+	// 1: Create viz panel
+	var vis = d3.select('{{ selector }}')
+		.append("svg:svg")
+		.attr("width", w)
+		.attr("height", h);
+		
+	// 2: Add force-driven layout to visualizer panel
+	var force = d3.layout.force()
+		.charge(-100)
+		.gravity(.05)
+		.distance(100)
+		.nodes(nodes)
+		.links(edges)
+		.size([w, h]);
+	
+	/* 4: Render line
+	var edge = vis.selectAll("line.link")
+		.data(edges)
+	 	.enter().append("svg:line")
+			.attr("data-hint", function (d, i) {return hints[i].key.encoded;})
+			.attr("data-source-node-key", function (d) {return d.source.key.encoded;})
+			.attr("data-target-node-key", function (d) {return d.target.key.encoded;})
+			.attr("class", "edge")
+			.attr("x1", function (d) {return d.source.x;})
+			.attr("y1", function (d) {return d.source.y;})
+			.attr("x2", function (d) {return d.target.x;})
+			.attr("y2", function (d) {return d.target.y})
+
+	// 5: Render node
+	var node = vis.selectAll("g.node")
+		.data(nodes)
+		.enter().append("svg:g")
+			.attr("id", function (d) {return d.key.encoded;})
+			.attr("class", "node")
+			.attr('data-kind', function (d) {return d.kind;})
+			.attr('data-label', function (d) {return d.label;})
+			.attr("data-object-key", function (d) {return d.key.parent;})
+			.call(force.drag);
+			
+	node.on('click', function (d, i) {
+				
+				$('#nodeDetails #node_label').text(d.label);
+				$('#nodeDetails #node_kind').text(d.kind);
+
+				outgoing_list = _.each($.fatcatmap.api.visualizer.graph.data.edges_by_node[d.key.encoded]['outgoing'], function mapOutgoingEdge(edge){
+				
+					console.log('OUTGOING EDGE', edge);
+					
+				});
+				$('#nodeDetails #node_outgoing_edges').html();
+				
+			})	
+			.on('mouseover', function (d, i) {
+				
+				//$(this).tipsy('show');
+				
+			})
+			.on('dblclick', function (d, i) {
+				$.fatcatmap.api.visualizer.graph.shiftTo(d.key.encoded);
+			});
+			
+	node.append("svg:circle")
+		.attr("class", "circle")
+		.attr("x", '-8px')
+		.attr("y", '-8px')
+		.attr("r", 16);
+			
+	node.append("svg:text")
+		.attr('x', -4)
+		.attr('y', 4)
+		.attr('class', 'label')		
+		.text(function (d) {return d.index.toString();});*/
+
+	/*force.on("tick", function () {
+		edge.attr("x1", function (d, i) {return d.source.x;})
+			.attr("y1", function (d, i) {return d.source.y;})
+			.attr("x2", function (d, i) {return d.target.x;})
+			.attr("y2", function (d, i) {return d.target.y;});
+			
+		node.attr('transform', function (d, i) { return 'translate('+d.x+','+d.y+')'; });
+	});*/
+	
+	//$.fatcatmap.api.visualizer.graph.register({visualizer: vis, force: force}, {nodes: nodes, edges: edges, hints: hints})
+
+{% if fn != none %}
+	//return {graph: vis, force: force, node: node, edge: edge}
+}
+{% endif %}
+
+{% if tags %}
+</script>
+{% endif %}
+{% endmacro %}
+
+
+
 {% macro protographer(selector, fn=none, tags=false) %}
 {% if tags %}
 <script type='text/javascript+protovis'>
@@ -77,118 +188,6 @@
 	
 	return {panel: vis, force: force}
 {% if fn != none %}
-}
-{% endif %}
-
-{% if tags %}
-</script>
-{% endif %}
-{% endmacro %}
-
-
-{% macro d3grapher(selector, fn=none, tags=false) %}
-{% if tags %}
-<script type='text/javascript'>
-{% endif %}
-
-{% if fn != none %}
-{{ fn }} = function (nodes, edges, hints)
-{
-{% endif %}
-
-	// Render Graph
-	var w = $("{{ selector }}").width(),
-	    h = $("{{ selector }}").height(),
-		colors = d3.scale.category20();
-
-	// 1: Create viz panel
-	var vis = d3.select('{{ selector }}')
-		.append("svg:svg")
-		.attr("width", w)
-		.attr("height", h);
-		
-	// 2: Add force-driven layout to visualizer panel
-	var force = d3.layout.force()
-		.charge(-100)
-		.gravity(.05)
-		.distance(100)
-		.nodes(nodes)
-		.links(edges)
-		.size([w, h])
-		.start();
-
-	// 4: Render line
-	var edge = vis.selectAll("line.link")
-		.data(edges)
-	 	.enter().append("svg:line")
-			.attr("data-hint", function (d, i) {return hints[i].key.encoded;})
-			.attr("data-source-node-key", function (d) {return d.source.key.encoded;})
-			.attr("data-target-node-key", function (d) {return d.target.key.encoded;})
-			.attr("class", "edge")
-			.attr("x1", function (d) {return d.source.x;})
-			.attr("y1", function (d) {return d.source.y;})
-			.attr("x2", function (d) {return d.target.x;})
-			.attr("y2", function (d) {return d.target.y})
-
-	// 5: Render node
-	var node = vis.selectAll("g.node")
-		.data(nodes)
-		.enter().append("svg:g")
-			.attr("id", function (d) {return d.key.encoded;})
-			.attr("class", "node")
-			.attr('data-kind', function (d) {return d.kind;})
-			.attr('data-label', function (d) {return d.label;})
-			.attr("data-object-key", function (d) {return d.key.parent;})
-			.call(force.drag)
-			.on('click', function (d, i) {
-				
-				alert('clicked '+d.label);
-				
-			})
-			.on('mouseover', function (d, i) {
-				
-				$(this).tipsy('show');
-				
-			});
-	
-	node.append("svg:circle")
-		.attr("class", "circle")
-		.attr("x", '-8px')
-		.attr("y", '-8px')
-		.attr("r", 16);
-			
-	node.append("svg:text")
-		.attr('x', -4)
-		.attr('y', 4)
-		.attr('class', 'label')		
-		.text(function (d) {return d.index.toString();});
-			
-	_.each($('.node'), function decorateNode(node) {
-		
-		$(node).tipsy({
-			fade: true,
-			trigger: 'manual',
-			gravity: $.fn.tipsy.autoNS,
-			title: function () {
-				return this.getAttribute('data-label');
-			}
-		});
-		
-	});
-			
-	force.on("tick", function () {
-		edge.attr("x1", function (d) {return d.source.x;})
-			.attr("y1", function (d) {return d.source.y;})
-			.attr("x2", function (d) {return d.target.x;})
-			.attr("y2", function (d) {return d.target.y;});
-			
-		//node.attr("cx", function (d) {return d.x;})
-		//	.attr("cy", function (d) {return d.y;});
-		node.attr('transform', function (d) { return 'translate('+d.x+','+d.y+')'; });
-	});
-
-{% if fn != none %}
-	return {graph: vis, force: force, node: node, edge: edge}
 }
 {% endif %}
 

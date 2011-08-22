@@ -2,19 +2,22 @@
 
 	<script type="text/javascript">
 	$(document).ready(function initDetailsPane() {	
-		detailspane = new Sidebar('#detailsPane');
-		fatcatmap.api.layout.register('detailspane', detailspane);
+		$.fatcatmap.state.events.registerHook('PLATFORM_READY', function (context) {
+			detailspane = new Layout.Sidebar('#detailsPane', {maximizable: true, unfolded_width: 360});
+			$.fatcatmap.api.layout.register('detailspane', detailspane);		
+		});
 	});
 	</script>
 		
 	<div class='paneButtonBox'>
-		<a class='paneButton enabled closeButton cp-right2' href="javascript:closeSidebar('#detailsPane', 'right');"><img src="/assets/img/static/layout/sprites/close-x.png" width="18" height="18" /></a>
+		<a class='paneButton enabled closeButton cp-left hidden'><img src="/assets/img/static/layout/sprites/close-x.png" width="18" height="18" /></a>
 
-		<a class='paneButton expandButton cp-right' href="javascript:expandSidebar('#detailsPane', 'right');" disabled='disabled'><img src="/assets/img/static/layout/sprites/arrow-right.png" width="18" height="18" /></a>
+		<a class='paneButton enabled expandButton cp-right'><img src="/assets/img/static/layout/sprites/arrow-right.png" width="18" height="18" /></a>
+		<a class='paneButton hidden minimizeButton cp-right'><img src="/assets/img/static/layout/sprites/arrow-left.png" width="18" height="18" /></a>		
 	</div>
 	
-	<div class='panelWrapper hidden'>
-		<div class='title'>Details Pane</div>
+	<div class='panelWrapper hidden textleft'>
+		<div class='title'>Details</div>
 		<div class='content'>
 
 			<div class='nodeDetailsPane'>

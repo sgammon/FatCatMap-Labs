@@ -30,6 +30,14 @@ class CoreLiveAPI extends CoreAPI
 
 		catch error
 			@fcm.dev.debug.error('CoreLive', 'Encountered error preparing live channel.', error)
+			return {channel: false, socket: false}
+		
+		return {channel: channel, socket: socket}
+		
+	
+	listen: (token) =>	
+		if @channel is null and @socket is null
+			@openChannel(token)
 		
 		
 	onOpen: () =>

@@ -25,6 +25,7 @@
     function CoreDevAPI(fcm) {
       this.verbose = __bind(this.verbose, this);;
       this.error = __bind(this.error, this);;
+      this.eventlog = __bind(this.eventlog, this);;
       this.log = __bind(this.log, this);;
       this.setDebug = __bind(this.setDebug, this);;      this.config = {};
       this.environment = {};
@@ -70,6 +71,16 @@
       }
       if (this.debug.logging === true) {
         console.log.apply(console, ["[" + module + "] INFO: " + message].concat(__slice.call(context)));
+      }
+    };
+    CoreDevAPI.prototype.eventlog = function() {
+      var context, sublabel;
+      sublabel = arguments[0], context = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      if (!(context != null)) {
+        context = '{no context}';
+      }
+      if (this.debug.eventlog === true) {
+        console.log.apply(console, ["[EventLog] " + sublabel].concat(__slice.call(context)));
       }
     };
     CoreDevAPI.prototype.error = function() {
@@ -337,6 +348,49 @@
   })();
   CoreStateAPI = (function() {
     function CoreStateAPI(fcm) {
+      this.ui = {
+        indicators: {
+          globalIndicatorQueue: 0,
+          currentGlobalProgress: 0,
+          startSpinner: function() {
+            if (this.globalIndicatorQueue === 0) {
+              $('#globalActivityIndicator').animate({
+                opacity: 1
+              }).removeClass('hidden');
+            }
+            return this.globalIndicatorQueue++;
+          },
+          stopSpinner: function() {
+            this.globalIndicatorQueue--;
+            if (this.globalIndicatorQueue === 0) {
+              return $('#globalActivityIndicator').animate({
+                opacity: 0
+              }, 'fast', function() {
+                return $(this).addClass('hidden');
+              });
+            }
+          },
+          setGlobalProgressBar: function(progress) {
+            if (!(progress != null)) {
+              progress = this.currentGlobalProgress + 10;
+            }
+            if (progress >= 100) {
+              $('#globalProgress').animate({
+                width: $('#toploader').width()
+              }, function() {
+                return $('#globalProgress').css({
+                  width: 0
+                });
+              });
+            } else {
+              $('#globalProgress').animate({
+                width: $('#toploader').width() * (progress / 100)
+              });
+            }
+            return this.currentGlobalProgress = progress;
+          }
+        }
+      };
       this.events = {
         registry: [],
         callchain: {},
@@ -362,15 +416,13 @@
             runonce: once
           };
           this.events.callchain[_event].push(calltask);
-          if (fcm.dev.debug.eventlog === true && fcm.dev.debug.verbose === true) {
-            return console.log("[EventLog] Hook Registered: ", fn, "on event", _event);
+          if (fcm.dev.debug.verbose === true) {
+            return fcm.dev.eventlog("Hook Registered", fn, "on event", _event);
           }
         }, this),
         triggerEvent: __bind(function(_event, context) {
           var calltask, result, result_calltask, _results;
-          if (fcm.dev.debug.eventlog === true) {
-            console.log("[EventLog] Event Triggered: " + _event, context || '{no context}');
-          }
+          fcm.dev.eventlog("Event Triggered", _event, context || '{no context}');
           if (typeof this.events.callchain[_event] !== null) {
             if (this.events.callchain[_event].length > 0) {
               _results = [];
@@ -380,7 +432,7 @@
                 } else {
                   try {
                     if (fcm.dev.debug.eventlog === true && fcm.dev.debug.verbose === true) {
-                      console.log("[EventLog] Callchain: ", calltask, this.events.callchain[_event]);
+                      fcm.dev.eventlog("Callchain", calltask, this.events.callchain[_event]);
                     }
                     result = this.events.callchain[_event][calltask].callback(context);
                     result_calltask = {
@@ -396,6 +448,7 @@
                       task: this.events.callchain[_event][calltask],
                       error: error
                     };
+                    fcm.dev.error('Events', 'Calltask failed with error: ', error, result_calltask);
                   } finally {
                     this.events.history.push(result_calltask);
                     this.events.callchain[_event][calltask].executed = true;
@@ -452,7 +505,7 @@
             element: element
           };
           fcm.state.events.triggerEvent('REGISTER_ELEMENT', context);
-          return this.events.registry[id];
+          return this.elements.registry[id];
         }, this),
         _setState: function(id, key, value) {
           if (this.registry[id] !== null) {
@@ -479,6 +532,21 @@
           return this;
         }
       };
+      /* === Register State Events === */
+      this.events.registerEvent('GLOBAL_ACTIVITY');
+      this.events.registerEvent('GLOBAL_ACTIVITY_FINISH');
+      this.events.registerHook('GLOBAL_ACTIVITY', __bind(function() {
+        return this.ui.indicators.startSpinner();
+      }, this));
+      this.events.registerHook('GLOBAL_ACTIVITY_FINISH', __bind(function() {
+        return this.ui.indicators.stopSpinner();
+      }, this));
+      $('body').bind("ajaxSend", __bind(function() {
+        return this.events.triggerHook('GLOBAL_ACTIVITY');
+      }, this));
+      $('body').bind("ajaxComplete", __bind(function() {
+        return this.events.triggerHook('GLOBAL_ACTIVITY_FINISH');
+      }, this));
     }
     __extends(CoreStateAPI, CoreAPI);
     return CoreStateAPI;
@@ -513,6 +581,7 @@
   })();
   CoreModelAPI = (function() {
     function CoreModelAPI(fcm) {
+      window.Models = {};
       fcm.state.events.registerEvent('MODEL_DEFINE');
       fcm.state.events.registerEvent('MODEL_SYNC');
       fcm.state.events.registerEvent('ENTITY_CREATE');
@@ -1206,7 +1275,31 @@
           id = arguments[0], context = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
         }, this)
       };
-      this.visualizer = {};
+      fcm.state.events.registerEvent('MAP_REGISTERED');
+      fcm.state.events.registerEvent('MAP_DATA_CHANGE');
+      fcm.state.events.registerEvent('MAP_NODE_ADDED');
+      fcm.state.events.registerEvent('MAP_EDGE_ADDED');
+      fcm.state.events.registerEvent('MAP_DRAW');
+      fcm.state.events.registerEvent('MAP_SHIFT_ORIGIN');
+      this.visualizer = {
+        graph: {
+          currentGraph: null,
+          register: function(currentGraph) {
+            this.currentGraph = currentGraph;
+          },
+          showMore: function(node) {
+            var list, neighbors;
+            $('#nodeDetails #node_label').text(node.label);
+            $('#nodeDetails #node_kind').text(node.kind);
+            list = '';
+            neighbors = this.currentGraph.index.neighbors_by_node[node.key.encoded];
+            _.each(neighbors, __bind(function(neighbor) {
+              return list += '<li><a href="#">' + neighbor.label + '</a></li>';
+            }, this));
+            return $('#nodeDetails #node_outgoing_edges').html(list);
+          }
+        }
+      };
     }
     __extends(CoreAPIBridge, CoreAPI);
     return CoreAPIBridge;
@@ -1443,16 +1536,47 @@
   })();
   CoreRPCAPI = (function() {
     function CoreRPCAPI(fcm) {
+      var original_xhr;
       fcm.state.events.registerEvent('RPC_CREATE');
       fcm.state.events.registerEvent('RPC_FULFILL');
       fcm.state.events.registerEvent('RPC_SUCCESS');
       fcm.state.events.registerEvent('RPC_ERROR');
       fcm.state.events.registerEvent('RPC_COMPLETE');
+      fcm.state.events.registerEvent('RPC_PROGRESS');
       if (window.amplify != null) {
         fcm.dev.verbose('RPC', 'AmplifyJS detected. Registering.');
         fcm.sys.drivers.register('transport', 'amplify', window.amplify, true, true);
       }
       this.base_rpc_uri = '/_api/rpc';
+      original_xhr = $.ajaxSettings.xhr;
+      this.internals = {
+        transports: {
+          xhr: {
+            factory: __bind(function() {
+              var req;
+              req = original_xhr();
+              if (req) {
+                if (typeof req.addEventListener === 'function') {
+                  console.log('ADDING PROGRESS LISTENER');
+                  req.addEventListener("progress", __bind(function(ev) {
+                    console.log('PROGRESS LISTENER CALLED');
+                    return $.fatcatmap.state.events.triggerEvent('RPC_PROGRESS', {
+                      event: ev
+                    });
+                  }, this), false);
+                }
+              }
+              return req;
+            }, this)
+          }
+        }
+      };
+      $.ajaxSetup({
+        global: true,
+        xhr: __bind(function() {
+          return this.internals.transports.xhr.factory();
+        }, this)
+      });
       this.api = {
         lastRequest: null,
         lastFailure: null,
@@ -1589,7 +1713,7 @@
               }, this),
               error: __bind(function(xhr, status, error) {
                 fatcatmap.dev.error('RPC', 'Error: ', {
-                  data: data,
+                  error: error,
                   status: status,
                   xhr: xhr
                 });
@@ -1603,7 +1727,8 @@
                   error: error
                 };
                 fatcatmap.state.events.triggerEvent('RPC_ERROR', context);
-                return callbacks != null ? callbacks.failure(data) : void 0;
+                fcm.state.events.triggerEvent('RPC_COMPLETE', context);
+                return callbacks != null ? callbacks.failure(error) : void 0;
               }, this),
               success: __bind(function(data, status, xhr) {
                 fatcatmap.dev.log('RPC', 'Success', data, status, xhr);
@@ -1617,18 +1742,9 @@
                   data: data
                 };
                 fcm.state.events.triggerEvent('RPC_SUCCESS', context);
+                fcm.state.events.triggerEvent('RPC_COMPLETE', context);
                 fatcatmap.dev.verbose('RPC', 'Success callback', callbacks);
                 return callbacks != null ? callbacks.success(data) : void 0;
-              }, this),
-              complete: __bind(function(xhr, status) {
-                fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr;
-                fatcatmap.rpc.api.history[request.envelope.id].status = status;
-                context = {
-                  xhr: xhr,
-                  status: status
-                };
-                fatcatmap.state.events.triggerEvent('RPC_COMPLETE', context);
-                return callbacks != null ? callbacks.complete(xhr, status) : void 0;
               }, this),
               statusCode: {
                 404: function() {
@@ -1646,7 +1762,7 @@
               }
             };
             amplify = fatcatmap.sys.drivers.resolve('transport', 'amplify');
-            if (amplify != null) {
+            if ((amplify != null) && amplify === !false) {
               fatcatmap.dev.verbose('RPC', 'Fulfilling with AmplifyJS adapter.');
               xhr_action = amplify.request;
               xhr = xhr_action(xhr_settings);
@@ -1671,7 +1787,15 @@
         frame: new RPCAdapter('frame')
       };
       this.ext = null;
-      fcm.state.events.triggerEvent('RPC_READY');
+      fcm.state.events.registerHook('RPC_FULFILL', function() {
+        return $.fatcatmap.state.events.triggerEvent('GLOBAL_ACTIVITY');
+      });
+      fcm.state.events.registerHook('RPC_COMPLETE', function() {
+        return $.fatcatmap.state.events.triggerEvent('GLOBAL_ACTIVITY_FINISH');
+      });
+      fcm.state.events.registerHook('RPC_PROGRESS', function(event) {
+        return console.log('progress', event);
+      });
     }
     __extends(CoreRPCAPI, CoreAPI);
     CoreRPCAPI.prototype.registerAPIMethod = function(api, name, base_uri, config) {
@@ -1722,6 +1846,7 @@
       this.onError = __bind(this.onError, this);;
       this.onMessage = __bind(this.onMessage, this);;
       this.onOpen = __bind(this.onOpen, this);;
+      this.listen = __bind(this.listen, this);;
       this.openChannel = __bind(this.openChannel, this);;
       this.fcm.state.events.registerEvent('CHANNEL_OPEN');
       this.fcm.state.events.registerEvent('CHANNEL_MESSAGE');
@@ -1742,9 +1867,22 @@
         this.socket.onopen = this.onOpen;
         this.socket.onmessage = this.onMessage;
         this.socket.onerror = this.onError;
-        return this.socket.onclose = this.onClose;
+        this.socket.onclose = this.onClose;
       } catch (error) {
-        return this.fcm.dev.debug.error('CoreLive', 'Encountered error preparing live channel.', error);
+        this.fcm.dev.debug.error('CoreLive', 'Encountered error preparing live channel.', error);
+        return {
+          channel: false,
+          socket: false
+        };
+      }
+      return {
+        channel: channel,
+        socket: socket
+      };
+    };
+    CoreLiveAPI.prototype.listen = function(token) {
+      if (this.channel === null && this.socket === null) {
+        return this.openChannel(token);
       }
     };
     CoreLiveAPI.prototype.onOpen = function() {
@@ -1817,6 +1955,10 @@
       this.state.events.registerEvent('DRIVER_REGISTERED');
       this.state.events.registerEvent('REGISTER_ELEMENT');
       this.state.events.registerEvent('PLATFORM_READY');
+      this.state.events.triggerEvent('GLOBAL_ACTIVITY');
+      this.state.events.registerHook('PLATFORM_READY', __bind(function() {
+        return this.state.events.triggerEvent('GLOBAL_ACTIVITY_FINISH');
+      }, this));
       this.model = new CoreModelAPI(this);
       this.api = new CoreAPIBridge(this);
       this.user = new CoreUserAPI(this);

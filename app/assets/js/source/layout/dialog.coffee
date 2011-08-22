@@ -27,3 +27,6 @@ class Dialog extends LayoutElement
 		
 	title: ->
 		return
+		
+		
+window.Layout.Dialog = Dialog

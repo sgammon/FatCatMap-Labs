@@ -119,12 +119,19 @@ class MomentumHandler(RequestHandler, Jinja2Mixin, AssetsMixin, LiveServicesMixi
 			'generalNotice': False,
 			'successNotice': False
 		}
-		params['page']['watermark'] = self._outputConfig()['watermark']
-		params['page']['standalone'] = self._outputConfig()['standalone']
+		try:
+			params['page']['watermark'] = int(self.request.args.get('_w', 0)) or self._outputConfig()['watermark']
+		except Exception:
+			params['page']['watermark'] = True
+			
+		try:
+			params['page']['standalone'] = int(self.request.args.get('_s', 0)) or self._outputConfig()['standalone']
+		except Exception:
+			params['page']['standalone'] = False
 			
 		# Appcaching
-		if self._outputConfig()['appcache']['enable'] == True:
-			params['page']['manifest'] = self._outputConfig()['appcache']['manifest']
+		if self._outputConfig()['appcache']['enable'] == True or self.request.args.get('_ac', False) == True:
+				params['page']['manifest'] = self._outputConfig()['appcache']['manifest']
 		
 		# Bind App Engine functions
 		params['api'] = {

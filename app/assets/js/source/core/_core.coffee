@@ -2,3 +2,4 @@
 class CoreAPI
  
 	constructor: (@name, @path, @config) ->
+		

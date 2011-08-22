@@ -21,45 +21,84 @@ config['momentum.fatcatmap.assets'] = {
 		('core', 'core'): {
 
 			'config': {
-				'version_mode': 'getvar'
+				'version_mode': 'getvar',
+				'bundle': 'dependencies.bundle.min.js'
 			},
 			
 			'assets': {
+				'data': {'min': True, 'version': '0.4.1'}, # Data.JS - beta duplicate site MVC core
 				'backbone': {'min': True, 'version': '0.5.1'}, # Backbone.JS - site MVC core
 				'amplify': {'min': True, 'version': '1.0.0'}, # AmplifyJS - for request, local storage + pubsub management
 				'modernizr': {'min': True, 'version': '2.0'}, # Modernizr - browser polyfill + compatibility testing
-				'yepnope': {'min': True, 'version': '1.0.1'} # YepNope: conditional async script loader
+				'yepnope': {'min': True, 'version': '1.0.1'}, # YepNope: conditional async script loader
+				'lawnchair': {'min': False, 'version': '0.6.1'} # Lawnchair: Client-side persistent storage
 			}
 		
-		},	
+		},
 		
-		### FatCatMap Platform Scripts ####
+		### FatCatMap Platform Scripts ###
 		('fatcatmap', 'compiled'): {
 
 			'config': {
-				'version_mode': 'getvar'
+				'version_mode': 'getvar',
+				'bundle': 'core.bundle.min.js'
 			},
 
 			'assets': {
 				'base': {'min': True, 'version': 0.1}, # milk (mustasche for coffee), _underscore, _root
 				'fcm': {'min': True, 'version': 0.1}, # init, framework, and client-side platform code
-				'layout': {'min': True, 'version': 0.1}, # contains code for manipulating page layout			
-				'interaction': {'min': True, 'version': 0.1}, # contains code for charting, visualization & graphing
+				'layout': {'min': True, 'version': 0.1}, # contains code for manipulating page layout
+				'interaction': {'min': True, 'version': 0.1} # contains code for charting, visualization & graphing
 			}
 	
 		},
-
+		
+		### FatCatMap Site Scripts ###
+		('site', 'compiled/site'): {
+		
+			'config': {
+				'min': True,
+				'version_mode': 'getvar'
+			},
+			
+			'assets': {
+				'browse': {'min': True, 'version': 0.1}, # content section: data browser
+				'search': {'min': True, 'version': 0.1}, # content section: data search
+				'map': {'min': True, 'version': 0.1}, # content section: data mapping
+				'interact': {'min': True, 'version': 0.1}, # content section: social interaction
+				'visualize': {'min': True, 'version': 0.1}, # content section: data visualization				
+			}
+		
+		},
+		
 		### FatCatMap Local Storage Drivers ###
 		('storage', 'compiled/storage'): {
+			
+			'config': {
+				'version_mode': 'getvar'
+			},
+			
+			'assets': {
+				'local': {'min': True, 'version': 0.1},
+			},
+			
+		},
+
+		### FatCatMap 3rd Party Storage Drivers ###
+		('ext-storage', 'core/storage'): {
 
 			'config': {
-				'version_mode': 'getvar'	
+				'version_mode': 'getvar',
+				'bundle': 'storage.bundle.min.js'			
 			},
 	
 			'assets': {
-				'sql': {'min': True, 'version': 0.1}, # Web SQL Database driver
-				'object': {'min': True, 'version': 0.1}, # IndexedDB Database driver
-				'local': {'min': True, 'version': 0.1} # LocalStorage driver
+				'websql': {'min': False, 'version': 0.1}, # Web SQL plugin for Lawnchair
+				'indexeddb': {'min': False, 'version': 0.1}, # IndexedDB plugin for Lawnchair
+				'query': {'min': False, 'version': 0.1}, # Query plugin for Lawnchair
+				'pagination': {'min': False, 'version': 0.1}, # Pagination plugin for Lawnchair
+				'callbacks': {'min': False, 'version': 0.1}, # Callbacks plugin for Lawnchair
+				'aggregation': {'min': False, 'version': 0.1} # Aggregation plugin for Lawnchair
 			}
 		
 		},
@@ -68,7 +107,8 @@ config['momentum.fatcatmap.assets'] = {
 		('plugins', 'compiled/plugins'): {
 
 			'config': {
-				'version_mode': 'getvar'
+				'version_mode': 'getvar',
+				'bundle': 'plugins.bundle.min.js'			
 			},
 			
 			'assets': {
@@ -82,7 +122,8 @@ config['momentum.fatcatmap.assets'] = {
 		('polyfills', 'core/polyfills'): { 
 
 			'config': {
-				'version_mode': 'getvar'
+				'version_mode': 'getvar',
+				'bundle': 'polyfills.bundle.min.js'
 			},
 			
 			'assets': {
@@ -96,8 +137,14 @@ config['momentum.fatcatmap.assets'] = {
 		
 		### FatCatMap Developer Tools ###
 		('dev', 'util'): {
-		
-			'fps_stats': {} # Little JS snippet to enable an on-page FPS/MB counter
+
+			'config': {
+				'bundle': 'util.bundle.min.js'
+			},
+
+			'assets': {
+				'fps_stats': {} # Little JS snippet to enable an on-page FPS/MB counter
+			}
 		
 		},						
 				
@@ -105,7 +152,8 @@ config['momentum.fatcatmap.assets'] = {
 		('jquery', 'jquery'): { 
 		
 			'config': {
-				'version_mode': 'getvar'
+				'version_mode': 'getvar',				
+				'bundle': 'jquery.bundle.min.js'
 			},
 			
 			'assets': {
@@ -121,14 +169,16 @@ config['momentum.fatcatmap.assets'] = {
 
 			'config': {
 				'min': True,
-				'version_mode': 'getvar'
+				'version_mode': 'getvar',
+				'bundle': 'jquery.ui.bundle.min.js'				
 			},
 			
 			'assets': {
 				'jqui': {'min': True, 'version': '1.8.9'}, # jQuery UI
 				'tipsy': {'min': True, 'version': '1.0.0a'}, # Effect for slick, animated tooltips
 				'masonry': {'min': True, 'version': '1.3.2'}, # Special easy-on-the-eye layout styling
-				'fancybox': {'min': True, 'version': '1.3.4'}, # Quick + clean lightbox-style dialogs		
+				'fancybox': {'min': True, 'version': '1.3.4'}, # Quick + clean lightbox-style dialogs
+				'animate-enhanced': {'min': True, 'version': '0.76'} # Replaces jQuery animate() with CSS3 animations
 			}
 		
 		},
@@ -138,7 +188,8 @@ config['momentum.fatcatmap.assets'] = {
 
 			'config': {
 				'min': False,
-				'version_mode': 'getvar'
+				'version_mode': 'getvar',
+				'bundle': 'zepto.bundle.min.js'
 			},
 
 			'assets': {
@@ -159,7 +210,8 @@ config['momentum.fatcatmap.assets'] = {
 		('d3', 'd3'): {
 		
 			'config': {
-				'version_mode': 'getvar'
+				'version_mode': 'getvar',
+				'bundle': 'd3.bundle.min.js'		
 			},
 		
 			'assets': {

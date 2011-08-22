@@ -3,6 +3,38 @@ class CoreStateAPI extends CoreAPI
 	
 	constructor: (fcm) ->
 		
+		@ui =
+			
+			indicators:
+				
+				globalIndicatorQueue: 0
+				currentGlobalProgress: 0
+
+				startSpinner: () ->
+					if @globalIndicatorQueue == 0
+						$('#globalActivityIndicator').animate({opacity: 1}).removeClass('hidden')
+					@globalIndicatorQueue++
+					
+				stopSpinner: () ->
+					@globalIndicatorQueue--
+					if @globalIndicatorQueue == 0
+						$('#globalActivityIndicator').animate({opacity: 0}, 'fast', -> $(@).addClass('hidden'))
+					
+				setGlobalProgressBar: (progress) ->
+					if not progress?
+						progress = @currentGlobalProgress + 10
+						
+					if progress >= 100
+						$('#globalProgress').animate({width: $('#toploader').width()}, () ->
+
+							$('#globalProgress').css({width: 0})	
+						)
+						
+					else
+						$('#globalProgress').animate({width: $('#toploader').width() * (progress / 100)})
+						
+					@currentGlobalProgress = progress
+		
 		@events =
 			
 			registry: []
@@ -28,13 +60,12 @@ class CoreStateAPI extends CoreAPI
 						return fn(context)
 					runonce: once
 				@events.callchain[_event].push(calltask)
-				if fcm.dev.debug.eventlog is true and fcm.dev.debug.verbose is true
-					console.log("[EventLog] Hook Registered: ", fn, "on event", _event)			
+				if fcm.dev.debug.verbose is true
+					fcm.dev.eventlog("Hook Registered", fn, "on event", _event)
 					
 			triggerEvent: (_event, context) =>
 				
-				if fcm.dev.debug.eventlog is true
-					console.log("[EventLog] Event Triggered: "+_event, context || '{no context}')
+				fcm.dev.eventlog("Event Triggered", _event, context || '{no context}')
 									
 				if typeof @events.callchain[_event] isnt null
 					if @events.callchain[_event].length > 0
@@ -44,7 +75,7 @@ class CoreStateAPI extends CoreAPI
 							else
 								try
 									if fcm.dev.debug.eventlog is true and fcm.dev.debug.verbose is true
-										console.log("[EventLog] Callchain: ", calltask, @events.callchain[_event])
+										fcm.dev.eventlog("Callchain", calltask, @events.callchain[_event])
 									result = @events.callchain[_event][calltask].callback(context)
 									result_calltask =
 										event: _event
@@ -57,6 +88,7 @@ class CoreStateAPI extends CoreAPI
 										context: context
 										task: @events.callchain[_event][calltask]
 										error: error
+									fcm.dev.error('Events', 'Calltask failed with error: ', error, result_calltask)
 								finally
 									@events.history.push(result_calltask)
 									@events.callchain[_event][calltask].executed = true
@@ -110,7 +142,7 @@ class CoreStateAPI extends CoreAPI
 					element: element
 				fcm.state.events.triggerEvent('REGISTER_ELEMENT', context)
 
-				return @events.registry[id]
+				return @elements.registry[id]
 				
 			_setState: (id, key, value) ->
 				if @registry[id] isnt null
@@ -129,3 +161,14 @@ class CoreStateAPI extends CoreAPI
 				else
 					@registry[id]._loadState(state)
 				return @
+
+		### === Register State Events === ###
+		
+		@events.registerEvent('GLOBAL_ACTIVITY')
+		@events.registerEvent('GLOBAL_ACTIVITY_FINISH')
+		
+		@events.registerHook('GLOBAL_ACTIVITY', => @ui.indicators.startSpinner())
+		@events.registerHook('GLOBAL_ACTIVITY_FINISH', => @ui.indicators.stopSpinner())
+		
+		$('body').bind "ajaxSend", => @events.triggerHook('GLOBAL_ACTIVITY')
+		$('body').bind "ajaxComplete", => @events.triggerHook('GLOBAL_ACTIVITY_FINISH')

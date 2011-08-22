@@ -21,6 +21,9 @@ class CoreModelAPI extends CoreAPI
 	
 	constructor: (fcm) ->
 		
+		## Model storage
+		window.Models = {}
+		
 		## Bind events
 		fcm.state.events.registerEvent('MODEL_DEFINE')
 		fcm.state.events.registerEvent('MODEL_SYNC')

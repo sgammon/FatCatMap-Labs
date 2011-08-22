@@ -137,6 +137,7 @@ class CoreRPCAPI extends CoreAPI
 		fcm.state.events.registerEvent('RPC_SUCCESS')
 		fcm.state.events.registerEvent('RPC_ERROR')
 		fcm.state.events.registerEvent('RPC_COMPLETE')
+		fcm.state.events.registerEvent('RPC_PROGRESS')
 		
 		## Use amplify, if we can
 		if window.amplify?
@@ -144,6 +145,34 @@ class CoreRPCAPI extends CoreAPI
 			fcm.sys.drivers.register('transport', 'amplify', window.amplify, true, true)
 
 		@base_rpc_uri = '/_api/rpc'
+		
+		
+		## Set up request internals
+		original_xhr = $.ajaxSettings.xhr
+		
+		@internals =
+		
+			transports:
+				
+				xhr:
+					factory: () =>
+						req = original_xhr()
+						if req
+							if typeof req.addEventListener == 'function'
+								console.log('ADDING PROGRESS LISTENER')
+								req.addEventListener("progress", (ev) =>
+										console.log('PROGRESS LISTENER CALLED')
+										$.fatcatmap.state.events.triggerEvent('RPC_PROGRESS', {event: ev})
+								, false)
+						return req
+						
+		$.ajaxSetup(
+			
+			global: true			
+			xhr: () =>
+				return @internals.transports.xhr.factory()
+
+		)
 		
 		@api =
 			
@@ -270,7 +299,7 @@ class CoreRPCAPI extends CoreAPI
 							return xhr
 				
 						error: (xhr, status, error) =>
-							fatcatmap.dev.error('RPC', 'Error: ', {data: data, status: status, xhr: xhr})
+							fatcatmap.dev.error('RPC', 'Error: ', {error: error, status: status, xhr: xhr})
 							fatcatmap.rpc.api.lastFailure = error
 							fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr
 							fatcatmap.rpc.api.history[request.envelope.id].status = status
@@ -280,8 +309,10 @@ class CoreRPCAPI extends CoreAPI
 								xhr: xhr
 								status: status
 								error: error
+								
 							fatcatmap.state.events.triggerEvent('RPC_ERROR', context)
-							callbacks?.failure(data)
+							fcm.state.events.triggerEvent('RPC_COMPLETE', context)			
+							callbacks?.failure(error)
 				
 						success: (data, status, xhr) =>
 							fatcatmap.dev.log('RPC', 'Success', data, status, xhr)
@@ -295,20 +326,10 @@ class CoreRPCAPI extends CoreAPI
 								status: status
 								data: data
 							fcm.state.events.triggerEvent('RPC_SUCCESS', context)
+							fcm.state.events.triggerEvent('RPC_COMPLETE', context)
 
 							fatcatmap.dev.verbose('RPC', 'Success callback', callbacks)
-							callbacks?.success(data)
-				
-						complete: (xhr, status) =>
-							fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr
-							fatcatmap.rpc.api.history[request.envelope.id].status = status
-						
-							context =
-								xhr: xhr
-								status: status
-							fatcatmap.state.events.triggerEvent('RPC_COMPLETE', context)
-							callbacks?.complete(xhr, status)
-						
+							callbacks?.success(data)						
 				
 						statusCode:
 				
@@ -325,7 +346,7 @@ class CoreRPCAPI extends CoreAPI
 								alert 'RPC 500: Woops! Something went wrong. Please try again.'
 				
 					amplify = fatcatmap.sys.drivers.resolve('transport', 'amplify')
-					if amplify?
+					if amplify? and amplify is not false
 						fatcatmap.dev.verbose('RPC', 'Fulfilling with AmplifyJS adapter.')
 						xhr_action = amplify.request
 						xhr = xhr_action(xhr_settings)
@@ -349,7 +370,9 @@ class CoreRPCAPI extends CoreAPI
 		
 		@ext = null
 		
-		fcm.state.events.triggerEvent('RPC_READY')
+		fcm.state.events.registerHook 'RPC_FULFILL', -> $.fatcatmap.state.events.triggerEvent 'GLOBAL_ACTIVITY'
+		fcm.state.events.registerHook 'RPC_COMPLETE', -> $.fatcatmap.state.events.triggerEvent 'GLOBAL_ACTIVITY_FINISH'
+		fcm.state.events.registerHook 'RPC_PROGRESS', (event) -> console.log('progress', event)
 		
 	registerAPIMethod: (api, name, base_uri, config) ->
 		if $?

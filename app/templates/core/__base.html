@@ -1,4 +1,8 @@
-{% from "macros/rpc.html" import jsapi_rpc %}{% from "macros/graph.html" import d3grapher %}{% from "macros/form.html" import renderForm %}{% from "macros/chart.html" import renderChart %}{% from "macros/datagrid.html" import renderDatagrid %}
+{%- from "macros/rpc.html" import jsapi_rpc -%}
+{%- from "macros/graph.html" import d3grapher -%}
+{%- from "macros/form.html" import renderForm -%}
+{%- from "macros/chart.html" import renderChart -%}
+{%- from "macros/datagrid.html" import renderDatagrid -%}
 <!doctype html>
 <!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
 <!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
@@ -16,44 +20,21 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">	
 		
-	<title>{% block title %}{% if title %}{{ title }} - {% endif %}FatCatMap Labs ({{ sys.version }}){% endblock title %}</title>
+	<title>{%- block title -%}{% if title %}{{ title }} - {% endif %}FatCatMap Labs ({{ sys.version }}){%- endblock title -%}</title>
 	
-	{% block north %}
+	{%- block north -%}
 	<!-- North Element -->
 		{% block prenorth %}{% endblock %}
 		{% include "elements/__north.html" %}
 		{% block postnorth %}{% endblock %}
 	<!-- End North -->
-	{% endblock north %}
+	{%- endblock north -%}
 	
 </head>
 
-<body class='{% block body_class %}fcm-beta{% endblock %}'>
+<body class='{%- block body_class -%}fcm-dark{%- endblock -%}'>
 
 	{% block body %}
-	<div id="container">
-
-		{# Includes super navigation, currently logged in user, etc... #}
-		{% block superbar %}
-			<header id='momentumSuperbar' class='superbar' data-element='superbar' data-element-type='SuperPanel'>
-				{% include 'snippets/superbar.html' %}
-			</header>
-		{% endblock %}
-
-		{# Main content div... content panes go in here. #}
-		<div id="main" role="main" class='rootContent'>
-			{% block content %}
-				<p>Welcome to FatCatMap!</p>
-			{% endblock %}
-		</div>
-
-		{# Superfooter is used for branding and copyright stuff... #}
-		{% block superfooter %}
-		<footer id='momentumSuperfooter' class='superfooter' data-element='superfooter' data-element-type='SuperPanel'>
-			{% include 'snippets/superfooter.html' %}
-		</footer>
-		{% endblock %}
-	</div>
 	{% endblock %}
 
 

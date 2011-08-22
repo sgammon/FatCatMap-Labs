@@ -50,7 +50,7 @@ _config['tipfy.sessions'] = {
     'session_max_age': None,
     'cookie_args': {
         'max_age':     86400,
-        'domain':      '*',
+        #'domain':      '*',
         'path':        '/',
         'secure':      False,
         'httponly':    False,
@@ -125,11 +125,13 @@ def readConfig(config=_config):
 				systemLog('Checking include "'+str(name)+'" at path "'+str(configpath)+'".')
 				try:
 					for key, cfg in import_string('.'.join(configpath.split('.')+['config'])).items():
-						systemLog('')
 						config[key] = cfg
 				except Exception, e:
 					systemLog('Encountered exception of type "'+str(e.__class__)+'" when trying to parse config include "'+str(name)+'" at path "'+str(configpath))
-					continue
+					if debug:
+						raise
+					else:
+						continue
 		if len(config) > 0 and _compiled_config is None:
 			_compiled_config = config
 				

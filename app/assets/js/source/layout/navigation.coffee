@@ -55,4 +55,4 @@ class Navigation extends LayoutElement
 				
 		)
 		
-window.Navigation = Navigation
+window.Layout.Navigation = Navigation

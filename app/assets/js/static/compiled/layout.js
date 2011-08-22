@@ -7,15 +7,14 @@
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  }, __indexOf = Array.prototype.indexOf || function(item) {
-    for (var i = 0, l = this.length; i < l; i++) {
-      if (this[i] === item) return i;
-    }
-    return -1;
-  };
+  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   LayoutElement = (function() {
-    LayoutElement.prototype.id = null;
+    function LayoutElement() {
+      LayoutElement.__super__.constructor.apply(this, arguments);
+    }
     __extends(LayoutElement, Backbone.View);
+    LayoutElement.prototype.id = null;
+    LayoutElement.prototype.name = null;
     LayoutElement.prototype.state = {};
     LayoutElement.prototype.config = {};
     LayoutElement.prototype.classes = [];
@@ -23,112 +22,14 @@
     LayoutElement.prototype.defaults = null;
     LayoutElement.prototype.selector = null;
     LayoutElement.prototype.registered = false;
-    function LayoutElement(selector, config) {
-      this.selector = selector;
-      this.config = config != null ? config : {};
-    }
-    LayoutElement.prototype.register = function(id) {
-      this.id = id;
-    };
-    LayoutElement.prototype._setState = function(key, value) {
-      this.state[key] = value;
-      return this;
-    };
-    LayoutElement.prototype._getState = function(key, default_value) {
-      if (default_value == null) {
-        default_value = null;
-      }
-      if (this.state[key] === void 0) {
-        return default_value;
-      } else {
-        return this.state[key];
-      }
-    };
-    LayoutElement.prototype._deleteState = function(key) {
-      return delete this.state[key];
-    };
-    LayoutElement.prototype._loadState = function(state, classes) {
-      this.state = state;
-      this.classes = classes;
-      return this._refreshState();
-    };
-    LayoutElement.prototype._flushState = function() {
-      var finalState;
-      finalState = {
-        state: this.state,
-        classes: this.classes
-      };
-      return finalState;
-    };
-    LayoutElement.prototype._refreshState = function() {
-      var classname, _i, _len, _ref, _results;
-      _ref = this.classes;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        classname = _ref[_i];
-        _results.push(this.get().addClass(classname));
-      }
-      return _results;
-    };
-    LayoutElement.prototype.get = function() {
-      if (this.element === null) {
-        this.element = $(this.selector);
-      }
-      return this.element;
-    };
-    LayoutElement.prototype.addClass = function(classname) {
-      this.classes.push(classname);
-      this.get().addClass(classname);
-      return this;
-    };
-    LayoutElement.prototype.removeClass = function(classname) {
-      if (__indexOf.call(this.classes, classname) >= 0) {
-        this.classes.remove(classname);
-      }
-      this.get().removeClass(classname);
-      return this;
-    };
-    LayoutElement.prototype.toggleClass = function(classname) {
-      if (__indexOf.call(this.classes, classname) >= 0) {
-        this.classes.remove(classname);
-      } else {
-        this.classes.push(classname);
-      }
-      this.get().toggleClass(classname);
-      return this;
-    };
-    LayoutElement.prototype.hide = function(duration, easing, callback) {
-      this._setState('visible', false);
-      this.get().hide(duration, easing, callback);
-      return this;
-    };
-    LayoutElement.prototype.show = function(duration, easing, callback) {
-      this._setState('visible', true);
-      return this.get().show(duration, easing, callback);
-    };
-    LayoutElement.prototype.showhide = function(duration, easing, callback) {
-      if (this._getState('visible', false) !== false) {
-        this.get().hide(duration, easing, callback);
-      } else {
-        this.get().show(duration, easing, callback);
-      }
-      return this;
-    };
-    LayoutElement.prototype.css = function(properties) {
-      this.get().css(properties);
-      return this;
-    };
-    LayoutElement.prototype.animate = function(properties, options) {
-      if (options == null) {
-        options = {};
-      }
-      this.get().animate(properties, options);
-      return this;
+    LayoutElement.prototype.register = function(name) {
+      this.name = name;
     };
     return LayoutElement;
   })();
   if (typeof window !== "undefined" && window !== null) {
     window.LayoutElement = LayoutElement;
+    window.Layout = {};
   }
   Panel = (function() {
     function Panel() {
@@ -151,17 +52,17 @@
       SuperBar.__super__.constructor.apply(this, arguments);
     }
     __extends(SuperBar, SuperPanel);
-    SuperBar.prototype.register = function(id) {
-      this.id = id;
-      $('#momentumSuperbar').hover(function() {
-        return $('#momentumSuperbar').animate({
+    SuperBar.prototype.initialize = function() {
+      $(this.el).hover(__bind(function() {
+        return $(this.el).animate({
           opacity: 1.0
         });
-      }, function() {
-        return $('#momentumSuperbar').animate({
+      }, this), __bind(function() {
+        return $(this.el).animate({
           opacity: 0.8
         });
-      });
+      }, this));
+      this.el = $(this.id);
     };
     return SuperBar;
   })();
@@ -170,41 +71,185 @@
       SuperFooter.__super__.constructor.apply(this, arguments);
     }
     __extends(SuperFooter, SuperPanel);
-    SuperFooter.prototype.register = function(id) {
-      this.id = id;
-      $('#momentumSuperfooter').hover(function() {
-        return $('#momentumSuperfooter').animate({
+    SuperFooter.prototype.initialize = function() {
+      $(this.el).hover(__bind(function() {
+        return $(this.el).animate({
           opacity: 0.8
         });
-      }, function() {
-        return $('#momentumSuperfooter').animate({
+      }, this), __bind(function() {
+        return $(this.el).animate({
           opacity: 0.5
         });
-      });
-      $('#bottomFcmBranding a').hover(function() {
-        return $('#bottomFcmBranding a div').addClass('brandingHover');
-      }, function() {
-        return $('#bottomFcmBranding a div').removeClass('brandingHover');
-      });
+      }, this));
+      this.$('#bottomFcmBranding a').hover(__bind(function() {
+        return this.$('#bottomFcmBranding a div').addClass('brandingHover');
+      }, this), __bind(function() {
+        return this.$('#bottomFcmBranding a div').removeClass('brandingHover');
+      }, this));
     };
     return SuperFooter;
   })();
   Sidebar = (function() {
-    function Sidebar() {
-      Sidebar.__super__.constructor.apply(this, arguments);
+    function Sidebar(id, config) {
+      this.id = id;
+      this.el = $(this.id);
+      this.state = {
+        hidden: false,
+        locked: false,
+        folded: false,
+        unfolded: false,
+        maximized: false
+      };
+      this.config = {
+        maximizable: false,
+        folded_width: 35,
+        unfolded_width: $('body').width() * .25,
+        maximized_width: $('body').width() * .70
+      };
+      if (config != null) {
+        _.extend(this.config, config);
+      }
+      this.$('.enabled.expandButton').click(__bind(function(event) {
+        return this.unfold();
+      }, this));
+      this.$('.enabled.closeButton').click(__bind(function(event) {
+        return this.fold();
+      }, this));
+      this.hide = __bind(function(animate) {
+        if (animate == null) {
+          animate = true;
+        }
+        if (this.state.hidden === false) {
+          this.state.hidden = true;
+          if (animate === true) {
+            $(this.el).animate({
+              opacity: 0
+            }, __bind(function() {
+              return $(this.el).addClass('hidden');
+            }, this));
+          } else {
+            $(this.el).addClass('hidden');
+          }
+        }
+        return this.state.hidden;
+      }, this);
+      this.unhide = __bind(function(animate) {
+        if (animate == null) {
+          animate = true;
+        }
+        if (this.state.hidden === true) {
+          this.state.hidden = false;
+          if (animate === true) {
+            $(this.el).animate({
+              opacity: 1
+            }, __bind(function() {
+              return $(this.el).removeClass('hidden');
+            }, this));
+          } else {
+            $(this.el).removeClass('hidden');
+          }
+        }
+        return this.state.hidden;
+      }, this);
+      this.lock = __bind(function() {
+        this.state.locked = true;
+        this.$('.expandButton').removeClass('enabled').unbind('click');
+        return this.state.locked;
+      }, this);
+      this.unlock = __bind(function() {
+        this.state.locked = false;
+        this.$('.expandButton').addClass('enabled').click(__bind(function() {
+          return this.unfold();
+        }, this));
+        return this.state.locked;
+      }, this);
+      this.fold = __bind(function() {
+        this.state.folded = true;
+        this.state.unfolded = false;
+        this.state.maximized = false;
+        this.hideContent();
+        if (this.$('.closeButton').hasClass('multiButton')) {
+          this.$('.closeButton').removeClass('closeButton').addClass('expandButton');
+          this.$('.closeMultiButton').removeClass('enabled').addClass('hidden');
+          this.$('.expandMultiButton').addClass('enabled').removeClass('hidden');
+        } else {
+          if (!this.$('.closeButton').hasClass('hidden')) {
+            this.$('.closeButton').addClass('hidden');
+          }
+        }
+        if (!this.$('.expandButton').hasClass('enabled') && this.state.locked !== true) {
+          this.$('.expandButton').addClass('enabled');
+        }
+        this.$('.enabled.expandButton').unbind('click').click(__bind(function(event) {
+          return this.unfold();
+        }, this));
+        return $(this.el).addClass('folded').removeClass('unfolded').animate({
+          width: this.config.folded_width
+        });
+      }, this);
+      this.unhideContent = __bind(function() {
+        return this.$('.panelWrapper').animate({
+          opacity: 1
+        }).removeClass('hidden');
+      }, this);
+      this.hideContent = __bind(function() {
+        return this.$('.panelWrapper').animate({
+          opacity: 0
+        }).addClass('hidden');
+      }, this);
+      this.unfold = __bind(function() {
+        this.state.folded = false;
+        this.state.unfolded = true;
+        this.state.maximized = false;
+        $(this.el).addClass('unfolded').removeClass('folded').animate({
+          width: this.config.unfolded_width
+        });
+        this.unhideContent();
+        $('.enabled.closeButton').removeClass('hidden');
+        if (this.config.maximizable !== false) {
+          return this.$('.enabled.expandButton').unbind('click').click(__bind(function(event) {
+            console.log('maximize called');
+            return this.maximize();
+          }, this));
+        } else {
+          if (this.$('.expandButton').hasClass('multiButton')) {
+            this.$('.expandMultiButton').addClass('hidden');
+            this.$('.closeMultiButton').removeClass('hidden');
+            this.$('.expandButton').removeClass('expandButton').addClass('closeButton');
+            return this.$('.closeButton').unbind('click').click(__bind(function() {
+              return this.fold();
+            }, this));
+          } else {
+            return this.$('.enabled.expandButton').removeClass('enabled');
+          }
+        }
+      }, this);
+      this.minimize = __bind(function() {
+        this.$('.enabled.minimizeButton').removeClass('enabled').addClass('hidden');
+        this.$('.expandButton').addClass('enabled').removeClass('hidden');
+        return this.unfold();
+      }, this);
+      this.maximize = __bind(function() {
+        this.state.folded = false;
+        this.state.unfolded = true;
+        this.state.maximized = true;
+        this.$('.enabled.expandButton').removeClass('enabled').addClass('hidden');
+        this.$('.minimizeButton').removeClass('hidden').addClass('enabled').unbind('click').click(__bind(function(ev) {
+          return this.minimize();
+        }, this));
+        return $(this.el).addClass('maximized').removeClass('unfolded').animate({
+          width: this.config.maximized_width
+        });
+      }, this);
     }
     __extends(Sidebar, LayoutElement);
-    Sidebar.prototype.fold = function() {};
-    Sidebar.prototype.unfold = function() {};
-    Sidebar.prototype.minimize = function() {};
-    Sidebar.prototype.maximize = function() {};
     return Sidebar;
   })();
-  window.Panel = Panel;
-  window.Sidebar = Sidebar;
-  window.SuperBar = SuperBar;
-  window.SuperPanel = SuperPanel;
-  window.SuperFooter = SuperFooter;
+  window.Layout.Panel = Panel;
+  window.Layout.Sidebar = Sidebar;
+  window.Layout.SuperBar = SuperBar;
+  window.Layout.SuperPanel = SuperPanel;
+  window.Layout.SuperFooter = SuperFooter;
   Dialog = (function() {
     function Dialog() {
       Dialog.__super__.constructor.apply(this, arguments);
@@ -224,6 +269,7 @@
     Dialog.prototype.title = function() {};
     return Dialog;
   })();
+  window.Layout.Dialog = Dialog;
   Navigation = (function() {
     var pane_class;
     function Navigation() {
@@ -270,5 +316,5 @@
     };
     return Navigation;
   })();
-  window.Navigation = Navigation;
+  window.Layout.Navigation = Navigation;
 }).call(this);

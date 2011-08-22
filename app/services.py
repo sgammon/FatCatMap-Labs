@@ -49,10 +49,6 @@ def generateServiceMappings(svc_cfg):
 def main():
 	
 	global services_config
-	
-	## Select Django 1.2
-	if not config.debug:
-		use_library('django', '1.2')
 		
 	ndb.debug = config.debug
 	

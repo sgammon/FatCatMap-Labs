@@ -10,7 +10,7 @@ config = {}
 ## Global Services
 config['momentum.services'] = {
 
-	'logging': True,
+	'logging': False,
 
 	'hooks': {
 		'appstats': {'enabled': False},
@@ -124,7 +124,7 @@ config['momentum.services'] = {
 					'default_ttl': 120,
 					
 					'activate': {
-						'local': False,
+						'local': True,
 						'request': True,
 						'internal': True
 					}
@@ -286,7 +286,7 @@ config['momentum.fatcatmap.services'] = {
 			'methods': ['construct', 'constructFromNode', 'constructFromObject'],
 
 			'config': {
-				'caching': 'lazy',
+				'caching': 'aggressive',
 				'security': 'none',
 				'recording': 'none'
 			}

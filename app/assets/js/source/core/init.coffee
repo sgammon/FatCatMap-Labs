@@ -15,12 +15,15 @@ class FatCatMap
 
 		## State API
 		@state = new CoreStateAPI(@)
-		@state.events.registerEvent('RPC_READY')
-		@state.events.registerEvent('API_READY')
-		@state.events.registerEvent('CORE_READY')
-		@state.events.registerEvent('DRIVER_REGISTERED')
-		@state.events.registerEvent('REGISTER_ELEMENT')
-		@state.events.registerEvent('PLATFORM_READY')
+		@state.events.registerEvent 'RPC_READY'
+		@state.events.registerEvent 'API_READY'
+		@state.events.registerEvent 'CORE_READY'
+		@state.events.registerEvent 'DRIVER_REGISTERED'
+		@state.events.registerEvent 'REGISTER_ELEMENT'
+		@state.events.registerEvent 'PLATFORM_READY'
+		
+		@state.events.triggerEvent 'GLOBAL_ACTIVITY'
+		@state.events.registerHook 'PLATFORM_READY', => @state.events.triggerEvent 'GLOBAL_ACTIVITY_FINISH'
 		
 		## Model API
 		@model = new CoreModelAPI(@)
@@ -43,4 +46,4 @@ class FatCatMap
 window.fatcatmap = new FatCatMap()
 if $?
 	$.extend(fatcatmap: window.fatcatmap)
-window.fatcatmap.state.events.triggerEvent('CORE_READY')
+window.fatcatmap.state.events.triggerEvent 'CORE_READY'

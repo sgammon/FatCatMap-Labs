@@ -120,7 +120,10 @@ class CoreAssetsAPI(MomentumCoreAPI):
 				# Start building asset URL
 				filename = []
 				query_string = {}
-				asset_url = ['assets', _type, prefix, module_path, ('.', filename)]
+				if self._OutputConfig['assets']['serving_mode'] == 'local':
+					asset_url = ['assets', _type, prefix, module_path, ('.', filename)]
+				else:
+					asset_url = [_type, prefix, module_path, ('.', filename)]
 				minify = minify or self._OutputConfig['assets'].get('minified', False)
 			
 			
@@ -233,7 +236,17 @@ class CoreAssetsAPI(MomentumCoreAPI):
 						compiled_url = reduce(lambda x, y: x+y, ['/', '/'.join(map(lambda x: isinstance(x, tuple) and x[0].join(x[1]) or x, filter(lambda x: x not in [True, False, None], asset_url)))])
 						
 					if compiled_url is not None and isinstance(compiled_url, basestring) and len(compiled_url) > 0:
-						asset_url_cache[identifier] = compiled_url
+						
+						if self._OutputConfig['assets']['serving_mode'] == 'local':
+							if cfg.debug is not True:
+								asset_url_cache[identifier] = compiled_url
+							return compiled_url
+
+						elif self._OutputConfig['assets']['serving_mode'] == 'cdn':
+							if cfg.debug is not True:
+								asset_url_cache[identifier] = ''.join(['http://', self._OutputConfig['assets']['cdn_prefix']]+[compiled_url])
+							return ''.join(['http://', self._OutputConfig['assets']['cdn_prefix']]+[compiled_url])
+						
 						return compiled_url
 				
 			else:

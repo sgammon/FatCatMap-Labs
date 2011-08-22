@@ -8,7 +8,7 @@ rules = [
 	HandlerPrefix('momentum.fatcatmap.handlers.', [
 	
 		## === Main URLs === ##
-		Rule('/', name='landing', handler='main.Landing'),
+		Rule('/', name='landing', handler='content.map.MapLanding'),
 		Rule('/offline', name='offline', handler='main.Offline'),
 
 		## === Content Sections == ##

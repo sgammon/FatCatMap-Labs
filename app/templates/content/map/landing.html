@@ -34,6 +34,7 @@
 	<script type="text/javascript">
 
 		// Define local context vars
+		_g = null;
 		_graph = null;
 		_visualizer = null;
 		makeGrapher = null;
@@ -42,27 +43,7 @@
 		{
 			$.fatcatmap.state.events.registerHook('PLATFORM_READY', function drawGraph()
 			{
-				{{ d3grapher("#grapher", "makeD3Grapher") }}
-		
-				// Graph init callback
-				function initGrapher(response)
-				{
-					_graph = response.graph;
-					makeD3Grapher(_graph.nodes, _graph.edges, _graph.hints);
-				}
-		
-				// Graph failure callback
-				function graphFailure(error)
-				{
-					alert("Woops!\nSomething went wrong. Please try your request again.\n\nGRAPHER: "+error.toString());
-					console.log('Grapher Failure: ', error);
-				}
-		
-				{% if rpc_params %}
-					{{ jsapi_rpc('graph', 'construct', 'initGrapher', 'graphFailure', rpc_params) }}
-				{% else %}
-					{{ jsapi_rpc('graph', 'construct', 'initGrapher', 'graphFailure') }}
-				{% endif %}
+				_g = new Interaction.Graph('#grapher').build().render().draw();
 			});
 		});
 	

@@ -1,12 +1,26 @@
-{% extends "layouts/main.html" %}
+{% extends "layouts/lite.html" %}
 
 {% block title %}{% block subtitle %}{% endblock %} - Map influence data in real time - FatCatMap{% endblock %}
 
+{% block northloader %}
+<link rel='stylesheet' href="{{ style_url('map', 'site') }}" media='screen'>
+{% endblock %}
+
 {% block content_body %}
+	
+	<div id='nodeCompare'>
+		<div id='compareleft' class='graphblock muted'>
+			<span>drag for details</span>
+		</div>
+	
+		<div id='compareright' class='graphblock muted hidden'>
+			<span>drag to compare</span>
+		</div>
+	</div>
 
 	<div id='grapher' class='fullheight fullwidth textcenter'>
-	{% block grapher %}
-	{% endblock %}
+		{% block grapher %}
+		{% endblock %}
 	</div>
 
 	{% include 'elements/pane/details-sidebar.html' %}
@@ -14,11 +28,14 @@
 
 {% endblock %}
 
-{% block postsouth %}
-<script src="{{ script_url('core', 'd3') }}"></script>
-<script src="{{ script_url('behavior', 'd3') }}"></script>
-<script src="{{ script_url('chart', 'd3') }}"></script>
-<script src="{{ script_url('geo', 'd3') }}"></script>
-<script src="{{ script_url('geom', 'd3') }}"></script>
-<script src="{{ script_url('layout', 'd3') }}"></script>
+{% block southloader %}
+	{
+		load: ["{{ script_url('core', 'd3') }}"]
+	},
+	{
+		load: ["{{ script_url('behavior', 'd3') }}", "{{ script_url('chart', 'd3') }}", "{{ script_url('geo', 'd3') }}", "{{ script_url('geom', 'd3') }}", "{{ script_url('layout', 'd3') }}"]		
+	},
+	{
+		load: ["{{ script_url('map', 'site') }}"]
+	},
 {% endblock %}

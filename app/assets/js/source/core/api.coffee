@@ -428,4 +428,32 @@ class CoreAPIBridge extends CoreAPI
 
 
 		## ========== FatCatMap Visualizer API ========== ##
-		@visualizer = {}
+		fcm.state.events.registerEvent('MAP_REGISTERED')
+		fcm.state.events.registerEvent('MAP_DATA_CHANGE')
+		fcm.state.events.registerEvent('MAP_NODE_ADDED')
+		fcm.state.events.registerEvent('MAP_EDGE_ADDED')
+		fcm.state.events.registerEvent('MAP_DRAW')
+		fcm.state.events.registerEvent('MAP_SHIFT_ORIGIN')
+		
+		@visualizer =
+		
+			graph:
+				
+				currentGraph: null
+					
+				register: (@currentGraph) ->
+				
+				showMore: (node) ->
+					
+					$('#nodeDetails #node_label').text(node.label)
+					$('#nodeDetails #node_kind').text(node.kind)
+
+					list = ''
+					
+					neighbors = @currentGraph.index.neighbors_by_node[node.key.encoded]
+					
+					_.each( neighbors, (neighbor) =>
+						list += '<li><a href="#">'+neighbor.label+'</a></li>'
+					)
+					
+					$('#nodeDetails #node_outgoing_edges').html(list);

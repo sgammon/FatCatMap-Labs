@@ -62,10 +62,7 @@ def main():
 	
 	if config.debug:
 		rules = get_rules()
-
-	if not config.debug:
-		use_library('django', '1.2')		
-	
+		
 	## Grab debug and system config
 	debug = config.debug
 	ndb.debug = debug

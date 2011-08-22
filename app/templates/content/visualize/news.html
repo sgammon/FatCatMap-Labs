@@ -7,9 +7,12 @@
 	<!-- Newsmap navigation bar -->
 	<div id='newsmapHeader'>
 		<h1>News Explorer</h1>
-		<span class='contentNavbar'>View as <b>newspaper</b>, <a href='#treemap' class='newsmap_view'>tree map</a>, <a href='#heatmap' class='newsmap_view'>heatmap</a> | <a href='#newsmap.alerts'>alerts</a>, <a href='#newsmap.filters'>filters</a> | <a href='#options' class='newsmap_dialog'>view options</a>, <a href='#settings' class='newsmap_dialog'>settings</a></span>
 		
-		<span class='contentStatus'>
+		<span id='topbarLoading' class='contentNavbar'>loading...</span>
+		
+		<span class='contentNavbar hidden'>View as <b>newspaper</b>, <a href='#treemap' class='newsmap_view'>tree map</a>, <a href='#heatmap' class='newsmap_view'>heatmap</a> | <a href='#newsmap.alerts'>alerts</a>, <a href='#newsmap.filters'>filters</a> | <a href='#options' class='newsmap_dialog'>view options</a>, <a href='#settings' class='newsmap_dialog'>settings</a></span>
+		
+		<span class='contentStatus hidden'>
 			updated <a href='#status'>6 minutes ago</a> | <a href='#update'>update</a> | <a href='#offline'>go offline</a></span>
 		</span>
 	</div>
@@ -31,8 +34,14 @@
 		
 	</div>
 	
+	<div id='mainLoading' class='alignmiddle textcenter'>
+		<div class='fullwidth textcenter fullheight'>
+			loading...
+		</div>
+	</div>
+	
 	<!-- The newsmap! :) -->
-	<div id='newsmap' class='alignmiddle textcenter'>
+	<div id='newsmap' class='alignmiddle textcenter hidden'>
 	
 		<div class='newsbox worldNews nbHalf'>
 			<h3>News headline 1 here</h3>
@@ -124,28 +133,32 @@
 
 	$(document).ready(function () {
 	
-		$('#newsmap').masonry({
-		
-			itemSelector: '.newsbox',
-			isFitWidth: true,
-			isResizable: true,
-			isAnimated: true,
-			animationOptions: { queue: false, duration: 500 }
+		$.fatcatmap.state.events.registerHook('PLATFORM_READY', function buildMasonry() {
 			
-		});
-		
-		$('.newsmap_dialog').fancybox({
-			
-			opacity: true,
-			width: 480,
-			height: 400,
-			overlayColor: '#333',
-			padding:20,
-			showCloseButton: true,
-			enableEscapeButton: true,
-			centerOnScroll: true,
-			overlayShow: true,
-			type: 'inline'
+			$('#newsmap').masonry({
+
+				itemSelector: '.newsbox',
+				isFitWidth: true,
+				isResizable: true,
+				isAnimated: true,
+				animationOptions: { queue: false, duration: 500 }
+
+			});
+
+			$('.newsmap_dialog').fancybox({
+
+				opacity: true,
+				width: 480,
+				height: 400,
+				overlayColor: '#333',
+				padding:20,
+				showCloseButton: true,
+				enableEscapeButton: true,
+				centerOnScroll: true,
+				overlayShow: true,
+				type: 'inline'
+
+			});			
 			
 		});
 	
