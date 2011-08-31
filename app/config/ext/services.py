@@ -347,3 +347,11 @@ config['momentum.fatcatmap.services'] = {
 	} ## End services
 
 } ## End services
+
+
+# Graph API
+config['momentum.fatcatmap.services.graph'] = {
+	
+	'debug': True
+	
+}

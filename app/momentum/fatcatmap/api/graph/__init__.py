@@ -1,13 +1,16 @@
+import config
 import logging
 import ndb as n
+
 from protorpc import remote
+from werkzeug import cached_property
 
 from momentum.fatcatmap import models as m
 
 from momentum.fatcatmap.api import FatCatMapAPIService
+from momentum.fatcatmap.api.graph import exceptions
 
 from momentum.fatcatmap.models.core.object import Node
-
 from momentum.fatcatmap.messages.util import DatastoreKey
 
 from momentum.fatcatmap.messages.graph import Graph
@@ -25,20 +28,30 @@ from momentum.fatcatmap.core.api.graph.factory import GraphFactory
 class GraphAPIService(FatCatMapAPIService):
 	
 	configPath = 'services.graph.config'
+	
+	
+	@cached_property
+	def GraphServiceConfig(self):
+		return config.config.get('momentum.fatcatmap.services.graph')
+	
 
 	@remote.method(GraphRequest, GraphResponse)
 	def construct(self, request):
 		
-		logging.info('====== GRAPH API SERVICE =====')
-		logging.info('Request origin: '+str(request.origin))
-		logging.info('Request degree: '+str(request.degree))
-		logging.info('Request limit: '+str(request.limit))
+		if self.GraphServiceConfig.get('debug', False):
+			logging.info('====== GRAPH API SERVICE =====')
+			logging.info('Request origin: '+str(request.origin))
+			logging.info('Request degree: '+str(request.degree))
+			logging.info('Request limit: '+str(request.limit))
 		
 		if request.origin is not None:
 			origin_key = n.key.Key(urlsafe=request.origin)
 		else:
 			node = Node.query().get()
-			origin_key = node.key
+			if node is not None:
+				origin_key = node.key
+			else:
+				raise exceptions.NodeNotFound, "Node not found."
 
 		graph, artifacts = GraphFactory(request.degree, request.limit).buildFromNode(origin_key).export_graph()
 		

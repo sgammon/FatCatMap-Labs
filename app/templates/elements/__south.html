@@ -1,9 +1,9 @@
 <!--[if lt IE 7 ]>
-<script src="{{ script_url('belated_png') }}"></script>
+<script src="{{ assets.script('belated_png') }}"></script>
 <script> DD_belatedPNG.fix('img, .png_bg');</script>
 <![endif]-->
 
-{% if not api.users.is_user_admin() %}
+{% if not api.users.is_current_user_admin() %}
 
 <!-- Google Analytics: Track pageview -->
 <script>
@@ -16,6 +16,6 @@
 {% else %}
 
 <!-- On-screen FPS/MB widget -->
-<script src="{{ script_url('fps_stats', 'dev') }}"></script>
+<script src="{{ assets.script('fps_stats', 'dev') }}"></script>
 
 {% endif %}

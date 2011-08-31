@@ -19,8 +19,25 @@ class CacheAdapter(object):
 	
 	namespace = None
 
+	state = {}
 	config = None
 	configPath = None
+	
+	def __init__(self, *args, **kwargs):
+		if len(kwargs) > 0:
+			for k, v in kwargs.items():
+				self.state[k] = v
+			
+	def _setstate(self, **kwargs):
+		for k, v in kwargs.items():
+			self.state[k] = v
+			
+	def _clrstate(self, args):
+		for arg in args:
+			try:
+				del self.state[arg]
+			except:
+				continue
 	
 	@cached_property
 	def cacherConfig(self):
@@ -231,9 +248,7 @@ class MemcacheAdapter(CacheAdapter):
 	
 	def getByKey(self, key, namespace=None, default_value=None):
 		namespace = self.resolveNamespace(namespace)
-		logging.info('GETTING KEY "'+str(key)+'" from namespace "'+str(namespace)+'"')
 		result = memcache.get(key, namespace=namespace)
-		logging.info('RESULT '+str(result))
 		if result is not None:
 			return result
 		else:
@@ -247,7 +262,6 @@ class MemcacheAdapter(CacheAdapter):
 		namespace = self.resolveNamespace(namespace)
 		if ttl is None:
 			ttl = self.config['default_ttl']
-		logging.info('SETTING KEY "'+str(key)+'" to namespace "'+str(namespace)+'" to value "'+str(value)+'"')
 		return memcache.set(key, value, ttl, namespace=namespace)
 		
 	def setMulti(self, mapping, prefix=None, ttl=None, namespace=None):
@@ -276,6 +290,18 @@ class DatastoreAdapter(CacheAdapter):
 	configPath = 'datastore'
 
 
+class BackendAdapter(CacheAdapter):
+	
+	''' Adapter to backend in-memory caching via URLfetch. '''
+	
+	configPath = 'backend'
+
 
 class CoreCacheAPI(MomentumCoreAPI):
-	pass
+
+	adapters = [DatastoreAdapter, BackendAdapter, MemcacheAdapter, FastcacheAdapter]
+	
+	def __init__(self, *args, **kwargs):
+		pass
+	
+	

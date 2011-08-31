@@ -17,7 +17,7 @@ fatcatmap.user.setUserInfo({
 	
 	{% if api.users.current_user() != none %}
 		current_user: "{{ api.users.current_user() }}",
-		is_user_admin: "{{ api.users.is_user_admin() }}",
+		is_user_admin: "{{ api.users.is_current_user_admin() }}",
 	{% else %}
 		current_user: null,
 		is_user_admin: false,

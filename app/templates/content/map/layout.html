@@ -3,7 +3,7 @@
 {% block title %}{% block subtitle %}{% endblock %} - Map influence data in real time - FatCatMap{% endblock %}
 
 {% block northloader %}
-<link rel='stylesheet' href="{{ style_url('map', 'site') }}" media='screen'>
+<link rel='stylesheet' href="{{ assets.style('map', 'site') }}" media='screen'>
 {% endblock %}
 
 {% block content_body %}
@@ -30,12 +30,12 @@
 
 {% block southloader %}
 	{
-		load: ["{{ script_url('core', 'd3') }}"]
+		load: ["{{ assets.script('core', 'd3') }}"]
 	},
 	{
-		load: ["{{ script_url('behavior', 'd3') }}", "{{ script_url('chart', 'd3') }}", "{{ script_url('geo', 'd3') }}", "{{ script_url('geom', 'd3') }}", "{{ script_url('layout', 'd3') }}"]		
+		load: ["{{ assets.script('behavior', 'd3') }}", "{{ assets.script('chart', 'd3') }}", "{{ assets.script('geo', 'd3') }}", "{{ assets.script('geom', 'd3') }}", "{{ assets.script('layout', 'd3') }}"]		
 	},
 	{
-		load: ["{{ script_url('map', 'site') }}"]
+		load: ["{{ assets.script('map', 'site') }}"]
 	},
 {% endblock %}

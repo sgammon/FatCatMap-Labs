@@ -1,9 +1,12 @@
+import config
 import logging
 
 from ndb import query as q
 from ndb import model as n
 from ndb import context as c
 from ndb import tasklets as t
+
+from werkzeug import cached_property
 
 from momentum.fatcatmap import models as m
 from momentum.fatcatmap.core.api import MomentumCoreAPI
@@ -31,7 +34,7 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 			-----------------------------------------------------
 			| Information:										|
 			-----------------------------------------------------
-			| 	Version: 2.2									|
+			| 	Version: 2.3									|
 			| 	Author: Sam Gammon <sam@momentum.io>  			|
 			| 	Description: This library recursively builds an	|
 			| 		efficient in-memory graph data structure	|
@@ -39,10 +42,15 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 			-----------------------------------------------------
 			| Change Log:										|
 			-----------------------------------------------------
-			|	-Version 2.2 // 5-23-2010 // sam:				|
+			|   -Version 2.3 // 8-28-2011 // sam:				|
+			|		Fixed and improved debug tools, filled in	|
+			|		methods for thread-local caching, filled	|
+			|		out methods for constructing different		|
+			|		graphs and structures via Objects.
+			|	-Version 2.2 // 5-23-2011 // sam:				|
 			|		Adding compatibility with ProtoRPC, adding	|
 			|		ability to pull Objects and Natives.		|
-			|	-Version 2.1 // 3-19-2010 // sam:				|
+			|	-Version 2.1 // 3-19-2011 // sam:				|
 			|		First port from early prototypes of FCM,	|
 			|		converted algorithm to work with NDB		|
 			-----------------------------------------------------
@@ -73,6 +81,11 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 		self.load_cache()
 		if len(kwargs) > 0:
 			self.bind_config(kwargs)
+
+
+	@cached_property
+	def FactoryConfig(self):
+		return config.config.get('momentum.fatcatmap.core.graph.factory')
 			
 
 	def load_cache(self):
@@ -94,11 +107,13 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 		
 		''' Converts keys in the _artifacts property to full models. '''
 		
-		logging.info('======Filling artifacts.')
+		if self.FactoryConfig.get('debug', False):		
+			logging.info('======Filling artifacts.')
 		
 		for key, value in self._artifacts.items():
 			
-			logging.info('=========Examining artifact \''+str(key)+'\'...')
+			if self.FactoryConfig.get('debug', False):
+				logging.info('=========Examining artifact \''+str(key)+'\'...')
 			
 			if key not in self._cache:
 				
@@ -169,13 +184,15 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 				
 		if node_key not in self._artifacts:
 			
-			logging.info('=========Adding node to artifacts...')
+			if self.FactoryConfig.get('debug', False):			
+				logging.info('=========Adding node to artifacts...')
 			
 			self._artifacts[node_key] = node
 			if self._graph is None:
 				self.flush_graph()
-				
-			logging.info('=========Adding node to graph object...')
+			
+			if self.FactoryConfig.get('debug', False):			
+				logging.info('=========Adding node to graph object...')
 				
 			self._graph.add_node(node_key, native=None, type=None, label=None, scope=None)		
 	
@@ -192,20 +209,23 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 			
 		if hint_key not in self._artifacts:
 
-			logging.info('=========Adding hint to artifacts...')
+			if self.FactoryConfig.get('debug', False):
+				logging.info('=========Adding hint to artifacts...')
 
 			## Retrieve edge parent for source, key name for target
 			source = hint.parent()
 			target = n.Key(urlsafe=hint.pairs()[-1][1])
 
-			logging.info('=========Source: '+str(source))
-			logging.info('=========Target: '+str(target))
+			if self.FactoryConfig.get('debug', False):
+				logging.info('=========Source: '+str(source))
+				logging.info('=========Target: '+str(target))
 
 			self._artifacts[hint_key] = (source, target)
 			if self._graph is None:
 				self.flush_graph()
-						
-			logging.info('=========Adding hint to graph object...')
+			
+			if self.FactoryConfig.get('debug', False):			
+				logging.info('=========Adding hint to graph object...')
 							
 			## Add to graph
 			self._graph.add_edge(hint_key, [source.urlsafe(), target.urlsafe()], native=None, type=None)
@@ -221,8 +241,9 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 		
 		''' Encounter and traverse through a node, possibly with a recursive call for that node's edge-connected nodes. '''
 		
-		logging.info('======Traversing node '+str(node_key)+'...')
-		logging.info('======Depth: '+str(depth))
+		if self.FactoryConfig.get('debug', False):
+			logging.info('======Traversing node '+str(node_key)+'...')
+			logging.info('======Depth: '+str(depth))
 
 		# Graph depth must be more than 0, if it is not unset
 		if self.config['degree'] is not None and self.config['degree'] < 1:
@@ -235,12 +256,14 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 			source, target = self.encounterHint(hint)
 			if depth is None or self.config['degree'] > depth: ## Recurse
 			
-				logging.info('======Degree is greater than depth. Recursing.')
+				if self.FactoryConfig.get('debug', False):
+					logging.info('======Degree is greater than depth. Recursing.')
 			
 				yield self.traverseNode(target, depth+1)
 			else:
-				
-				logging.info('======Degree is not greater than depth. Returning.')
+
+				if self.FactoryConfig.get('debug', False):				
+					logging.info('======Degree is not greater than depth. Returning.')
 				
 				raise t.Return(self)
 
@@ -252,19 +275,21 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 		
 		''' Build a graph from an origin node key. '''
 		
-		logging.info('===================== Build from Node =====================')
-		logging.info('NodeKey: '+str(node_key))
-		logging.info('Limit: '+str(self.config['limit']))
-		logging.info('Degree: '+str(self.config['degree']))
-		logging.info('Kwargs: '+str(kwargs))
-		logging.info('Graph: '+str(self._graph))
+		if self.FactoryConfig.get('debug', False):
+			logging.info('===================== Build from Node =====================')
+			logging.info('NodeKey: '+str(node_key))
+			logging.info('Limit: '+str(self.config['limit']))
+			logging.info('Degree: '+str(self.config['degree']))
+			logging.info('Kwargs: '+str(kwargs))
+			logging.info('Graph: '+str(self._graph))
 		
-		logging.info('===Flushing graph...')
+			logging.info('===Flushing graph...')
 		
 		self.flush_graph()
 		self._graph.set_origin(node_key)
 		
-		logging.info('Graph: '+str(self._graph))
+		if self.FactoryConfig.get('debug', False):
+			logging.info('Graph: '+str(self._graph))
 		
 		if isinstance(node_key, str):
 			node_key = n.Key(urlsafe=node_key)

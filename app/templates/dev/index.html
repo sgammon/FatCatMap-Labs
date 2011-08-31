@@ -29,7 +29,7 @@
 		<li><a href="/_ah/mapreduce/" target="_blank">MapReduce Console</a></li>
 		<li>
 			<a href="/_ah/appstats" target="_blank">AppStats Console</a> (RPC Profiling)
-			{% if util.config.hooks.appstats != true %}
+			{% if util.config.get('momentum.system', {}).get('hooks', {}).get('appstats', False) != true %}
 				<br /><i><b>(Currently disabled in application config)</b></i>				
 			{% endif %}
 		</li>

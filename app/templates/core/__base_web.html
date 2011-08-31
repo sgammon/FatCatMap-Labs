@@ -1,29 +1,29 @@
 {% extends "core/__base.html" %}
 
 {% block prenorth %}
-<link rel="stylesheet" media="screen" href="{{ style_url('fonts', 'core') }}">
-<link rel="stylesheet" media="screen" href="{{ style_url('ie', 'compiled') }}">
-<link rel="stylesheet" media="screen" href="{{ style_url('main', 'compiled') }}">
-<link rel="stylesheet" media="screen" href="{{ style_url('print', 'compiled') }}">
-<link rel="stylesheet" media="screen" href="{{ style_url('interaction', 'compiled') }}">
-<link rel="stylesheet" media="handheld" href="{{ style_url('mobile', 'core') }}">
-<link rel="stylesheet" media="screen" href="{{ style_url('plugins', 'core') }}">
+<link rel="stylesheet" media="screen" href="{{ assets.style('fonts', 'core') }}">
+<link rel="stylesheet" media="screen" href="{{ assets.style('ie', 'compiled') }}">
+<link rel="stylesheet" media="screen" href="{{ assets.style('main', 'compiled') }}">
+<link rel="stylesheet" media="screen" href="{{ assets.style('print', 'compiled') }}">
+<link rel="stylesheet" media="screen" href="{{ assets.style('interaction', 'compiled') }}">
+<link rel="stylesheet" media="handheld" href="{{ assets.style('mobile', 'core') }}">
+<link rel="stylesheet" media="screen" href="{{ assets.style('plugins', 'core') }}">
 
 <!-- jQuery via CDN -->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script> 
 
 <!-- Core Dependencies -->
-<script src="{{ script_url('base', 'fatcatmap') }}"></script>
-<script src="{{ script_url('core', 'jquery') }}"></script>
-<script src="{{ script_url('data', 'core') }}"></script>
-<script src="{{ script_url('lawnchair', 'core') }}"></script>
+<script src="{{ assets.script('base', 'fatcatmap') }}"></script>
+<script src="{{ assets.script('core', 'jquery') }}"></script>
+<script src="{{ assets.script('data', 'core') }}"></script>
+<script src="{{ assets.script('lawnchair', 'core') }}"></script>
 
-<script src="{{ script_url('backbone', 'core') }}"></script>
-<script src="{{ script_url('yepnope', 'core') }}"></script>
-<script src="{{ script_url('modernizr', 'core') }}"></script>
+<script src="{{ assets.script('backbone', 'core') }}"></script>
+<script src="{{ assets.script('yepnope', 'core') }}"></script>
+<script src="{{ assets.script('modernizr', 'core') }}"></script>
 
 <!-- FatCatMap Platform -->
-<script src="{{ script_url('fcm', 'fatcatmap') }}"></script>
+<script src="{{ assets.script('fcm', 'fatcatmap') }}"></script>
 
 {% block northloader %}{% endblock %}
 
@@ -55,35 +55,35 @@
 			{
 				// Polyfill JSON Support
 				test : window.JSON && window.JSON.parse,
-				nope: "{{ script_url('json2', 'polyfills') }}"
+				nope: "{{ assets.script('json2', 'polyfills') }}"
 			},
 
 			{
 				// Load jQuery and jQuery Plugins
 				test: window.jQuery,
-				nope: "{{ script_url('core', 'jquery') }}",
-				load: ["{{ script_url('tipsy', 'jquery-ui') }}", "{{ script_url('masonry','jquery-ui') }}", "{{ script_url('fancybox', 'jquery-ui') }}",
-						"{{ script_url('easing', 'jquery') }}", "{{ script_url('mousewheel','jquery') }}"]
+				nope: "{{ assets.script('core', 'jquery') }}",
+				load: ["{{ assets.script('tipsy', 'jquery-ui') }}", "{{ assets.script('masonry','jquery-ui') }}", "{{ assets.script('fancybox', 'jquery-ui') }}",
+						"{{ assets.script('easing', 'jquery') }}", "{{ assets.script('mousewheel','jquery') }}"]
 			},
 			
 			{
 				// Load Lawnchair and plugins
 				test: window.Lawnchair,
-				nope: ["{{ script_url('lawnchair', 'core') }}"],
-				load: ["{{ script_url('query', 'ext-storage') }}", "{{ script_url('pagination', 'ext-storage') }}", "{{ script_url('callbacks', 'ext-storage') }}", "{{ script_url('aggregation', 'ext-storage') }}"]
+				nope: ["{{ assets.script('lawnchair', 'core') }}"],
+				load: ["{{ assets.script('query', 'ext-storage') }}", "{{ assets.script('pagination', 'ext-storage') }}", "{{ assets.script('callbacks', 'ext-storage') }}", "{{ assets.script('aggregation', 'ext-storage') }}"]
 			},
 			
 			{
 				// CSS Animations Support
 				test: Modernizr.cssanimations,
-				yep: ["{{ script_url('animate-enhanced', 'jquery-ui') }}"]
+				yep: ["{{ assets.script('animate-enhanced', 'jquery-ui') }}"]
 			},
 
 			{
 				// FCM Layout + Interaction packages
 				test: $.fatcatmap,
-				nope: "{{ script_url('fcm', 'fatcatmap') }}",
-				load: ["{{ script_url('layout', 'fatcatmap') }}", "{{ script_url('interaction', 'fatcatmap') }}"]
+				nope: "{{ assets.script('fcm', 'fatcatmap') }}",
+				load: ["{{ assets.script('layout', 'fatcatmap') }}", "{{ assets.script('interaction', 'fatcatmap') }}"]
 			},
 
 			{
@@ -106,31 +106,31 @@
 			{
 				// Load Workers
 				test: Modernizr.webworkers,
-				yep: ["{{ script_url('workers', 'plugins') }}"]
+				yep: ["{{ assets.script('workers', 'plugins') }}"]
 			},
 
 			{
 				// Load Geo
 				test: Modernizr.geolocation,
-				yep: ["{{ script_url('geo', 'plugins') }}"]
+				yep: ["{{ assets.script('geo', 'plugins') }}"]
 			},
 
 			{
 				// Load LocalStorage
 				test: Modernizr.localstorage || Modernizr.sessionsetorage,
-				yep: ["{{ script_url('local', 'storage') }}"]
+				yep: ["{{ assets.script('local', 'storage') }}"]
 			},
 			
 			{
 				// Load IndexedDB
 				test: Modernizr.indexeddb,
-				yep: ["{{ script_url('indexeddb', 'ext-storage') }}"]
+				yep: ["{{ assets.script('indexeddb', 'ext-storage') }}"]
 			},
 
 			{
 				// Load WebSQL
 				test: Modernizr.websqldatabase,
-				yep: ["{{ script_url('websql', 'ext-storage') }}"]
+				yep: ["{{ assets.script('websql', 'ext-storage') }}"]
 			},
 
 			{% block southloader %}

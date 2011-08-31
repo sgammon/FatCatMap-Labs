@@ -2,6 +2,8 @@
 	{% extends "core/__base_web.html" %}
 {% endif %}
 
+{% block body_class %}fcm-lite fcm-dark{% endblock %}
+
 {% block superbar %}
 {% include "snippets/litebar.html" %}
 {% endblock superbar %}
@@ -59,7 +61,7 @@
 			<a href='http://labs.momentum.io/fatcatmap' class='noicon'>FATCATMAP LABS</a> - WORK IN PROGRESS<br />
 			&copy; 2008-2011, POLITICAL <a href='http://momentum.io' class='noicon'>MOMENTUM</a><br />
 
-			{% if api.users.is_user_admin() %}
+			{% if api.users.is_current_user_admin() %}
 			
 			<hr />
 			<div id='devMenu'>

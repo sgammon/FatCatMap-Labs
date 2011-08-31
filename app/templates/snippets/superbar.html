@@ -36,7 +36,7 @@
 			</ul>
 		</li>
 		
-		<li id='utilDotSpacer'>&#183;</li>		
+		<li id='utilDotSpacer'>&#183;</li>
 		<li class='navButton'><a href='#'><span id='inboxCount'>0</span> Inbox</a></li>
 		
 		{% else %}
@@ -47,7 +47,7 @@
 		
 		<li class='navButton'><a href='#'>momentum</a>
 			<ul class='subnav rightsub'>
-				{% if api.users.is_user_admin() %}
+				{% if api.users.is_current_user_admin() %}
 					<li><a href="{{ link('dev-index') }}">Developer Console</a></li>
 					<li><a href="{{ link('admin-index') }}">Management Console</a></li>
 					<li><a href="/_pc/console/">Infrastructure Console</a></li>

@@ -66,12 +66,18 @@ config['momentum.fatcatmap.cache'] = {
 		
 		}, 
 		
+		'backend': {
+
+			'default_ttl': 10800
+
+		},
+
 		'datastore': {
 
 			'default_ttl': 86400
 		
 		}
-	
+			
 	}
 
 }
@@ -97,5 +103,12 @@ config['momentum.fatcatmap.pipelines'] = {
 		'jid': '', # Default XMPP JID to send to (this can be overridden on a per-pipeline basis in the dev console)
 	
 	}
+
+}
+
+# Graph factory
+config['momentum.fatcatmap.core.graph.factory'] = {
+
+	'debug': False, # Enable basic serverlogs
 
 }
