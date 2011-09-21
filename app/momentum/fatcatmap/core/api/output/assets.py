@@ -1,3 +1,4 @@
+import random
 import logging
 import config as cfg
 from config import config
@@ -12,6 +13,7 @@ from momentum.fatcatmap.core.api.output.exceptions import AssetException
 from momentum.fatcatmap.core.api.output.exceptions import InvalidAssetType
 from momentum.fatcatmap.core.api.output.exceptions import InvalidAssetEntry
 
+img_url_cache = {}
 asset_url_cache = {}
 
 
@@ -74,6 +76,30 @@ class CoreAssetsAPI(MomentumCoreAPI):
 		''' Return a URL for a stylesheet. '''
 
 		return self.asset_url('ext', name, module, prefix, version, minify, version_by_getvar, **kwargs)
+		
+		
+	def img_url(self, path, name):
+
+		''' Return a simple URL for an image. (Note: does not use assets config - images are not registered assets) '''
+		
+		global img_url_cache
+		
+		url_fragments = []
+		gervars = {}
+		if self._OutputConfig.get('assets', {}).get('serving_mode', 'local') == 'cdn':
+			url_fragments.append('http://')
+			if isinstance(self._OutputConfig['assets']['cdn_prefix'], list):
+				cdnprefix = random.choice(self._OutputConfig['assets']['cdn_prefix'])
+			else:
+				cdnprefix = self._OutputConfig['assets']['cdn_prefix']
+			url_fragments.append([cdnprefix, 'img', 'static']+[i for i in path.split('/')]+[''])
+		else:
+			url_fragments.append('/')
+			url_fragments.append(['assets', 'img', 'static']+[i for i in path.split('/')]+[''])
+			
+		url_fragments.append(name)
+		
+		return reduce(lambda x, y: str(x)+str(y), map(lambda x: isinstance(x, list) and '/'.join(x) or x, url_fragments))
 		
 	
 	def asset_url(self, _type, name, module, prefix, version, minify, version_by_getvar, **kwargs):
@@ -159,7 +185,7 @@ class CoreAssetsAPI(MomentumCoreAPI):
 							if version_mode == 'filename':
 								filename.append(str(version))
 							elif version_mode == 'getvar':
-								query_string['v'] = str(version)				
+								query_string['v'] = str(version)
 
 
 						### Minification in path mode is a path
@@ -228,7 +254,7 @@ class CoreAssetsAPI(MomentumCoreAPI):
 					self._log('Query String = '+str(query_string), 'debug')
 					
 					## 2.4: Build relative asset URL
-					if len(query_string) > 0:
+					if len(query_string) > 0 and self._outputConfig['assets']['serving_mode'] != 'cdn':
 					
 						compiled_url = reduce(lambda x, y: x+y, ['/', '/'.join(map(lambda x: isinstance(x, tuple) and x[0].join(x[1]) or x, filter(lambda x: x not in [True, False, None], asset_url))), '?', '&'.join([str(k)+'='+str(v) for k, v in query_string.items()])])
 					
@@ -243,9 +269,15 @@ class CoreAssetsAPI(MomentumCoreAPI):
 							return compiled_url
 
 						elif self._OutputConfig['assets']['serving_mode'] == 'cdn':
+							
+							if isinstance(self._OutputConfig['assets']['cdn_prefix'], list):
+								cdnprefix = random.choice(self._OutputConfig['assets']['cdn_prefix'])
+							else:
+								cdnprefix = self._OutputConfig['assets']['cdn_prefix']
+							
 							if cfg.debug is not True:
-								asset_url_cache[identifier] = ''.join(['http://', self._OutputConfig['assets']['cdn_prefix']]+[compiled_url])
-							return ''.join(['http://', self._OutputConfig['assets']['cdn_prefix']]+[compiled_url])
+								asset_url_cache[identifier] = ''.join(['http://', cdnprefix]+[compiled_url])
+							return ''.join(['http://', cdnprefix]+[compiled_url])
 						
 						return compiled_url
 				

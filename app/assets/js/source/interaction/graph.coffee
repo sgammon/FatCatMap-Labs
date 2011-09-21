@@ -48,6 +48,7 @@ class Graph extends InteractiveWidget
 			visualizer: null
 		
 		@index =
+			filled_keys: []		
 			nodes_by_key: {}
 			edges_by_node: {}
 			encountered_nodes: []
@@ -132,33 +133,20 @@ class Graph extends InteractiveWidget
 					return _.indexOf(@index.encountered_hints, hint.key.encoded)
 				
 
-	build: (key, cursor, degree, limit, silent=false) ->
-		
-		rpc_params = {}
-
-		if key?
-			rpc_params.key = key
-
-		if cursor?
-			rpc_params.cursor = cursor
-
-		if degree?
-			rpc_params.degree = degree
-
-		if limit?
-			rpc_params.limit = limit
+	build: (rpc_params, fillNodes=true, fillEdges=false) ->
 			
-		$.fatcatmap.rpc.api.graph.construct(rpc_params).fulfill(
+		request = $.fatcatmap.rpc.api.graph.construct(rpc_params)
+		request.fulfill(
 		
 			success: (data) =>
 				
 				nodemap = []
-				_.each( data.graph.nodes, (node, i) =>
+				_.each( data.graph.vertices, (node, i) =>
 					nodemap.push(@data.setNode(node))
 				 )
 				
 				edgemap = []
-				_.each( data.graph.edges, (edge) =>
+				_.each( data.graph.vectors, (edge) =>
 					edgemap.push(@data.setEdge(edge, nodemap))
 				)
 				
@@ -168,10 +156,12 @@ class Graph extends InteractiveWidget
 				)
 				
 				@draw()
+				@fill(fillNodes, fillEdges)
 				
 				return
 				
-			error: (event) =>
+			failure: (event) =>
+			
 				$.fcm.dev.error('Graph', 'Could not complete graph build operation.', event)
 				alert 'Could not construct graph.'
 				
@@ -179,6 +169,33 @@ class Graph extends InteractiveWidget
 		
 		return @
 
+
+	fill: (nodes=true, edges=false) ->
+		keys = []
+		types = []
+		
+		if nodes
+			types.push(@index.encountered_nodes)
+		
+		if edges
+			types.push(@index.encountered_edges)
+		
+		for type in types
+			for key in type
+				if key not in @index.filled_keys
+					keys.push(key)
+					
+		if key.length > 0
+			data_request = $.fatcatmap.rpc.api.data.get({keys: keys})
+			data_request.fulfill({success: @_dataSuccessCallback, failure: @_dataFailureCallback})
+		return @
+		
+
+	_dataSuccessCallback: (content) ->
+		console.log('data response', content)
+
+	_dataFailureCallback: (error) ->
+		console.log('data error', error)
 
 	render: () ->
 

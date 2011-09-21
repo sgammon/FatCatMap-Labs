@@ -79,9 +79,6 @@ def set_tdata_to_memcache(name, data, do_log):
 	
 	''' Set template data to memcache. '''
 	
-	logging.info('NAME: '+str(name))
-	logging.info('DATA: '+str(data))
-	
 	memcache.set('Core//Output//Template-'+name, data)
 	if do_log: logging.debug('OUTPUT_LOADER: Set template \''+str(name)+'\' to memcache under key \'Core//Output//Template-'+str(name)+'\'.')
 	
@@ -107,8 +104,7 @@ class FCMCoreOutputLoader(JFileSystemLoader):
 		
 		# Encode in Base64
 		b64_name = base64.b64encode(name)
-		uptodate = lambda: mtime == getmtime(path)
-		
+
 		# Debug logging
 		if y_cfg.get('debug') == True: do_log = True
 		else: do_log = False
@@ -143,10 +139,10 @@ class FCMCoreOutputLoader(JFileSystemLoader):
 		else: ## In dev mode, compile everything every time
 		
 			source, name, uptodate = super(FCMCoreOutputLoader, self).get_source(environment, name)
-			uptodate = False
+			return source, name, uptodate
 			
 		# Return compiled template code
-		return source, name, uptodate
+		return source, name, lambda: True
 		
 		
 # Template Factory

@@ -3,7 +3,8 @@
 {%- from "macros/form.html" import renderForm -%}
 {%- from "macros/chart.html" import renderChart -%}
 {%- from "macros/datagrid.html" import renderDatagrid -%}
-<!doctype html>
+
+{%- block html -%}<!doctype html>
 <!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
 <!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
 <!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
@@ -47,4 +48,4 @@
 	{% endblock south %}
 	
 </body>
-</html>
+</html>{%- endblock -%}

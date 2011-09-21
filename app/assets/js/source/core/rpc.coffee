@@ -84,6 +84,17 @@ class RPCRequest
 			@envelope.agent = agent
 		
 	fulfill: (callbacks, config...) ->
+	
+		if not callbacks?.success
+			defaultSuccessCallback = (context) =>
+				$.fatcatmap.dev.log('RPC', 'RPC succeeded but had no success callback.', @)
+			callbacks.success = defaultSuccessCallback
+		
+		if not callbacks?.failure
+			defaultFailureCallback = (context) =>
+				$.fatcatmap.dev.error('RPC', 'RPC failed but had no failure callback.', @)
+			callbacks.failure = defaultFailureCallback
+	
 		return window.fatcatmap.rpc.api.fulfillRPCRequest(config, @, callbacks)
 
 	setAsync: (async) ->
@@ -159,9 +170,7 @@ class CoreRPCAPI extends CoreAPI
 						req = original_xhr()
 						if req
 							if typeof req.addEventListener == 'function'
-								console.log('ADDING PROGRESS LISTENER')
 								req.addEventListener("progress", (ev) =>
-										console.log('PROGRESS LISTENER CALLED')
 										$.fatcatmap.state.events.triggerEvent('RPC_PROGRESS', {event: ev})
 								, false)
 						return req
@@ -296,9 +305,11 @@ class CoreRPCAPI extends CoreAPI
 			
 						beforeSend: (xhr, settings) =>
 							fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr;
+							callbacks?.status?('beforeSend')
 							return xhr
 				
 						error: (xhr, status, error) =>
+							callbacks?.status?('error')
 							fatcatmap.dev.error('RPC', 'Error: ', {error: error, status: status, xhr: xhr})
 							fatcatmap.rpc.api.lastFailure = error
 							fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr
@@ -312,38 +323,60 @@ class CoreRPCAPI extends CoreAPI
 								
 							fatcatmap.state.events.triggerEvent('RPC_ERROR', context)
 							fcm.state.events.triggerEvent('RPC_COMPLETE', context)			
-							callbacks?.failure(error)
+							callbacks?.failure?(error)
 				
 						success: (data, status, xhr) =>
-							fatcatmap.dev.log('RPC', 'Success', data, status, xhr)
-							fatcatmap.rpc.api.lastResponse = data
-							fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr
-							fatcatmap.rpc.api.history[request.envelope.id].status = status
-							fatcatmap.rpc.api.history[request.envelope.id].response = data
 
-							context =
-								xhr: xhr
-								status: status
-								data: data
-							fcm.state.events.triggerEvent('RPC_SUCCESS', context)
-							fcm.state.events.triggerEvent('RPC_COMPLETE', context)
+							if data.status == 'ok'
+								callbacks?.status?('success')
+								fatcatmap.dev.log('RPC', 'Success', data, status, xhr)
+								fatcatmap.rpc.api.lastResponse = data
+								fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr
+								fatcatmap.rpc.api.history[request.envelope.id].status = status
+								fatcatmap.rpc.api.history[request.envelope.id].response = data
 
-							fatcatmap.dev.verbose('RPC', 'Success callback', callbacks)
-							callbacks?.success(data)						
+								context =
+									xhr: xhr
+									status: status
+									data: data
+								fcm.state.events.triggerEvent('RPC_SUCCESS', context)
+								fcm.state.events.triggerEvent('RPC_COMPLETE', context)
+
+								fatcatmap.dev.verbose('RPC', 'Success callback', callbacks)
+							
+								callbacks?.success?(data.response.content, data.response.type, data)
+							
+							else if data.status == 'failure'
+								callbacks?.status?('error')
+								fatcatmap.dev.error('RPC', 'Error: ', {error: error, status: status, xhr: xhr})
+								fatcatmap.rpc.api.lastFailure = error
+								fatcatmap.rpc.api.history[request.envelope.id].xhr = xhr
+								fatcatmap.rpc.api.history[request.envelope.id].status = status
+								fatcatmap.rpc.api.history[request.envelope.id].failure = error
+						
+								context =
+									xhr: xhr
+									status: status
+									error: error
+								
+								fatcatmap.state.events.triggerEvent('RPC_ERROR', context)
+								fcm.state.events.triggerEvent('RPC_COMPLETE', context)			
+								callbacks?.failure?(error)
+
 				
 						statusCode:
 				
 							404: ->
 								fatcatmap.dev.error('RPC', 'HTTP/404', 'Could not resolve RPC action URI.')
-								alert 'RPC 404: Could not resolve RPC action URI.'
+								fatcatmap.state.events.triggerEvent('RPC_ERROR', message: 'RPC 404: Could not resolve RPC action URI.', code: 404)
 					
 							403: ->
 								fatcatmap.dev.error('RPC', 'HTTP/403', 'Not authorized to access the specified endpoint.')
-								alert 'RPC 403: Not authorized to access the specified endpoint.'
+								fatcatmap.state.events.triggerEvent('RPC_ERROR', message: 'RPC 403: Not authorized to access the specified endpoint.', code: 403)
 					
 							500: ->
 								fatcatmap.dev.error('RPC', 'HTTP/500', 'Internal server error.')
-								alert 'RPC 500: Woops! Something went wrong. Please try again.'
+								fatcatmap.state.events.triggerEvent('RPC_ERROR', message: 'RPC 500: Woops! Something went wrong. Please try again.', code: 500)
 				
 					amplify = fatcatmap.sys.drivers.resolve('transport', 'amplify')
 					if amplify? and amplify is not false

@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
 import logging
 import datetime
-from werkzeug import import_string
+import bootstrap
+
+if 'lib' not in sys.path or 'lib/distlib' not in sys.path:
+	bootstrap.MomentumBootstrapper.prepareImports()
 
 _config = {}
 _compiled_config = None
@@ -116,6 +120,7 @@ def systemLog(message, _type='debug'):
 
 def readConfig(config=_config):
 	global _compiled_config
+	from werkzeug import import_string	
 	if _compiled_config is not None:
 		return _compiled_config
 	else:

@@ -85,8 +85,4 @@ class MomentumNDBModel(ProvidenceClarityNDBModel):
 	pass
 	
 	
-class MomentumPolymorphicModel(ProvidenceClarityPolyModel):
-	
-	''' Top-level model class for polymorphic models (PolyPro-enabled). '''
-	
-	pass
+MomentumPolymorphicModel = ProvidenceClarityPolyModel

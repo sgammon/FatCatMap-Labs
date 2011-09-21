@@ -1,15 +1,57 @@
-<header id='momentumSuperbar' class='litebar' data-element='superbar' data-element-type='SuperPanel'>
+<header id='momentumSuperbar' class='litebar' data-element='superbar' data-element-type='SuperPanel'>	
 
-	<div id='liteNavigation' class='hidden'>
-		Here is all the crazy content up top
+	<div id='liteNavigation'>
+		<div id='liteNavContent' class='hidden'>
+			Here is all the crazy content up top
+			<br />
+			Cool navigation stuff will go here
+			<br />
+			Hopefully it will start working
+		</div>
 	</div>
-		
+
 	<div id='toploader'>
 		<div id='globalProgress'></div>
 	</div>
 
 	<div id='fcmTopBranding' class='pulldown'>
-		<a href="{{ link('landing') }}"><img src='/assets/img/static/branding/fatcatmap-alpha-v3-15.png' height='30' width='228'  alt='fatcatmap alpha' /></a>
+		<img src="{{ assets.image('branding', 'fatcatmap-alpha-v3-alt-15.png') }}" height='30' width='228'  alt='fatcatmap alpha' />
 	</div>
-	
+		
 </header>
+
+<script type="text/javascript">
+
+$('#fcmTopBranding').click(function () {
+	
+	litenav = $('#liteNavigation');
+	litenav_content = $('#liteNavContent');
+	
+	if (litenav.hasClass('expanded'))
+	{
+		litecss = {height: 0};
+		litecss['min-height'] = 0;
+		
+		litenav_content.animate({opacity: 0}, function () {
+		
+			litenav_content.addClass('hidden');
+			
+		}).parent().animate(litecss, function () {
+			litenav.removeClass('expanded').addClass('hidden');
+		});
+	}
+	else
+	{
+		litecss = {height: $(document).height() * .2};
+		litecss['min-height'] = 115;
+		
+		litenav.animate(litecss, function () {
+			
+			litenav_content.animate({opacity: 1}).removeClass('hidden');
+				
+		}).addClass('expanded').removeClass('hidden');
+	}
+	
+});
+
+</script>

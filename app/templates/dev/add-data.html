@@ -11,18 +11,20 @@
 	<div class='notice'><p>{{ msg }}</p></div>
 {% endif %}
 
-<h2>Create Object Collection:</h2><br />
+<div class='floatleft'>
+	<h2>Create Object Collection:</h2><br />
 
-{{ renderForm(create_collection) }}
+	{{ renderForm(create_collection) }}
+</div>
+
+<div class='floatleft' style='margin-left: 25px'>
+	<h2>Create Object Relation:</h2><br />
+
+	{{ renderForm(create_relation) }}
+</div>
+
+<div class='clearboth'></div>
 
 <br />
 <br />
-
-<h2>Create Object Relation:</h2><br />
-
-{{ renderForm(create_relation) }}
-			
-<br />
-<br />
-
 {% endblock %}

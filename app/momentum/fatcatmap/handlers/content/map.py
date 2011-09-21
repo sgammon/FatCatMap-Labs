@@ -30,5 +30,17 @@ class MapLanding(WebHandler):
 				rpc['object'] = self.request.args.get('o')
 			else:
 				elements['errorNotice'] = "The specified object key could not be found. :("
+				
+		if '_nd' in self.request.args:
+			rpc['depth'] = int(self.request.args.get('_nd'))
+			
+		if '_cl' in self.request.args:
+			rpc['limit'] = int(self.request.args.get('_cl'))
+			
+		if '_gs' in self.request.args:
+			rpc['scope'] = self.request.args.get('_gs')
+			
+		if '_vcontext' in self.request.args:
+			rpc['context'] = self.request.args.get('_vcontext')
 
 		return self.render('content/map/landing.html', elements=elements, rpc_params=rpc, origin=node)

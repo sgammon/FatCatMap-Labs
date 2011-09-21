@@ -14,80 +14,81 @@
     return -1;
   };
   RouteController = (function() {
+    __extends(RouteController, Backbone.Router);
     function RouteController() {
       RouteController.__super__.constructor.apply(this, arguments);
     }
-    __extends(RouteController, Backbone.Router);
     return RouteController;
   })();
   InteractiveWidget = (function() {
+    __extends(InteractiveWidget, Backbone.View);
     function InteractiveWidget(name, path, config) {
       this.name = name;
       this.path = path;
       this.config = config;
     }
-    __extends(InteractiveWidget, Backbone.View);
     return InteractiveWidget;
   })();
   GraphArtifact = (function() {
+    __extends(GraphArtifact, RemoteModel);
     function GraphArtifact() {
       GraphArtifact.__super__.constructor.apply(this, arguments);
     }
-    __extends(GraphArtifact, RemoteModel);
     return GraphArtifact;
   })();
   Node = (function() {
+    __extends(Node, GraphArtifact);
     function Node() {
       Node.__super__.constructor.apply(this, arguments);
     }
-    __extends(Node, GraphArtifact);
     return Node;
   })();
   Edge = (function() {
+    __extends(Edge, GraphArtifact);
     function Edge() {
       Edge.__super__.constructor.apply(this, arguments);
     }
-    __extends(Edge, GraphArtifact);
     return Edge;
   })();
   GraphSprite = (function() {
+    __extends(GraphSprite, InteractiveWidget);
     function GraphSprite() {
       GraphSprite.__super__.constructor.apply(this, arguments);
     }
-    __extends(GraphSprite, InteractiveWidget);
     return GraphSprite;
   })();
   GraphNode = (function() {
+    __extends(GraphNode, GraphSprite);
     function GraphNode() {
       GraphNode.__super__.constructor.apply(this, arguments);
     }
-    __extends(GraphNode, GraphSprite);
     return GraphNode;
   })();
   GraphEdge = (function() {
+    __extends(GraphEdge, GraphSprite);
     function GraphEdge() {
       GraphEdge.__super__.constructor.apply(this, arguments);
     }
-    __extends(GraphEdge, GraphSprite);
     return GraphEdge;
   })();
   NodeCollection = (function() {
+    __extends(NodeCollection, ModelCollection);
     function NodeCollection() {
       NodeCollection.__super__.constructor.apply(this, arguments);
     }
-    __extends(NodeCollection, ModelCollection);
     NodeCollection.prototype.model = Node;
     return NodeCollection;
   })();
   EdgeCollection = (function() {
+    __extends(EdgeCollection, ModelCollection);
     function EdgeCollection() {
       EdgeCollection.__super__.constructor.apply(this, arguments);
     }
-    __extends(EdgeCollection, ModelCollection);
     EdgeCollection.prototype.model = Edge;
     return EdgeCollection;
   })();
   Graph = (function() {
+    __extends(Graph, InteractiveWidget);
     function Graph(id, data, config) {
       this.id = id;
       this.el = $(this.id);
@@ -107,6 +108,7 @@
         visualizer: null
       };
       this.index = {
+        filled_keys: [],
         nodes_by_key: {},
         edges_by_node: {},
         encountered_nodes: [],
@@ -209,34 +211,24 @@
         }, this)
       };
     }
-    __extends(Graph, InteractiveWidget);
-    Graph.prototype.build = function(key, cursor, degree, limit, silent) {
-      var rpc_params;
-      if (silent == null) {
-        silent = false;
+    Graph.prototype.build = function(rpc_params, fillNodes, fillEdges) {
+      var request;
+      if (fillNodes == null) {
+        fillNodes = true;
       }
-      rpc_params = {};
-      if (key != null) {
-        rpc_params.key = key;
+      if (fillEdges == null) {
+        fillEdges = false;
       }
-      if (cursor != null) {
-        rpc_params.cursor = cursor;
-      }
-      if (degree != null) {
-        rpc_params.degree = degree;
-      }
-      if (limit != null) {
-        rpc_params.limit = limit;
-      }
-      $.fatcatmap.rpc.api.graph.construct(rpc_params).fulfill({
+      request = $.fatcatmap.rpc.api.graph.construct(rpc_params);
+      request.fulfill({
         success: __bind(function(data) {
           var edgemap, hintmap, nodemap;
           nodemap = [];
-          _.each(data.graph.nodes, __bind(function(node, i) {
+          _.each(data.graph.vertices, __bind(function(node, i) {
             return nodemap.push(this.data.setNode(node));
           }, this));
           edgemap = [];
-          _.each(data.graph.edges, __bind(function(edge) {
+          _.each(data.graph.vectors, __bind(function(edge) {
             return edgemap.push(this.data.setEdge(edge, nodemap));
           }, this));
           hintmap = [];
@@ -244,13 +236,56 @@
             return hintmap.push(this.data.setHint(hint, edgemap));
           }, this));
           this.draw();
+          this.fill(fillNodes, fillEdges);
         }, this),
-        error: __bind(function(event) {
+        failure: __bind(function(event) {
           $.fcm.dev.error('Graph', 'Could not complete graph build operation.', event);
           return alert('Could not construct graph.');
         }, this)
       });
       return this;
+    };
+    Graph.prototype.fill = function(nodes, edges) {
+      var data_request, key, keys, type, types, _i, _j, _len, _len2;
+      if (nodes == null) {
+        nodes = true;
+      }
+      if (edges == null) {
+        edges = false;
+      }
+      keys = [];
+      types = [];
+      if (nodes) {
+        types.push(this.index.encountered_nodes);
+      }
+      if (edges) {
+        types.push(this.index.encountered_edges);
+      }
+      for (_i = 0, _len = types.length; _i < _len; _i++) {
+        type = types[_i];
+        for (_j = 0, _len2 = type.length; _j < _len2; _j++) {
+          key = type[_j];
+          if (__indexOf.call(this.index.filled_keys, key) < 0) {
+            keys.push(key);
+          }
+        }
+      }
+      if (key.length > 0) {
+        data_request = $.fatcatmap.rpc.api.data.get({
+          keys: keys
+        });
+        data_request.fulfill({
+          success: this._dataSuccessCallback,
+          failure: this._dataFailureCallback
+        });
+      }
+      return this;
+    };
+    Graph.prototype._dataSuccessCallback = function(content) {
+      return console.log('data response', content);
+    };
+    Graph.prototype._dataFailureCallback = function(error) {
+      return console.log('data error', error);
     };
     Graph.prototype.render = function() {
       var el;

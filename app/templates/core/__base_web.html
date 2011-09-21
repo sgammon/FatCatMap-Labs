@@ -1,29 +1,38 @@
 {% extends "core/__base.html" %}
 
 {% block prenorth %}
-<link rel="stylesheet" media="screen" href="{{ assets.style('fonts', 'core') }}">
-<link rel="stylesheet" media="screen" href="{{ assets.style('ie', 'compiled') }}">
-<link rel="stylesheet" media="screen" href="{{ assets.style('main', 'compiled') }}">
-<link rel="stylesheet" media="screen" href="{{ assets.style('print', 'compiled') }}">
-<link rel="stylesheet" media="screen" href="{{ assets.style('interaction', 'compiled') }}">
+
+{% if page.optimize %}
+	<link rel="stylesheet" media="screen" href="{{ assets.style('fcm', 'compiled') }}">
+{% else %}
+	<link rel="stylesheet" media="screen" href="{{ assets.style('fonts', 'core') }}">
+	<link rel="stylesheet" media="screen" href="{{ assets.style('main', 'compiled') }}">
+	<link rel="stylesheet" media="screen" href="{{ assets.style('interaction', 'compiled') }}">
+{% endif %}
+
+{% if page.mobile %}
 <link rel="stylesheet" media="handheld" href="{{ assets.style('mobile', 'core') }}">
-<link rel="stylesheet" media="screen" href="{{ assets.style('plugins', 'core') }}">
+{% endif %}
+
+{% if page.print %}
+<link rel="stylesheet" media="screen" href="{{ assets.style('print', 'compiled') }}">
+{% endif %}
+
+{% if page.ie %}
+<link rel="stylesheet" media="screen" href="{{ assets.style('ie', 'compiled') }}">
+{% endif %}
+
+
+{% block northstyle %}{% endblock %}
 
 <!-- jQuery via CDN -->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script> 
+<!-- script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script -->
+<script src="{{ assets.script('core', 'jquery') }}"></script>
 
 <!-- Core Dependencies -->
 <script src="{{ assets.script('base', 'fatcatmap') }}"></script>
-<script src="{{ assets.script('core', 'jquery') }}"></script>
-<script src="{{ assets.script('data', 'core') }}"></script>
-<script src="{{ assets.script('lawnchair', 'core') }}"></script>
-
-<script src="{{ assets.script('backbone', 'core') }}"></script>
 <script src="{{ assets.script('yepnope', 'core') }}"></script>
-<script src="{{ assets.script('modernizr', 'core') }}"></script>
 
-<!-- FatCatMap Platform -->
-<script src="{{ assets.script('fcm', 'fatcatmap') }}"></script>
 
 {% block northloader %}{% endblock %}
 
@@ -48,6 +57,14 @@
 {% endblock body %}
 
 {% block presouth %}
+<script src="{{ assets.script('backbone', 'core') }}"></script>
+<script src="{{ assets.script('data', 'core') }}"></script>
+<script src="{{ assets.script('lawnchair', 'core') }}"></script>
+<script src="{{ assets.script('modernizr', 'core') }}"></script>
+
+<!-- FatCatMap Platform -->
+<script src="{{ assets.script('fcm', 'fatcatmap') }}"></script>
+
 <script type="text/javascript">
 	{% autoescape false %}
 		yepnope([
@@ -62,15 +79,14 @@
 				// Load jQuery and jQuery Plugins
 				test: window.jQuery,
 				nope: "{{ assets.script('core', 'jquery') }}",
-				load: ["{{ assets.script('tipsy', 'jquery-ui') }}", "{{ assets.script('masonry','jquery-ui') }}", "{{ assets.script('fancybox', 'jquery-ui') }}",
+				load: ["{{ assets.script('masonry','jquery-ui') }}", "{{ assets.script('fancybox', 'jquery-ui') }}",
 						"{{ assets.script('easing', 'jquery') }}", "{{ assets.script('mousewheel','jquery') }}"]
 			},
 			
 			{
 				// Load Lawnchair and plugins
 				test: window.Lawnchair,
-				nope: ["{{ assets.script('lawnchair', 'core') }}"],
-				load: ["{{ assets.script('query', 'ext-storage') }}", "{{ assets.script('pagination', 'ext-storage') }}", "{{ assets.script('callbacks', 'ext-storage') }}", "{{ assets.script('aggregation', 'ext-storage') }}"]
+				nope: ["{{ assets.script('lawnchair', 'core') }}"]
 			},
 			
 			{
@@ -89,9 +105,32 @@
 			{
 				// Load FatCatMap JSAPI & Channel JSAPI
 				load: ["{{ link('js-api') }}", "/_ah/channel/jsapi"],
+			},
 
-				// Bootstrap Platform
-				complete: function () {
+			{
+				// Combined Storage
+				test: Modernizr.localstorage && Modernizr.sessionstorage && Modernizr.indexeddb,
+				yep: ["{{ assets.script('combined', 'storage') }}"],
+			},
+			
+			{
+				// Local Storage Only
+				test: (Modernizr.localstorage || Modernizr.sessionstorage) && !Modernizr.indexeddb,
+				yep: ["{{ assets.script('local', 'storage') }}"]
+			},
+			
+			{
+				// Object Storage Only
+				test: Modernizr.indexeddb && !(Modernizr.localstorage || Modernizr.sessionstorage),
+				yep: ["{{ assets.script('object', 'storage') }}"]
+			},
+			
+			{% block southloader %}
+			{% endblock southloader %}
+
+			{
+				complete: function (){
+
 					superbar = new Layout.SuperBar({id: 'momentumSuperbar', el: document.getElementById('momentumSuperbar')});
 					$.fatcatmap.api.layout.register('superbar', superbar);
 
@@ -99,45 +138,8 @@
 					$.fatcatmap.api.layout.register('supernav', supernav);
 
 					superfooter = new Layout.SuperFooter({id: 'momentumSuperfooter', el: document.getElementById('momentumSuperfooter')});
-					$.fatcatmap.api.layout.register('superfooter', superfooter);
-				}	
-			},
-
-			{
-				// Load Workers
-				test: Modernizr.webworkers,
-				yep: ["{{ assets.script('workers', 'plugins') }}"]
-			},
-
-			{
-				// Load Geo
-				test: Modernizr.geolocation,
-				yep: ["{{ assets.script('geo', 'plugins') }}"]
-			},
-
-			{
-				// Load LocalStorage
-				test: Modernizr.localstorage || Modernizr.sessionsetorage,
-				yep: ["{{ assets.script('local', 'storage') }}"]
-			},
-			
-			{
-				// Load IndexedDB
-				test: Modernizr.indexeddb,
-				yep: ["{{ assets.script('indexeddb', 'ext-storage') }}"]
-			},
-
-			{
-				// Load WebSQL
-				test: Modernizr.websqldatabase,
-				yep: ["{{ assets.script('websql', 'ext-storage') }}"]
-			},
-
-			{% block southloader %}
-			{% endblock southloader %}
-
-			{
-				complete: function (){
+					$.fatcatmap.api.layout.register('superfooter', superfooter);					
+					
 					$.fatcatmap.state.events.triggerEvent('PLATFORM_READY', {fcm: $.fatcatmap});
 				}
 			}

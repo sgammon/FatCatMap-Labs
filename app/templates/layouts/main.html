@@ -143,49 +143,14 @@
 
 		{% if not page.standalone %}
 			{% if page.watermark %}
-			<div id='devNotice'>
-				<a href='http://labs.momentum.io/fatcatmap' class='noicon'>FATCATMAP LABS</a> - WORK IN PROGRESS<br />
-				&copy; 2008-2011, POLITICAL <a href='http://momentum.io' class='noicon'>MOMENTUM</a><br />
-
-				{% if api.users.is_current_user_admin() %}
-				
-				<hr />
-				<div id='devMenu'>
-					<ul>
-						<li><a href='#dEnv' onclick="$('.devContentSection').hide(); $('#devMenu').hide(); $('#devTools').show(); $('#devTools').removeClass('hidden');">Development Tools</a></li>
-						<li><a href='#dEnv' onclick="$('.devContentSection').hide(); $('#devMenu').hide(); $('#devEnvironmentInfo').show(); $('#devEnvironmentInfo').removeClass('hidden');">Request Environment</a></li>
-					</ul>
-				</div>
-				
-				<div id='devContent'>
-
-					<div id='devEnvironmentInfo' class='devContentSection hidden'>
-
-						<b>BUILD:</b> {{ util.config.fcm.version.major }}.{{ util.config.fcm.version.minor }}.{{ util.config.fcm.version.minor }}.{{ util.config.fcm.version.micro }}-{{ util.config.fcm.version.release }}<br /><b>APP:</b> {{ util.env.get('CURRENT_VERSION_ID') }} // <b>NAMESPACE:</b> {% if api.multitenancy.get_namespace() == '' %}None{% else %}{{ api.multitenancy.get_namespace() }}{% endif %}
-						<br />
-						<b>DATACENTER:</b> {{ util.env.get('DATACENTER') }} // <b>R(hash):</b> {{ util.env.get('REQUEST_ID_HASH') }} // <b>S(hash):</b> None<br />
-						<b>LAYER:</b> {% if api.backends.get_backend() == none %}Frontend{% else %}Backend{% endif %} // <b>BACKEND:</b> {{ api.backends.get_backend() }} // <b>INSTANCE:</b> {{ util.env.get('INSTANCE_ID', '0') }}
-						
-						<br />
-						<br />
-						<a href='#' onclick="$('#devEnvironmentInfo').hide().addClass('hidden'); $('#devMenu').show();">Back to Dev Menu</a>
-
-					</div>
-
-					<div id='devTools' class='devContentSection hidden'>
-						<a href='#' onclick="fatcatmap.dev.performance.tools.fpsstats.show();">FPS/Memory Counter</a>
-
-						<br />
-						<br />
-						<a href='#' onclick="$('#devTools').hide().addClass('hidden'); $('#devMenu').show();">Back to Dev Menu</a>
-					</div>
-				</div>
-				{% endif %}
-			</div>
+				{% include "snippets/dev_widget.html" %}
 			{% endif %}
 		{% endif %}
 	
 	</div>
+
+	{% block sidebars %}
+	{% endblock %}
 
 	{% if not page.standalone %}
 		<div id='contentFooter' class='{% block content_footer_class %}content_footer{% endblock %} hidden'>

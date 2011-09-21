@@ -2,8 +2,15 @@
 
 {% block title %}{% block subtitle %}{% endblock %} - Map influence data in real time - FatCatMap{% endblock %}
 
-{% block northloader %}
+{% block northstyle %}
 <link rel='stylesheet' href="{{ assets.style('map', 'site') }}" media='screen'>
+{% endblock %}
+
+
+{% block sidebars %}
+	<!-- Sidebars -->
+	{% include 'elements/pane/details-sidebar.html' %}
+	{% include 'elements/pane/controls-sidebar.html' %}
 {% endblock %}
 
 {% block content_body %}
@@ -22,18 +29,11 @@
 		{% block grapher %}
 		{% endblock %}
 	</div>
-
-	{% include 'elements/pane/details-sidebar.html' %}
-	{% include 'elements/pane/controls-sidebar.html' %}	
-
 {% endblock %}
 
 {% block southloader %}
 	{
 		load: ["{{ assets.script('core', 'd3') }}"]
-	},
-	{
-		load: ["{{ assets.script('behavior', 'd3') }}", "{{ assets.script('chart', 'd3') }}", "{{ assets.script('geo', 'd3') }}", "{{ assets.script('geom', 'd3') }}", "{{ assets.script('layout', 'd3') }}"]		
 	},
 	{
 		load: ["{{ assets.script('map', 'site') }}"]

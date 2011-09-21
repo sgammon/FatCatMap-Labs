@@ -30,10 +30,14 @@ class WebHandler(MomentumHandler, AssetsMixin, LiveServicesMixin, SessionsMixin)
 		params['assets']['script'] = self.script_url
 		params['assets']['style'] = self.style_url
 		params['assets']['url'] = self.asset_url
+		params['assets']['image'] = self.img_url
 		
 		# Page Parameters
 		params['page'] = {}
+		params['page']['ie'] = False
+		params['page']['mobile'] = False
 		params['page']['manifest'] = False
+		params['page']['optimized'] = False
 		params['page']['elements'] = {
 			'errorNotice': False,
 			'infoNotice': False,
@@ -49,7 +53,20 @@ class WebHandler(MomentumHandler, AssetsMixin, LiveServicesMixin, SessionsMixin)
 			params['page']['standalone'] = int(self.request.args.get('_s', 0)) or self._outputConfig['standalone']
 		except Exception:
 			params['page']['standalone'] = False
+		
+		# Optimized (bundled) assets
+		if self._outputConfig['optimize'] == True and self.request.args.get('_op', '1') != '0':
+			params['page']['optimize'] = True
 			
+		# IE and Mobile flags
+		if self.uagent is not None:
+			if 'browser' in self.uagent:
+				if 'name' in self.uagent['browser']:
+					if self.uagent['browser']['name'].lower() in ['msie', 'internet explorer', 'trident']:
+						params['page']['ie'] = True
+					elif self.uagent['browser']['name'].lower() in ['android', 'safari', 'iphone', 'ipad']:
+						params['page']['mobile'] = True
+		
 		# Appcaching
 		if self._outputConfig['appcache']['enable'] == True or self.request.args.get('_ac', False) == True:
 				params['page']['manifest'] = self._outputConfig['appcache']['manifest']

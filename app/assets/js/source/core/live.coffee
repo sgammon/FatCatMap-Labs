@@ -12,6 +12,38 @@ class CoreLiveAPI extends CoreAPI
 		@channel = null
 		@socket = null
 
+		@handlers = 
+
+			_registry:
+				default: @defaultLiveHandler
+
+			add: (type, callback) ->
+				@registry[type] = callback
+				return
+			
+			remove: (type) ->
+				@registry[type] = null
+				return
+			
+			resolve: (type) ->
+				if type in @registry
+					return @registry[type]
+				else
+					return false
+					
+			handle: (type, data) ->
+				return @registry[type](data)
+
+
+	defaultLiveSuccessHandler: (message...) =>
+		@fcm.dev.debug.log('CoreLive', 'Live API received unhandled successful push message.', message...)
+		return
+
+		
+	defaultLiveFailureHandler: (message...) =>
+		@fcm.dev.debug.log('CoreLive', 'Live API received unhandled push message failure.', message...)
+		return
+		
 		
 	openChannel: (@token) =>
 		
@@ -37,8 +69,22 @@ class CoreLiveAPI extends CoreAPI
 	
 	listen: (token) =>	
 		if @channel is null and @socket is null
-			@openChannel(token)
-		
+			{channel, socket} = @openChannel(token)
+			if channel? and socket?
+				@fcm.state.events.registerHook('CHANNEL_OPEN', @dispatch)
+			
+	dispatch: (message) =>
+		if message.status == 'ok'
+			if @handlers.resolve(message.response.type)
+				return @handlers.handle(message.response.type, message)
+			else
+				@defaultLiveSuccessHandler(message)
+		else
+			if @handlers.resolve(message.response.type)
+				return @handlers.handle(message.error.type, message)
+			else
+				@defaultLiveFailureHandler(message)
+		return
 		
 	onOpen: () =>
 		@fcm.dev.debug.log('CoreLive', 'Channel is ready to receive live messages.')

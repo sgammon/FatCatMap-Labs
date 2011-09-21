@@ -8,13 +8,13 @@ fatcatmap = window.fatcatmap;
 	{% for service, action, config, opts in services %}	
 		fatcatmap.rpc.api.factory('{{ service }}', '{{ action }}', [{% for method in config.methods %}'{{ method }}',{% endfor %}], {% autoescape false %}{{ util.converters.json.dumps(opts) }}{% endautoescape %});
 	{% endfor %}
-	
+
 		fatcatmap.state.events.triggerEvent('API_READY');
 {% endif %}
 
 // Initliaze user object
 fatcatmap.user.setUserInfo({
-	
+
 	{% if api.users.current_user() != none %}
 		current_user: "{{ api.users.current_user() }}",
 		is_user_admin: "{{ api.users.is_current_user_admin() }}",

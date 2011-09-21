@@ -1,6 +1,5 @@
-
 import config
-from protorpc import remote
+from momentum.services import remote
 from momentum.services import MomentumService
 
 

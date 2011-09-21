@@ -60,7 +60,7 @@ class Sidebar extends LayoutElement
 			
 		@config =
 			maximizable: false
-			folded_width: 35
+			folded_width: 40
 			unfolded_width: $('body').width() * .25
 			maximized_width: $('body').width() * .70
 			

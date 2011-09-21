@@ -6,52 +6,65 @@ import hashlib
 import logging
 import pipeline
 import werkzeug
-import protorpc
-import momentum
-import mapreduce
-import simplejson
 
-# ProtoRPC Imports
-from protorpc import remote
+try:
+	import json
+except ImportError:
+	try:
+		import simplejson as json
+	except ImportError:
+		logging.critical('No compatible JSON adapter found.')
 
-# Momentum
-from momentum import core
-from momentum import platform
-
-# Momentum Core
-from momentum.core import model
-from momentum.core import platform
+import httpagentparser
 
 # Tipfy Imports
 from tipfy import Request
 from tipfy import Response
 from tipfy import RequestHandler
 from tipfyext.jinja2 import Jinja2Mixin
-from tipfy.i18n import I18nMiddleware
 from tipfy.sessions import SessionMiddleware
 
 # Providence/Clarity Imports
-import ProvidenceClarity
 from ProvidenceClarity.struct.util import DictProxy
 from ProvidenceClarity.struct.util import ObjectProxy
+from ProvidenceClarity.struct.util import CallbackProxy
 
-# App Engine Imports
-from google.appengine.ext import db
-from google.appengine.api import xmpp
-from google.appengine.api import mail
-from google.appengine.api import oauth
-from google.appengine.api import users
-from google.appengine.api import images
-from google.appengine.api import channel
-from google.appengine.api import backends
-from google.appengine.api import memcache
-from google.appengine.api import urlfetch
-from google.appengine.ext import blobstore
-from google.appengine.api import taskqueue
-from google.appengine.api import capabilities
-from google.appengine.api import app_identity
-from google.appengine.api import namespace_manager
-from google.appengine.api import prospective_search
+_api_cache = {}
+
+
+def _loadAPIModule(entry):
+	
+	''' Callback to lazy-load an API module in tuple(path, item) format. '''
+	
+	global _api_cache
+
+	if entry not in _api_cache:
+		path, name = entry
+		mod = __import__(path, globals(), locals(), [name])
+		_api_cache[entry] = getattr(mod, name)
+		
+	return _api_cache[entry]
+	
+_apibridge = CallbackProxy(_loadAPIModule, {
+
+	'db': ('google.appengine.ext', 'db'),
+	'xmpp': ('google.appengine.api', 'xmpp'),
+	'mail': ('google.appengine.api', 'mail'),
+	'oauth': ('google.appengine.api', 'oauth'),
+	'users': ('google.appengine.api', 'users'),
+	'images': ('google.appengine.api', 'images'),
+	'channel': ('google.appengine.api', 'channel'),
+	'backends': ('google.appengine.api', 'backends'),
+	'memcache': ('google.appengine.api', 'memcache'),
+	'urlfetch': ('google.appengine.api', 'urlfetch'),
+	'blobstore': ('google.appengine.ext', 'blobstore'),
+	'taskqueue': ('google.appengine.api', 'taskqueue'),
+	'capabilities': ('google.appengine.api', 'capabilities'),
+	'identity': ('google.appengine.api', 'app_identity'),
+	'multitenancy': ('google.appengine.api', 'namespace_manager'),
+	'matcher': ('google.appengine.api', 'prospective_search')
+
+})
 
 
 class MomentumHandler(RequestHandler, Jinja2Mixin):
@@ -62,49 +75,21 @@ class MomentumHandler(RequestHandler, Jinja2Mixin):
 	configPath = None
 	minify = unicode
 	response = Response
+	uagent = {}
 	
 	## 2: Sessions, auth, etc middleware
-	middleware = [SessionMiddleware(), I18nMiddleware()]
+	middleware = [SessionMiddleware()]
 
 	## 3: Shortcuts
-	api = DictProxy({
-	
-		'db': db,
-		'xmpp': xmpp,
-		'mail': mail,
-		'oauth': oauth,
-		'users': users,
-		'images': images,
-		'channel': channel,
-		'backends': backends,
-		'memcache': memcache,
-		'urlfetch': urlfetch,
-		'blobstore': blobstore,
-		'taskqueue': taskqueue,
-		'capabilities': capabilities,
-		'identity': app_identity,
-		'multitenancy': namespace_manager,
-		'matcher': prospective_search,
-		
-	})
+	api = _apibridge
 
 	ext = DictProxy({
 	
 		'ndb': ndb,
-		'protorpc': protorpc,
 		'pipelines': pipeline,
-		'mapreduce': mapreduce
 	
 	})
-	
-	platform = DictProxy({
-
-		'core': momentum.core,
-		'api': momentum.platform,
-		'engine': ProvidenceClarity.AppBridge,
-	
-	})
-	
+		
 	## 4: HTTP Headers included in every response
 	baseHeaders = {
 		
@@ -113,7 +98,6 @@ class MomentumHandler(RequestHandler, Jinja2Mixin):
 		'X-UA-Compatible': 'IE=edge,chrome=1' # Enable compatibility with Chrome Frame, and force IE to render with the latest engine
 
 	}
-	
 	
 	## 5: Base template context
 	baseContext = {
@@ -135,29 +119,28 @@ class MomentumHandler(RequestHandler, Jinja2Mixin):
 		## Utility stuff
 		'util': {
 
-			'env': os.environ,		
+			'env': os.environ,
 			'config': {
 				'get': config.config.get,
 				'debug': config.debug,
 				'hooks': config.config
 			},
 			'converters': {
-				'json': simplejson
+				'json': json
 			}
 		},
 		
 		## API Shortcuts
 		'api': {
 		
-			'oauth': oauth,
 			'users': {
-				'is_current_user_admin': users.is_current_user_admin,
-				'current_user': users.get_current_user,
-				'create_login_url': users.create_login_url,
-				'create_logout_url': users.create_logout_url
+				'is_current_user_admin': _apibridge.users.is_current_user_admin,
+				'current_user': _apibridge.users.get_current_user,
+				'create_login_url': _apibridge.users.create_login_url,
+				'create_logout_url': _apibridge.users.create_logout_url
 			},
-			'backends': backends,
-			'multitenancy': namespace_manager
+			'backends': _apibridge.backends,
+			'multitenancy': _apibridge.multitenancy
 		
 		}
 			
@@ -234,6 +217,13 @@ class MomentumHandler(RequestHandler, Jinja2Mixin):
 			map(self._setcontext, tmp_context)
 		else:
 			self.context = self._bindBaseContext			
+		
+		# Parse useragent
+		if self.request.headers.get('user-agent', None) is not None:
+			try:
+				self.uagent = httpagentparser.detect(s)
+			except Exception:
+				pass
 		
 		# Build response HTTP headers
 		response_headers = {}

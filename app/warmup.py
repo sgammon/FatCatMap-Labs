@@ -28,6 +28,10 @@ import wsgiref.handlers
 import ProvidenceClarity
 
 ## GAE APIs
+import google
+from google import appengine
+from google.appengine import api
+from google.appengine import ext
 from google.appengine.api import mail
 from google.appengine.api import users
 from google.appengine.api import images
@@ -41,8 +45,6 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import db
 from google.appengine.ext import gql
 from google.appengine.ext import search
-from google.appengine.ext import webapp
-from google.appengine.ext import bulkload
 
 ## Momentum
 import momentum
@@ -69,12 +71,24 @@ from momentum.fatcatmap import decorators
 
 
 def respond200():
-	logging.debug('Warming up interpreter caches...')
 
+	logging.debug('Warming up interpreter caches [CGI]...')
+	
 	print "HTTP/1.1 200 OK"
 	print "Content-Type: text/plain"
 	print ""
 	print "WARMUP_SUCCESS"
+
+
+class WarmupHandler(webapp2.RequestHandler):
+
+	def get(self):
+	
+		logging.debug('Warming up interpreter caches [WSGI]...')
+		self.response.out.write("Warmup succeeded.")
+		
+		
+Warmup = webapp2.WSGIApplication([webapp2.Route('/_ah/warmup', WarmupHandler, name='warmup')])
 
 if __name__ == '__main__':
 	respond200()

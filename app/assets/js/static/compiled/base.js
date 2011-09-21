@@ -449,7 +449,7 @@
     return function() {
       var args, i, _ref;
       args = arguments;
-      for (i = _ref = funcs.length - 1; _ref <= 0 ? i <= 0 : i >= 0; i += -1) {
+      for (i = _ref = funcs.length - 1; i >= 0; i += -1) {
         args = [funcs[i].apply(this, args)];
       }
       return args[0];

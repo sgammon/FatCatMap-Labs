@@ -67,12 +67,9 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 
 
 	######## ======== Util Methods ======== ########
-	def __init__(self, degree, limit, **kwargs):
+	def __init__(self, **kwargs):
 		
 		''' Init - copies grapher cache to internal graph structure (if one exists in thread memory) and binds config from kwargs. '''
-
-		self.config['limit'] = limit
-		self.config['degree'] = degree		
 
 		if len(kwargs) > 0:
 			for c_key, c_value in kwargs.items():
@@ -246,7 +243,7 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 			logging.info('======Depth: '+str(depth))
 
 		# Graph depth must be more than 0, if it is not unset
-		if self.config['degree'] is not None and self.config['degree'] < 1:
+		if self.config['depth'] is not None and self.config['depth'] < 1:
 			raise ValueError, "Graph depth must be greater than 0."
 			
 		self.encounterNode(node_key, **kwargs)
@@ -254,16 +251,16 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 
 		for hint in query.iter(options=q_options):
 			source, target = self.encounterHint(hint)
-			if depth is None or self.config['degree'] > depth: ## Recurse
+			if depth is None or self.config['depth'] > depth: ## Recurse
 			
 				if self.FactoryConfig.get('debug', False):
-					logging.info('======Degree is greater than depth. Recursing.')
+					logging.info('======Depth is greater than depth. Recursing.')
 			
 				yield self.traverseNode(target, depth+1)
 			else:
 
 				if self.FactoryConfig.get('debug', False):				
-					logging.info('======Degree is not greater than depth. Returning.')
+					logging.info('======Depth is not greater than depth. Returning.')
 				
 				raise t.Return(self)
 
@@ -279,7 +276,7 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 			logging.info('===================== Build from Node =====================')
 			logging.info('NodeKey: '+str(node_key))
 			logging.info('Limit: '+str(self.config['limit']))
-			logging.info('Degree: '+str(self.config['degree']))
+			logging.info('Depth: '+str(self.config['depth']))
 			logging.info('Kwargs: '+str(kwargs))
 			logging.info('Graph: '+str(self._graph))
 		
@@ -301,7 +298,7 @@ class GraphFactory(GraphAPI, ConfigurableStruct):
 
 
 	@c.toplevel
-	def buildFromObject(self, object_key, limit, degree, **kwargs):
+	def buildFromObject(self, object_key, limit, depth, **kwargs):
 		
 		''' Build a graph from an origin object key. '''		
 		pass

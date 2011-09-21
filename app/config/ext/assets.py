@@ -26,12 +26,14 @@ config['momentum.fatcatmap.assets'] = {
 			},
 			
 			'assets': {
+				'dependencies': {'version': 0.1}, # compiled version of all the following			
 				'data': {'min': True, 'version': '0.4.1'}, # Data.JS - beta duplicate site MVC core
 				'backbone': {'min': True, 'version': '0.5.1'}, # Backbone.JS - site MVC core
 				'amplify': {'min': True, 'version': '1.0.0'}, # AmplifyJS - for request, local storage + pubsub management
 				'modernizr': {'min': True, 'version': '2.0'}, # Modernizr - browser polyfill + compatibility testing
 				'yepnope': {'min': True, 'version': '1.0.1'}, # YepNope: conditional async script loader
-				'lawnchair': {'min': False, 'version': '0.6.1'} # Lawnchair: Client-side persistent storage
+				'lawnchair': {'version': '0.6.3'}, # Lawnchair: Client-side persistent storage
+				'zeroclipboard': {'min': False, 'version': '1.0.7'} # ZeroClipboard: Universal copy-to-clipboard
 			}
 		
 		},
@@ -79,7 +81,9 @@ config['momentum.fatcatmap.assets'] = {
 			},
 			
 			'assets': {
+				'combined': {'min': True, 'version': 0.1},
 				'local': {'min': True, 'version': 0.1},
+				'object': {'min': True, 'version': 0.1}
 			},
 			
 		},
@@ -95,10 +99,6 @@ config['momentum.fatcatmap.assets'] = {
 			'assets': {
 				'websql': {'min': False, 'version': 0.1}, # Web SQL plugin for Lawnchair
 				'indexeddb': {'min': False, 'version': 0.1}, # IndexedDB plugin for Lawnchair
-				'query': {'min': False, 'version': 0.1}, # Query plugin for Lawnchair
-				'pagination': {'min': False, 'version': 0.1}, # Pagination plugin for Lawnchair
-				'callbacks': {'min': False, 'version': 0.1}, # Callbacks plugin for Lawnchair
-				'aggregation': {'min': False, 'version': 0.1} # Aggregation plugin for Lawnchair
 			}
 		
 		},
@@ -211,18 +211,11 @@ config['momentum.fatcatmap.assets'] = {
 		
 			'config': {
 				'version_mode': 'getvar',
-				'bundle': 'd3.bundle.min.js'		
+				'bundle': 'd3.bundle.min.js'
 			},
 		
 			'assets': {
-				'core': {'name': 'd3', 'min': True}, # D3 Core Library
-				'behavior': {'name': 'd3.behavior', 'min': True}, # D3 Behaviors
-				'chart': {'name': 'd3.chart', 'min': True}, # D3 Charting
-				'csv': {'name': 'd3.csv', 'min': True}, # D3 CSV Parsing
-				'geo': {'name': 'd3.geo', 'min': True}, # D3 Geo-related functions
-				'geom': {'name': 'd3.geom', 'min': True}, # D3 Geo-map related functions
-				'layout': {'name': 'd3.layout', 'min': True}, # D3 Layout
-				'time': {'name': 'd3.time', 'min': True} # D3 Time/Date based functions
+				'core': {'name': 'd3.fcm', 'min': True} # D3 Core Library
 			}
 		
 		},
@@ -257,6 +250,7 @@ config['momentum.fatcatmap.assets'] = {
 			},
 		
 			'assets': {
+				'fcm': {'version': 0.1}, # compiled version of all the following
 				'main': {'version': 0.3}, # reset, main, layout, forms
 				'interaction': {'version': 0.1}, # visualizer, charts
 				'ie': {'version': 0.1}, # fixes for internet explorer (grrr...)

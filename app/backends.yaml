@@ -7,15 +7,11 @@ backends:
   class: B2
   instances: 5
   options: dynamic
-- name: scheduler
-  class: B2
-  options: resident
-  instances: 2
-- name: storage
+- name: data
   class: B8
-  options: resident
+  options: dynamic, public
   instances: 1
-- name: intake
+- name: graph
   class: B2
   instances: 5
   options: dynamic, public

@@ -27,42 +27,133 @@ def add_graph_artifact_types():
 	object_types = []
 
 
-	########## Object Types ##########
+	######################### Object Types #########################
 	
-	##### Person
 
-	## Schema
-	person = Schema(key=k.Key('Schema','object.natural.Person'), path=['object', 'natural', 'Person'], type='object')
-	person.put()
+	############### Person ###############
 
-	## Properties
-	properties.append(Property(key=k.Key('Property', 'firstname', parent=person.key), type='StringProperty'))
-	properties.append(Property(key=k.Key('Property', 'lastname', parent=person.key), type='StringProperty'))
-	properties.append(Property(key=k.Key('Property', 'gender', parent=person.key), type='StringProperty'))
-	properties.append(Property(key=k.Key('Property', 'date_of_birth', parent=person.key), type='DateProperty'))
-	properties.append(Property(key=k.Key('Property', 'date_of_death', parent=person.key), type='DateProperty'))
+	####### Schema
+	person = Schema(key=k.Key('Schema','object.natural.Person'), path=['object', 'natural', 'Person'], type='object', classpath='momentum:fatcatmap:models:natural:Person')
 	person.put()
+	
+	schemas.append(person)
+
+
+	####### Properties
+	p_properties = []
+	p_properties.append(Property(key=k.Key('Property', 'firstname', parent=person.key), name='First Name', type='StringProperty'))
+	p_properties.append(Property(key=k.Key('Property', 'lastname', parent=person.key), name='Last Name', type='StringProperty'))
+	p_properties.append(Property(key=k.Key('Property', 'gender', parent=person.key), name='Gender', type='StringProperty'))
+	p_properties.append(Property(key=k.Key('Property', 'date_of_birth', parent=person.key), name='Date of Birth', type='DateProperty'))
+	p_properties.append(Property(key=k.Key('Property', 'date_of_death', parent=person.key), name='Date of Death', type='DateProperty'))
+	person.properties = p_properties
+	
+	properties = properties + p_properties
 		
-	## Object Type
+	####### Object Type
 	person_object = ObjectType(key=k.Key('ObjectType', 'natural.Person'), name='Person', schema=k.Key('Schema', 'object.natural.Person'))
 	person_object.put()
+	person.artifact_types.append(person_object.key)
 	
-	## Node Types
-	node_types.append(NodeType(key=k.Key('NodeType', 'natural.Person', parent=person_object.key), name='Person', schema=person.key, object_type=k.Key('ObjectType', 'object.natural.Person'), scope=['natural']))
+	####### Node Types
+	person_node = NodeType(key=k.Key('NodeType', 'natural.Person', parent=person_object.key), name='Person', schema=person.key, object_type=k.Key('ObjectType', 'object.natural.Person'), scope=['natural'])
+	node_types.append(person_node)
+	person.artifact_types.append(person_node.key)
+	
+	person.put()
 	
 
-	########## Relation Types ##########
+	############## US State ###############
 	
-	##### Friendship
+	####### Schema
+	state = Schema(key=k.Key('Schema', 'object.geo.boundary.USState'), path=['object', 'geo', 'boundary', 'USState'], type='object', classpath='momentum:fatcatmap:models:government:boundaries:USState')
+	state.put()
+	schemas.append(state)
 	
-	## Schema
-	friendship = Schema(key=k.Key('Schema', 'relation.social.Friendship'), path=['relation', 'social', 'Friendship'], type='edge')
+	####### Properties
+	s_properties = []
+	s_properties.append(Property(key=k.Key('Property', 'abbreviation', parent=state.key), name='Abbreviation', type='StringProperty'))
+	s_properties.append(Property(key=k.Key('Property', 'fullname', parent=state.key), name='Full Name', type='StringProperty'))
+	state.properties = s_properties
+	state.put()
+	
+	properties = properties + s_properties
+	
+	####### Object Type
+	state_object = ObjectType(key=k.Key('ObjectType', 'object.geo.boundary.USState'), name='US State', schema=state.key)
+	state_object.put()
+	state.artifact_types.append(state_object.key)
+
+	####### Node Types
+	state_node_type = NodeType(key=k.Key('NodeType', 'geo.boundary.USState', parent=state_object.key), name='US State', schema=state.key, object_type=k.Key('ObjectType', 'object.geo.boundary.USState'), scope=['geo', 'boundary'])
+	state.artifact_types.append(state_node_type.key)
+	node_types.append(state_node_type)
+
+	state.put()
+
+
+	############## Company ###############
+
+	####### Schema
+	company = Schema(key=k.Key('Schema', 'object.business.Company'), path=['object', 'business', 'Company'], type='object', classpath='momentum:fatcatmap:models:business:Company')
+	company.put()
+	
+	schemas.append(company)
+	
+	####### Properties
+	c_properties = []
+	c_properties.append(Property(key=k.Key('Property', 'name', parent=company.key), name='Name', type='StringProperty'))
+	c_properties.append(Property(key=k.Key('Property', 'symbol', parent=company.key), name='Ticker Symbol', type='StringProperty'))
+	company.properties = c_properties
+	
+	properties = properties + c_properties
+	
+	####### Object Type
+	company_object = ObjectType(key=k.Key('ObjectType', 'business.Company'), name='Company', schema=k.Key('Schema', 'object.business.Company'))
+	company_object.put()
+	company.artifact_types.append(company_object.key)
+	
+	####### Node Types
+	company_node_type = NodeType(key=k.Key('NodeType', 'business.Company', parent=company_object.key), name='Company', schema=company.key, object_type=k.Key('ObjectType', 'object.business.Company'), scope=['business'])
+	company.artifact_types.append(state_node_type.key)
+	company.put()
+	node_types.append(company_node_type)
+
+
+	######################### Relation Types #########################
+	
+
+	############### Friendship ###############
+	
+	####### Schema
+	friendship = Schema(key=k.Key('Schema', 'relation.social.Friendship'), path=['relation', 'social', 'Friendship'], type='edge', classpath='momentum:fatcatmap:models:social:Friendship')
+	relationship = Schema(key=k.Key('Schema', 'relation.social.Relationship'), path=['relation', 'social', 'Relationship'], type='edge', classpath='momentum:fatcatmap:models:social:Relationship')
+	family = Schema(key=k.Key('Schema', 'relation.social.Family'), path=['relation', 'social', 'Family'], type='edge', classpath='momentum:fatcatmap:models:social:Family')
+	
+	schemas.append(friendship)
+	schemas.append(relationship)
+	schemas.append(family)
+
 	friendship.put()
+	relationship.put()
+	family.put()
 	
-	## Edge Type
-	edge_types.append(EdgeType(key=k.Key('EdgeType', 'social.Friendship'), name='Friendship', schema=friendship.key))
-	
+	####### Edge Type
+	friendship_edge = EdgeType(key=k.Key('EdgeType', 'social.Friendship'), name='Friendship', schema=friendship.key)
+	relationship_edge = EdgeType(key=k.Key('EdgeType', 'social.Relationship'), name='Relationship', schema=relationship.key)
+	family_edge = EdgeType(key=k.Key('EdgeType', 'social.Family'), name='Family', schema=family.key)
 
+	edge_types.append(friendship_edge)
+	edge_types.append(relationship_edge)
+	edge_types.append(family_edge)
+	
+	####### Artifact Types
+	friendship.artifact_types.append(friendship_edge.key)
+	relationship.artifact_types.append(relationship_edge.key)
+	family.artifact_types.append(family_edge.key)
+
+
+	######################### Batch Put #########################
 	keys = []
 	batches_to_put = [schemas, properties, node_types, edge_types, object_types]
 	for batch in batches_to_put:

@@ -3,34 +3,6 @@
 {% block subtitle %}{% if origin %}{{ origin.label }}{% else %}Mapper{% endif %}{% endblock %}
 
 {% block grapher %}
-	<style>
-	
-		.node
-		{
-			border: 1px solid blue;
-		}
-		
-		.node .label
-		{
-			color: #000;
-			pointer-events: none;
-		}
-		
-		.node .circle
-		{
-			fill: white;
-			stroke: blue;
-			stroke-width: 2;
-		}
-		
-		.edge
-		{
-			stroke: #888;
-			stroke-width: 2;
-		}
-	
-	</style>
-
 	<script type="text/javascript">
 
 		// Define local context vars
@@ -43,7 +15,7 @@
 		{
 			$.fatcatmap.state.events.registerHook('PLATFORM_READY', function drawGraph()
 			{
-				_g = new Interaction.Graph('#grapher').build().render().draw();
+				_g = new Interaction.Graph('#grapher').build({% autoescape off %}{{ util.converters.json.dumps(rpc_params) }}{% endautoescape %}).render().draw();
 			});
 		});
 	

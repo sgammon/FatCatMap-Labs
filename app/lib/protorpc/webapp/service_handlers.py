@@ -100,7 +100,8 @@ import traceback
 import urllib
 import weakref
 
-from google.appengine.ext import webapp
+import webapp2
+
 from google.appengine.ext.webapp import util as webapp_util
 from protorpc import messages
 from protorpc import protobuf
@@ -385,7 +386,7 @@ class ServiceHandlerFactory(object):
     return factory
 
 
-class ServiceHandler(webapp.RequestHandler):
+class ServiceHandler(webapp2.RequestHandler):
   """Web handler for RPC service.
 
   Overridden methods:

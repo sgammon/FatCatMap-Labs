@@ -1,19 +1,18 @@
 class StorageDriver
 	
-	constructor: (@name, @config) ->
-		if $?
-			fcm = $.fatcatmap
-		else
-			fcm = window.fatcatmap
-		fcm.sys.drivers.register(@name, 'native', @, 999, true)
+	name = 'StorageDriver'
+	store = {}
+		
+	setup: (@name, @config) ->
+		$.fatcatmap.sys.drivers.register(@name, 'native', @init?(), 999, true)	
 	
-	getValueByKey: (key) ->
+	getValueByKey: (store, key) ->
 		
-	setValueByKey: (key, value) ->
+	setValueByKey: (store, key, value) ->
 		
-	addValueByKey: (key, value) ->
+	addValueByKey: (store, key, value) ->
 		
-	deleteByKey: (key) ->
+	deleteByKey: (store, key) ->
 		
 	nuke: () ->
 		
@@ -38,6 +37,5 @@ class AdvancedStorageDriver extends StorageDriver
 		
 
 ## Exports
-if window?
-	window.StorageDriver = StorageDriver
-	window.AdvancedStorageDriver = AdvancedStorageDriver
+@StorageDriver = StorageDriver
+@AdvancedStorageDriver = AdvancedStorageDriver

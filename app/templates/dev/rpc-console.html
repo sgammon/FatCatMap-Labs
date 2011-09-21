@@ -4,67 +4,568 @@
 {% block panel_header %}RPC Playground{% endblock %}
 {% block panel_backnav %}<a href="{{ link('dev-index') }}">Development Console</a>{% endblock %}
 
+{% block postnorth %}
+<script src="{{	assets.script('zeroclipboard', 'core') }}"></script>
+{% endblock %}
+
 {% block panel_content %}
 
-<h2>Operations:</h2><br />
+<style>
 
-<a href='#' id='drawGraph'>Draw Graph</a>
+	#playground
+	{
+	}
 
-<br />
-<br />
-<hr />
-<br />
+	#playground ul.nav
+	{
+		list-style:none;
+		margin:0;
+		text-indent:none;
+		padding-top: 10px;
+		padding-bottom: 10px;
+		margin-top: 10px;
+		margin-bottom: 20px;
 
-<p>
-	<b>Request ID: </b><input type='text' value='' id='api_request_id' style='width:50px; margin-left:15px; text-align:right;' /><br />
-	<b>Asynchronous: </b><input type='text' value='' id='api_request_async' style='width:50px; margin-left:15px; text-align:right;' />
-</p><br />
+	}
+	#playground ul.nav li
+	{
+		list-style:none;
+		text-indent:none;
+		display:inline;
+		padding: 3px;
+		padding-right: 15px;
+		padding-left: 15px;
+		border-right: 1px solid white;
+	}
+	#playground ul.nav li.last
+	{
+		border-right: none;
+	}
+	#playground ul.nav li.current a
+	{
+		background: #666;		
+	}
+	#playground ul.nav li a
+	{
+		background: #333;		
+		border-radius: 5px;
+		padding: 7px;
+		color: white;
+		text-decoration:none;
+	}
+	div.navcolumn
+	{
+		margin-left: 25px;
+		padding-left: 5px;
+		padding-right: 5px;
+	}
+	div.navcolumn span
+	{
+	}
+	div.navcolumn input
+	{
+		width:75px;
+		margin-left:15px;
+		text-align:right;
+	}
+	div.navcolumn input.long
+	{
+		width: 150px !important;
+	}
+	div.playgroundView.hidden
+	{
+		opacity: 0;
+	}
+	
+	#operations
+	{
+		width: 20%;
+	}
+	
+	#playgroundContent
+	{
+		width: 78%;
+	}
+	
+	.contentbox
+	{
+		padding: 10px;
+	}
+	
+	#api_response_type, #api_response_freshness
+	{
+		background: white;
+		color: black;
+		font-size:13px;
+	}
+	
+	#api_response_type
+	{
+		width: 120px;
+		margin-left: 5px;		
+	}
+	
+	#api_response_freshness
+	{
+		width: 90px;
+		margin-left: 5px;
+		text-align:left;
+		font-weight: bold;
+	}
+	
+	#responseDetails
+	{
+		padding: 0;
+		margin: 0;
+	}
+	
+	#responseType
+	{
+		margin-right: 15px;
+	}
+	
+	#responseFreshness
+	{
+		
+	}
+	
+	hr
+	{
+		margin-top: .8em;
+		margin-bottom: .5em;
+	}
 
-<div class='floatleft'>
-	<b>API Request:<b><br />
-	<textarea id='api_request_content' style='width:550px; padding:5px; height:300px; background:white;'></textarea>
+</style>
+
+<script type='text/javascript'>
+
+	// Shortcut global vars
+	_lastRequest = null; // the last RPC request
+	_lastResponse = null; // the last RPC response	
+	_lastError = null; // last RPC error encountered
+	
+	// State vars
+	_current_view = null;
+	_original_data = {};
+
+	// Config
+	_sample_datastore_entity = 'ag9kZXZ-ZmF0LWNhdC1tYXByEAsSCEJvdW5kYXJ5IgJBSww'; // schema record for "Person"
+	
+	_sample_datastore_entities = ['ag9kZXZ-ZmF0LWNhdC1tYXByIwsSBlNjaGVtYSIXb2JqZWN0LmJ1c2luZXNzLkNvbXBhbnkM',
+									'ag9kZXZ-ZmF0LWNhdC1tYXByJwsSBlNjaGVtYSIbb2JqZWN0Lmdlby5ib3VuZGFyeS5VU1N0YXRlDA',
+									'ag9kZXZ-ZmF0LWNhdC1tYXByIQsSBlNjaGVtYSIVb2JqZWN0Lm5hdHVyYWwuUGVyc29uDA',
+									'ag9kZXZ-ZmF0LWNhdC1tYXByIgsSBlNjaGVtYSIWcmVsYXRpb24uc29jaWFsLkZhbWlseQw',
+									'ag9kZXZ-ZmF0LWNhdC1tYXByJgsSBlNjaGVtYSIacmVsYXRpb24uc29jaWFsLkZyaWVuZHNoaXAM',
+									'ag9kZXZ-ZmF0LWNhdC1tYXByKAsSBlNjaGVtYSIccmVsYXRpb24uc29jaWFsLlJlbGF0aW9uc2hpcAw']
+	
+	_sample_origin_node = 'ag9kZXZ-ZmF0LWNhdC1tYXByFgsSBk9iamVjdBgHDAsSBE5vZGUYAQw'; // first node in the database
+
+	// Util & Callbacks
+	function setRPCStatus(text, color)
+	{
+		$('#api_request_status').val(text.toUpperCase()).css({color: color});
+	}
+	function setRPCFreshness(text, color)
+	{
+		$('#api_response_freshness').val(text.toUpperCase()).css({color: color});
+	}
+	function displayRequest(request)
+	{
+		_lastRequest = request;
+		
+		// Dump raw values
+		$('#api_request_id').val(request.id); // set request id
+		$('#api_request_api').val(request.request.api); // set request api
+		$('#api_request_method').val(request.request.method); // set request method
+		$('#api_request_async').val(request.request.ajax.async.toString()); // set if request is async
+		$('#api_request_params').val(JSON.stringify(request.request.params)); // dump request params
+		$('#api_request_action').val(request.request.action); // dump request action
+		$('#api_request_content').val(JSON.stringify(request.request)); // stringify request to json raw
+		request_copypaste.setText($('#api_request_content').val());
+		request_copypaste.show();	
+	}
+	function rpcSuccess(response, responsetype, fullresponse)
+	{
+		_lastResponse = response;
+		console.log('RPC Success: ', response);
+		$('#api_response_content').val(JSON.stringify(fullresponse));
+		setRPCStatus('success!', 'green');
+		
+		if (fullresponse.flags.freshness == 'FRESH')
+		{
+			setRPCFreshness('FRESH', 'green');			
+		}
+		
+		else if (fullresponse.flags.freshness == 'CACHED')
+		{
+			setRPCFreshness('CACHED', 'blue');
+		}
+		$('#api_response_type').val(responsetype);
+		
+		response_copypaste.setText($('#api_response_content').val());
+		response_copypaste.show();
+	}
+	function rpcFailure(response)
+	{
+		setRPCStatus('error!', 'red');
+		_lastError = response;
+		_lastResponse = response;
+		console.log('RPC Failure: ', response);
+		$('#api_response_content').val(JSON.stringify(response));		
+	}
+	callbacks = {
+		success: rpcSuccess,
+		failure: rpcFailure
+	};
+	function doRemoteRequest(method, params)
+	{
+		_original_data = {};
+		displayRequest(method(params).fulfill(callbacks));
+	}
+	function playground(api, method, params)
+	{
+		setRPCStatus('sending...', 'blue');
+		doRemoteRequest(fatcatmap.rpc.api[api][method], params);
+	}
+	function switchView(id)
+	{
+		newview = $('#'+id);
+		if (_current_view == null)
+		{
+			_current_view = 'raw';
+		}
+		
+		// Switch nav
+		$("li.naventry").removeClass('current');
+		$("a[data-view="+id+"]").parent().addClass('current');
+		
+		// Switch panel
+		$('#'+_current_view).animate({opacity:0.0}).addClass('hidden');
+		newview.animate({opacity:1.0}).removeClass('hidden');
+		_current_view = id;
+	}
+
+</script>
+
+<div id='operations' class='floatleft textleft'>
+	
+	<h2>Operations:</h2><br />
+
+	<ul>
+		<li>System API
+			<ul>
+				<li><a href="javascript:playground('system', 'hello');" id='sysHello'>Hello!</a></li>
+				<li><a href="javascript:playground('system', 'echo', {message: 'testecho'});" id='sysEcho'>Echo</a></li>
+			</ul>
+		</li>
+		<br />
+		
+		<li>Charts API
+			<ul>
+				<li>No methods yet</li>
+			</ul>
+		</li>
+		<br />
+
+		<li>Data API
+			<ul>
+				<li><a href="javascript:playground('data', 'get', {key: _sample_datastore_entity});" id='getEntity'>Get Entity</a></li>
+				<li><a href="javascript:playground('data', 'get', {keys: _sample_datastore_entities});" id='getEntity'>Get Entity (Multi)</a></li>				
+			</ul>
+		</li>
+		<br />
+		
+		<li>Frame API
+			<ul>
+				<li><a href="javascript:playground('frame', 'render', {path: 'dev/test.html'});" id='renderTemplate'>Render Template</a></li>
+			</ul>
+		</li>
+		<br />
+		
+		<li>Graph API
+			<ul>
+				<li><a href="javascript:playground('graph', 'construct');" id='drawGraph'>Construct (No Origin)</a></li>
+				<li><a href="javascript:playground('graph', 'construct', {origin: _sample_origin_node});" id='drawGraphWithOrigin'>Construct (With Origin)</a></li>
+				<li><a href="javascript:playground('graph', 'construct', {degree: 5, limit: 15});" id='deepGraph'>Deep Construct (No Origin)</a></li>
+				<li><a href="javascript:playground('graph', 'construct', {degree: 5, limit: 15, origin: _sample_origin_node});" id='deepGraphWithOrigin'>Deep Construct (With Origin)</a></li>
+			</ul>
+		</li>
+		<br />
+		
+		<li>Query API
+			<ul>
+				<li><a href="javascript:playground('query', 'gql', {gql:'SELECT * FROM Schema LIMIT 5'});" id='queryGQL'>Raw GQL</a></li>
+				<li><a href="javascript:playground('query', 'build', {kind: 'Schema', filter:[{property:'type', value:'edge'}], order:[{property: 'path', direction: 'DSC'}]});" id='queryFilters'>Raw Filters</a></li>
+				<li><a href="javascript:playground('query', 'search', {query:'sam gammon'});" id='searchGlobal'>Global Search</a></li>
+				<li><a href="javascript:playground('query', 'search', {query:'sam gammon', scope: {type: 'graph', subtype: 'Node'}});" id='searchScoped'>Scoped Search</a></li>
+				<li><a href="javascript:playground('query', 'autocomplete', {fragment: 'sam'});" id='autocompleteGlobal'>Global Autocomplete</a></li>
+				<li><a href="javascript:playground('query', 'autocomplete', {fragment: 'sam', scope: {type: 'graph', subtype: 'Node'}});" id='autocompleteScoped'>Scoped Autocomplete</a></li>
+			</ul>
+		</li>
+		<br />
+		
+		<li>Session API
+			<ul>
+				<li><a href="javascript:playground('session', 'checkin', {token: $.fatcatmap.state.session.getToken()});" id='sessionCheckin'>Checkin</a></li>
+				<li><a href="javascript:playground('session', 'live');" id='liveStart'>Start Live Services</a></li>
+				<li><a href="javascript:playground('session', 'ping');" id='livePing'>Ping Live Services</a></li>
+			</ul>
+		</li>					
+
+	</ul>
+
 </div>
 
-<div class='floatleft'>
-	<b>API Response:<b><br />
-	<textarea id='api_response_content' style='width:550px; padding:5px; height:300px; background:white;'></textarea>
+<div id='playgroundContent' class='floatleft textleft'>
+	
+	<div id='playground'>
+		<ul class='nav'>
+			<li class='current naventry'><a href='javascript:switchView("raw");' data-view='raw'>Raw View</a></li>
+			<li class='naventry'><a href='javascript:switchView("pretty");' data-view='pretty'>Formatted View</a></li>
+			<li class='naventry'><a href='javascript:switchView("statistics");' data-view='statistics'>Statistics</a></li>			
+			<li class='naventry'><a href='javascript:switchView("history");' data-view='history'>History</a></li>
+			<li class='last naventry'><a href='javascript:switchView("diagnostics");' data-view='diagnostics'>Diagnostics</a></li>			
+		</ul>
+
+		<!-- Raw request/response view -->
+		<div id='raw' class='playgroundView'>
+			<div>
+				
+				<div class='floatleft navcolumn'>
+					<p>
+						<span><b>Request ID: </b></span><input type='text' value='' id='api_request_id' disabled/><br />
+						<span><b>Asynchronous: </b></span><input type='text' value='' id='api_request_async' disabled/>
+					</p>
+				</div>
+				
+				<div class='floatleft navcolumn'>
+					<p>
+						<span><b>Request API: </b></span><input type='text' value='' id='api_request_api' disabled/><br />
+						<span><b>Request Method: </b></span><input type='text' value='' id='api_request_method' disabled/>
+					</p>
+				</div>
+				
+				<div class='floatleft navcolumn'>
+					<p>
+						<span><b>Request Action: </b></span><input type='text' value='' id='api_request_action' class='long' disabled/><br />
+						<span><b>Request Status: </b></span><input type='text' value='' id='api_request_status' class='long bold' disabled/>
+					</p>
+				</div>
+				
+			</div>
+			
+
+			<div class='clearboth'></div>
+			<hr />
+
+			<div class='contentbox floatleft'>
+				<div>
+					<div class='floatleft'>
+						<b>API Request:</b>
+					</div>
+					<div class='floatright'>
+						<b><div id='request_copypaste_wrapper' class='inline relative'><a id='request_copypaste' href="#">Copy</a></div> / <a id='format_request' href="javascript:DoJSONFormat('#api_request_content', 'request');" class="">Format</a><a id='unformat_request' href="javascript:DoJSONUnFormat('#api_request_content', 'request');" class="hidden">Unformat</a></b>
+					</div>
+				</div>
+				<div class='clearboth'></div>
+				<textarea id='api_request_content' style='width:400px; padding:5px; height:300px; background:white;' disabled></textarea>
+			</div>
+
+			<div class='contentbox floatleft'>
+				<div>
+					<div class='floatleft'>
+						<b>API Response:</b>
+					</div>
+					<div class='floatright'>
+						<b><div id='response_copypaste_wrapper' class='inline relative'><a id='response_copypaste' href="#">Copy</a></div> / <a id='format_response' href="javascript:DoJSONFormat('#api_response_content', 'response');" class="">Format</a><a id='unformat_response' href="javascript:DoJSONUnFormat('#api_response_content', 'response');" class="hidden">Unformat</a></b>
+					</div>
+				</div>
+				<div class='clearboth'></div>
+				<textarea id='api_response_content' style='width:400px; padding:5px; height:300px; background:white;' disabled></textarea><br />
+				<div id='responseDetails'>
+					<div id='responseType' class='floatleft textleft'>
+						<b>Response Type:</b> <input id='api_response_type' disabled />
+					</div>
+					<div id='responseFreshness' class='floatleft textright'>
+						<b>Freshness:</b> <input id='api_response_freshness' disabled />
+					</div>
+					<div class='clearboth'></div>
+				</div>
+			</div>
+		</div>
+		
+		<!--A nicely-structured and formatted view of API requests & responses -->
+		<div id='pretty' class='hidden playgroundView'>
+			<p>Pretty Printed version</p>
+		</div>
+		
+		<!-- Averaged latency and other statistics for the current playground session -->
+		<div id='statistics' class='hidden playgroundView'>
+			<p>Statistics</p>
+		</div>
+		
+		<!-- RPC History of current playground session -->
+		<div id='history' class='hidden playgroundView'>
+			<p>History</p>
+		</div>
+		
+		<!-- Diagnostic & utility tools -->
+		<div id='diagnostics' class='hidden playgroundView'>
+			<p>Debug/diagnostics</p>
+		</div>		
+
+	</div>
+
 </div>
 
 <div class='clearboth'></div>
 
 {% endblock %}
 
+
 {% block postsouth %}
-
 <script type='text/javascript'>
-_error = null;
-	$('#drawGraph').click(function doGrpahRPC()
-		{
 
-			request = fatcatmap.rpc.api.graph.construct({},
-				{
-					success: function (response) {
-						
-						console.log('RPC Success: ', response);
-						$('#api_response_content').val(JSON.stringify(response));
-						
-					},
-					
-					failure: function (response) {
-			
-						console.log('RPC Failure: ', response);
-						alert('RPC failure. Response logged to console.');
-						$('#api_response_content').val(JSON.stringify(response));						
-						
-					},
+$(document).ready(function (){
+	
+	request_copypaste = new ZeroClipboard.Client('request_copypaste');
+	request_copypaste.hide();
 
-			}, false);
-			
-			$('#api_request_id').val(request.id);
-			$('#api_request_async').val(request.async);
-			$('#api_request_content').val(JSON.stringify(request.request));			
-		}
-	);
+	response_copypaste = new ZeroClipboard.Client('response_copypaste');
+	response_copypaste.hide();
+	
+})
+
+function UnFormatJSON(s_type)
+{
+	return JSON.stringify(_original_data[s_type]);
+}
+
+function DoJSONUnFormat(selector, s_type)
+{
+	$('#'+s_type+'_unformat').addClass('hidden');
+	$('#'+s_type+'_format').removeClass('hidden');
+	$(selector).val(UnFormatJSON(s_type));
+}
+
+function DoJSONFormat(selector, s_type)
+{
+	$('#'+s_type+'_format').addClass('hidden');
+	$('#'+s_type+'_unformat').removeClass('hidden');
+	$(selector).val(FormatJSON(JSON.parse($(selector).val()), s_type));
+}
+
+function RealTypeOf(v) {
+  if (typeof(v) == "object") {
+    if (v === null) return "null";
+    if (v.constructor == (new Array).constructor) return "array";
+    if (v.constructor == (new Date).constructor) return "date";
+    if (v.constructor == (new RegExp).constructor) return "regex";
+    return "object";
+  }
+  return typeof(v);
+}
+
+// code courtesy of: http://joncom.be/code/javascript-json-formatter/
+function FormatJSON(oData, s_type, sIndent) {
+	_original_data[s_type] = oData;
+    if (arguments.length < 2) {
+        var sIndent = "";
+    }
+    var sIndentStyle = "    ";
+    var sDataType = RealTypeOf(oData);
+
+    // open object
+    if (sDataType == "array") {
+        if (oData.length == 0) {
+            return "[]";
+        }
+        var sHTML = "[";
+    } else {
+        var iCount = 0;
+        $.each(oData, function() {
+            iCount++;
+            return;
+        });
+        if (iCount == 0) { // object is empty
+            return "{}";
+        }
+        var sHTML = "{";
+    }
+
+    // loop through items
+    var iCount = 0;
+    $.each(oData, function(sKey, vValue) {
+        if (iCount > 0) {
+            sHTML += ",";
+        }
+        if (sDataType == "array") {
+            sHTML += ("\n" + sIndent + sIndentStyle);
+        } else {
+            sHTML += ("\n" + sIndent + sIndentStyle + "\"" + sKey + "\"" + ": ");
+        }
+
+        // display relevant data type
+        switch (RealTypeOf(vValue)) {
+            case "array":
+            case "object":
+                sHTML += FormatJSON(vValue, (sIndent + sIndentStyle));
+                break;
+            case "boolean":
+            case "number":
+                sHTML += vValue.toString();
+                break;
+            case "null":
+                sHTML += "null";
+                break;
+            case "string":
+                sHTML += ("\"" + vValue + "\"");
+                break;
+            default:
+                sHTML += ("TYPEOF: " + typeof(vValue));
+        }
+
+        // loop
+        iCount++;
+    });
+
+    // close object
+    if (sDataType == "array") {
+        sHTML += ("\n" + sIndent + "]");
+    } else {
+        sHTML += ("\n" + sIndent + "}");
+    }
+
+    // return
+    return sHTML;
+}
+
+function SortObject(oData) {
+  var oNewData = {};
+  var aSortArray = [];
+
+  // sort keys
+  $.each(oData, function(sKey) {
+    aSortArray.push(sKey);
+  });
+  aSortArray.sort(SortLowerCase);
+
+  // create new data object
+  $.each(aSortArray, function(i) {
+    if( RealTypeOf(oData[(aSortArray[i])]) == "object" ) {
+      oData[(aSortArray[i])] = SortObject(oData[(aSortArray[i])]);
+    }
+    oNewData[(aSortArray[i])] = oData[(aSortArray[i])];
+  });
+
+  return oNewData;
+
+  function SortLowerCase(a,b) {
+    a = a.toLowerCase();
+    b = b.toLowerCase();
+    return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+  }
+}
+
 </script>
-
 {% endblock %}

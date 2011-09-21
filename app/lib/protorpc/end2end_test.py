@@ -22,7 +22,7 @@ __author__ = 'rafek@google.com (Rafe Kaplan)'
 import logging
 import unittest
 
-from google.appengine.ext import webapp
+import webapp2 as webapp
 
 from protorpc import protojson
 from protorpc import remote

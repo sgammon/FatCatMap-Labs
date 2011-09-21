@@ -1,5 +1,5 @@
 (function() {
-  var LocalStorageDriver, SessionStorageDriver;
+  var LocalStorageDriver;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -9,10 +9,21 @@
     return child;
   };
   LocalStorageDriver = (function() {
+    __extends(LocalStorageDriver, StorageDriver);
     function LocalStorageDriver() {
       LocalStorageDriver.__super__.constructor.apply(this, arguments);
     }
-    __extends(LocalStorageDriver, StorageDriver);
+    LocalStorageDriver.prototype.init = function() {
+      return this.store = new Lawnchair({
+        name: 'fcm-base'
+      }, function(store) {
+        $.fatcatmap.dev.log('LSB/LocalStorage', 'Driver loaded. Local store created.');
+        return $.fatcatmap.state.events.triggerEvent('STORAGE_DB_LOAD', {
+          name: 'fcm-base',
+          store: this.store
+        });
+      });
+    };
     LocalStorageDriver.prototype.getValueByKey = function(key) {};
     LocalStorageDriver.prototype.setValueByKey = function(key, value) {};
     LocalStorageDriver.prototype.deleteValueByKey = function(key) {};
@@ -20,18 +31,5 @@
     LocalStorageDriver.prototype.allValues = function() {};
     return LocalStorageDriver;
   })();
-  SessionStorageDriver = (function() {
-    function SessionStorageDriver() {
-      SessionStorageDriver.__super__.constructor.apply(this, arguments);
-    }
-    __extends(SessionStorageDriver, StorageDriver);
-    SessionStorageDriver.prototype.getValueByKey = function(key) {};
-    SessionStorageDriver.prototype.setValueByKey = function(key, value) {};
-    SessionStorageDriver.prototype.deleteValueByKey = function(key) {};
-    SessionStorageDriver.prototype.nuke = function() {};
-    SessionStorageDriver.prototype.allValues = function() {};
-    return SessionStorageDriver;
-  })();
-  LocalStorageDriver('localstorage', {});
-  SessionStorageDriver('sessionstorage', {});
+  this.LocalStorageDriver = new LocalStorageDriver().setup('localstorage', {});
 }).call(this);

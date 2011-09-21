@@ -81,7 +81,13 @@ class AddData(WebHandler):
 					logging.info('---Object Type: '+str(form.object_type.data))
 					logging.info('---Node Type: '+str(form.node_type.data))
 					logging.info('---Label: '+str(form.label.data))
-					n.start(queue_name='graph')
+					logging.info('---Target: '+str(form.target.data))					
+					if form.target.data == 'graph':
+						n.start(queue_name='graph', target='graph')
+					elif form.target.data == 'data':
+						n.start(queue_name='graph', target='data')
+					else:
+						n.start(queue_name='graph')
 					return self.redirect_to('dev-add-data', msg='NewObjectCollection pipeline started successfully.')
 				else:
 					return self.redirect_to('dev-add-data', msg='Form would not validate!')

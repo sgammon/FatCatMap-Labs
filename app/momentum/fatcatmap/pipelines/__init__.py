@@ -223,6 +223,20 @@ class FCMPipeline(pipeline.Pipeline):
 		## Pass it up the line...
 		super(FCMPipeline, self).__init__(*args, **kwargs)
 
+	def start(self, *args, **kwargs):
+		if 'return_task' in kwargs:
+			del kwargs['return_task']
+		kwargs['return_task'] = True
+		task = super(FCMPipeline, self).start(*args, **kwargs)
+		if 'target' in kwargs:
+			target = kwars['target']
+		else:
+			target = None
+		def txn(task, kwargs):
+			t = taskqueue.Task(url=task.url, params=task.extract_params(), name=task.name, eta=task.eta, headers={'X-Ae-Pipeline-Key': task.headers['X-Ae-Pipeline-Key']}, method=task.method, target=None)
+			return t.add(queue_name=kwargs.get('queue_name', 'default'), transactional=True)
+		return self.db.run_in_transaction(txn, task, kwargs)
+
 	@property
 	def log(self):
 		return self.logger

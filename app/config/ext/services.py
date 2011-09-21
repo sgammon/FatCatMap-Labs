@@ -10,7 +10,7 @@ config = {}
 ## Global Services
 config['momentum.services'] = {
 
-	'logging': False,
+	'logging': True,
 
 	'hooks': {
 		'appstats': {'enabled': False},
@@ -265,6 +265,19 @@ config['momentum.fatcatmap.services'] = {
 
 	# Installed API's
 	'services': {
+	
+		## Debug, development, uptime, etc methods for infrastructure/testing/monitoring use
+		'system': {
+			'enabled': True,
+			'service': 'momentum.fatcatmap.api.system.SystemAPIService',
+			'methods': ['echo', 'hello'],
+			
+			'config': {
+				'caching': 'none',
+				'security': 'none',
+				'recording': 'none'
+			}
+		},
 	
 		## For creating/updating/retrieving userspace data
 		'data': {
