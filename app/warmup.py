@@ -67,6 +67,40 @@ from momentum.fatcatmap import handlers
 from momentum.fatcatmap import pipelines
 from momentum.fatcatmap import decorators
 
+## Compiled templates
+try:
+	import templates
+	import templates.compiled
+except ImportError, e:
+	logging.warning('Failed to import compiled templates path... skipping.')
+
+else:
+	try:
+		import templates.compiled.admin
+		import templates.compiled.content
+		import templates.compiled.core
+		import templates.compiled.dev
+		import templates.compiled.elements
+		import templates.compiled.layouts
+		import templates.compiled.macros
+		import templates.compiled.main
+		import templates.compiled.platform
+		import templates.compiled.snippets
+	
+		from templates.compiled.admin import *
+		from templates.compiled.content import *
+		from templates.compiled.core import *
+		from templates.compiled.dev import *
+		from templates.compiled.elements import *
+		from templates.compiled.layouts import *
+		from templates.compiled.macros import *
+		from templates.compiled.main import *
+		from templates.compiled.platform import *
+		from templates.compiled.snippets import *
+		
+	except ImportError, e:
+		logging.warning('Failed to import compiled template module: '+str(e))
+
 
 def respond200():
 
