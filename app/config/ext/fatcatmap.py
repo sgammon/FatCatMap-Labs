@@ -27,7 +27,7 @@ config['momentum.fatcatmap.dev'] = {
 ## Output layer settings
 config['momentum.fatcatmap.output'] = { 
 
-	'minify': False,
+	'minify': True,
 	'optimize': True,
 	'watermark': True,
 	'standalone': False,
@@ -38,7 +38,7 @@ config['momentum.fatcatmap.output'] = {
 	},
 
 	'assets':{
-		'minified': False,
+		'minified': True,
 		'serving_mode': 'cdn', ## 'local' or 'cdn' (CDN prefixes all assets with an absolute URL)
 		'cdn_prefix': ['cdn.static.labs.momentum.io', 'cdn.static.momentum.io',
 						'west-us.cdn.static.fatcatmap.com', 'west-us.cdn.static.fatcatmap.org']
@@ -89,8 +89,8 @@ config['momentum.fatcatmap.output.template_loader'] = {
 
 	'force': True, ## Force enable template loader even on Dev server
 	'debug': False,  ## Enable dev logging
-	'use_memory_cache': False, ## Use handler in-memory cache for template source
-	'use_memcache': False, ## Use Memcache API for template source
+	'use_memory_cache': True, ## Use handler in-memory cache for template source
+	'use_memcache': True, ## Use Memcache API for template source
 
 }
 

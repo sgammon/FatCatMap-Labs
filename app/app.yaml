@@ -1,5 +1,5 @@
 application: fat-cat-map
-version: alpha-161-py27
+version: beta
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -46,10 +46,11 @@ builtins:
 #### ===== Incoming Services
 inbound_services:
 - mail
+- warmup
 - xmpp_message
 - xmpp_presence
 - xmpp_subscribe
-- warmup
+- channel_presence
 
 
 #### ===== Force precompilation
