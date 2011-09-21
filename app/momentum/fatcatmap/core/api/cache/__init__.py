@@ -2,7 +2,7 @@ import logging
 import datetime
 from config import config
 
-from werkzeug import cached_property
+from webapp2 import cached_property
 from google.appengine.api import memcache
 from google.appengine.api import namespace_manager
 from momentum.fatcatmap.core.api import MomentumCoreAPI

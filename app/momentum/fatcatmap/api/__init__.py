@@ -29,9 +29,9 @@ def QueryResponder(func):
 	def decorated(self, query={}, *args, **kwargs):
 
 		## Retrieve 'mode' parameter
-		mode = self.request.args.get('mode', False)
+		mode = self.request.get('mode', False)
 		if mode is False:
-			self.request.form.get('mode', False)
+			self.request.get('mode', False)
 			if mode is False:
 				if mode in kwargs:
 					mode = kwargs['mode']

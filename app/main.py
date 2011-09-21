@@ -10,14 +10,8 @@ import ndb
 import config
 import logging
 import webapp2
-import services as APIServices
 
-from tipfy import Tipfy
 from urls import get_rules
-
-from warmup import Warmup as WarmupApp
-
-from pipeline.handlers import _APP as PipelinesApp
 
 rules = get_rules()
 	
@@ -27,7 +21,7 @@ def enable_appstats(app):
 	""" Utility function that enables appstats middleware."""
 	
 	from google.appengine.ext.appstats.recording import appstats_wsgi_middleware
-	app.wsgi_app = appstats_wsgi_middleware(app.wsgi_app)
+	app.app = appstats_wsgi_middleware(app.app)
 	return app
 	
 	
@@ -37,7 +31,7 @@ def enable_apptrace(app):
 	
 	from apptrace import middleware
 	middleware.Config.URL_PATTERNS = ['^/$']
-	app.wsgi_app = middleware.apptrace_middleware(app.wsgi_app)
+	app.app = middleware.apptrace_middleware(app.app)
 	return app
 	
 
@@ -78,7 +72,7 @@ def main(environ=None, start_response=None):
 	global rules
 	
 	if environ is not None and start_response is not None:
-		logging.info('Running in WSGI mode...')
+		logging.info('Running in WSGI mode... :)')
 		action = run_wsgi
 	else:
 		action = run
@@ -92,7 +86,7 @@ def main(environ=None, start_response=None):
 	sys_config = config.config.get('momentum.system')
 	
 	## Create the app, get it ready for middleware
-	app = Tipfy(rules=rules, config=config.config, debug=debug)
+	app = webapp2.WSGIApplication(rules, debug=debug, config=config.config)
 
 	try:
 		## If we're in debug mode, automatically activate some stuff
@@ -122,12 +116,8 @@ def main(environ=None, start_response=None):
 				def profile_run(app):
 					logging.info('CORE: Profiling enabled.')
 					enable_jinja2_debugging()
-					try:
-						dump_path = '/'.join(os.path.realpath(__file__).split('/')[0:-1]+['FatCatMap.profile'])
-						cProfile.runctx("run(app)", globals(), locals(), filename=dump_path)
-					except IOError, e:
-						logging.critical('IOError encountered trying to start profiler. Error: '+str(e))
-						exit()
+					dump_path = '/'.join(os.path.realpath(__file__).split('/')[0:-1]+['FatCatMap.profile'])
+					cProfile.runctx("run(app)", globals(), locals(), filename=dump_path)
 				action = profile_run ## Set our action to the profiler
 
 	except Exception, e:
@@ -143,12 +133,15 @@ def main(environ=None, start_response=None):
 
 
 def services(environ=None, start_response=None):
+	import services as APIServices	
 	return APIServices.main(environ, start_response)
 
 def pipelines(environ=None, start_response=None):
+	from pipeline.handlers import _APP as PipelinesApp	
 	return PipelinesApp(environ, start_response)
 	
 def warmup(environ=None, start_response=None):
+	from warmup import Warmup as WarmupApp
 	return WarmupApp(environ, start_response)
 	
 def backend(environ=None, start_response=None):

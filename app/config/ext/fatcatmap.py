@@ -11,9 +11,9 @@ config['momentum.fatcatmap'] = {
 
 	'version': {
 		'major': 1,
-		'minor': 5,
-		'micro': 4,
-		'build': 20110920,
+		'minor': 6,
+		'micro': 1,
+		'build': 20110921,
 		'release': 'BETA'
 	}
 
@@ -39,8 +39,9 @@ config['momentum.fatcatmap.output'] = {
 
 	'assets':{
 		'minified': False,
-		'serving_mode': 'local', ## 'local' or 'cdn' (CDN prefixes all assets with an absolute URL)
-		'cdn_prefix': ['cdn.static.fatcatmap.com', 'cdn.static.momentum.io', 'cdn.static.labs.momentum.io']
+		'serving_mode': 'cdn', ## 'local' or 'cdn' (CDN prefixes all assets with an absolute URL)
+		'cdn_prefix': ['cdn.static.labs.momentum.io', 'cdn.static.momentum.io',
+						'west-us.cdn.static.fatcatmap.com', 'west-us.cdn.static.fatcatmap.org']
 	}
 
 }
@@ -88,8 +89,8 @@ config['momentum.fatcatmap.output.template_loader'] = {
 
 	'force': True, ## Force enable template loader even on Dev server
 	'debug': False,  ## Enable dev logging
-	'use_memory_cache': True, ## Use handler in-memory cache for template source
-	'use_memcache': True, ## Use Memcache API for template source
+	'use_memory_cache': False, ## Use handler in-memory cache for template source
+	'use_memcache': False, ## Use Memcache API for template source
 
 }
 
@@ -99,7 +100,7 @@ config['momentum.fatcatmap.pipelines'] = {
     'debug': False, # Enable basic serverlogs
 	'logging': {
 	
-		'enable': True, # Enable the pipeline logging subsystem
+		'enable': False, # Enable the pipeline logging subsystem
 		'mode': 'serverlogs', # 'serverlogs', 'xmpp' or 'channel'
 		'channel': '', # Default channel to send to (admin channels are their email addresses, this can be overridden on a per-pipeline basis in the dev console)
 		'jid': '', # Default XMPP JID to send to (this can be overridden on a per-pipeline basis in the dev console)

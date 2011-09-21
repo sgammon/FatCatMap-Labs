@@ -1,8 +1,8 @@
 import hashlib
 import logging
 
-from tipfy import Response
-from werkzeug import cached_property
+from webapp2 import Response
+from webapp2 import cached_property
 
 from google.appengine.api import users
 from google.appengine.api import memcache

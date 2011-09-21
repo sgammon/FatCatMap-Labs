@@ -13,7 +13,6 @@ bootstrap.MomentumBootstrapper.prepareImports()
 ## Libraries
 import ndb
 import webob
-import tipfy
 import jinja2
 import config
 import logging
@@ -21,7 +20,6 @@ import webapp2
 import slimmer
 import protorpc
 import pipeline
-import werkzeug
 import mapreduce
 import webapp2_extras
 import wsgiref.handlers

@@ -1,7 +1,7 @@
 import config
 import logging
 import protorpc
-import werkzeug
+import webapp2
 
 from momentum.services.core import handler
 from momentum.services.core import dialects
@@ -18,7 +18,7 @@ _middleware_cache = {}
 
 class MomentumServiceHandlerFactory(proto.ServiceHandlerFactory):
 	
-	@werkzeug.cached_property
+	@webapp2.cached_property
 	def servicesConfig(self):
 		return config.config.get('momentum.services')
 	
@@ -66,7 +66,7 @@ class MomentumServiceHandlerFactory(proto.ServiceHandlerFactory):
 				if cfg['enabled'] is True:
 					try:
 						if name not in _middleware_cache or config.debug:
-							middleware_class = werkzeug.import_string(cfg['path'])
+							middleware_class = webapp2.import_string(cfg['path'])
 						else:
 							middleware_class = _middleware_cache[name]
 							

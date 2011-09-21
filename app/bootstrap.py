@@ -13,9 +13,3 @@ class MomentumBootstrapper(object):
 		if 'lib' not in sys.path:
 			sys.path[0:0] = ['lib', 'lib/dist', 'lib/dist.zip']
 		return cls
-			
-	@classmethod
-	def prepareTipfy(cls):
-		from tipfy import Tipfy
-		import config
-		return (Tipfy, config.config)

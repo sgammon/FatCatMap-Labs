@@ -2,7 +2,7 @@ import random
 import logging
 import config as cfg
 from config import config
-from werkzeug import cached_property
+from webapp2 import cached_property
 
 ## Momentum Imports
 from momentum.fatcatmap.core.api import MomentumCoreAPI

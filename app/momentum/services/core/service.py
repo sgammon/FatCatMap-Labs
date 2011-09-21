@@ -1,6 +1,6 @@
 import config
 import logging
-import werkzeug
+import webapp2
 
 from protorpc import remote
 
@@ -15,7 +15,7 @@ class MomentumService(remote.Service):
 	state = {'request': {}, 'opts': {}, 'service': {}}
 	config = {'global': {}, 'module': {}, 'service': {}}
 
-	@werkzeug.cached_property
+	@webapp2.cached_property
 	def globalConfig(self):
 		return config.config.get('momentum.services')
 		

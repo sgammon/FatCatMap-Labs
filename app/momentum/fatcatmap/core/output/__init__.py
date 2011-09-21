@@ -29,11 +29,15 @@ from os.path import getmtime
 from google.appengine.ext import db
 from google.appengine.api import memcache
 
-from werkzeug import cached_property
+from webapp2 import cached_property
 
-from tipfyext.jinja2 import Environment as JEnvironment
-from tipfyext.jinja2 import ModuleLoader as JModuleLoader
-from tipfyext.jinja2 import FileSystemLoader as JFileSystemLoader
+from module_loaders import ModuleLoader
+
+from webapp2_extras.jinja2 import Jinja2
+
+from jinja2 import Environment as JEnvironment
+from jinja2 import ModuleLoader as JModuleLoader
+from jinja2 import FileSystemLoader as JFileSystemLoader
 
 try:
 	from tipfy.ext import i18n
@@ -143,10 +147,10 @@ class FCMCoreOutputLoader(JFileSystemLoader):
 			
 		# Return compiled template code
 		return source, name, lambda: True
-		
+
 		
 # Template Factory
-def fcmOutputEnvironmentFactory(environment):
+def fcmOutputEnvironmentFactory(app):
 
 	"""Returns a prepared Jinja2 environment for FCM.
 
@@ -154,16 +158,19 @@ def fcmOutputEnvironmentFactory(environment):
 		A ``jinja2.Environment`` instance.
 	"""
 
-	cfg = config.config.get('tipfyext.jinja2')
-	templates_compiled_target = cfg.get('templates_compiled_target')
-	use_compiled = not config.debug or cfg.get( 'force_use_compiled')
+	cfg = config.config.get('webapp2_extras.jinja2')
+	templates_compiled_target = cfg.get('compiled_path')
+	use_compiled = not config.debug or cfg.get( 'force_compiled')
 
 	if templates_compiled_target is not None and use_compiled:
 		# Use precompiled templates loaded from a module or zip.
-		loader = JModuleLoader(templates_compiled_target)
+		loader = ModuleLoader(templates_compiled_target)
 	else:
 		# Parse templates for every new environment instances.
-		loader = FCMCoreOutputLoader(cfg.get('templates_dir'))
+		loader = FCMCoreOutputLoader(cfg.get('template_path'))
+	
+	cfg['environment_args']['loader'] = loader
+	environment = Jinja2(app, config=cfg)
 
 	# Add global functions
 	util = {
@@ -217,7 +224,7 @@ def fcmOutputEnvironmentFactory(environment):
 	}
 	
 	# Set global functions
-	environment.globals['util'] = util
+	#environment.globals['util'] = util
 	
 	if i18n:
 		# Install i18n.
@@ -231,5 +238,5 @@ def fcmOutputEnvironmentFactory(environment):
 			'format_time':	   i18n.format_time,
 			'format_datetime': i18n.format_datetime,
 		})
-
-	environment.loader = loader
+		
+	return environment

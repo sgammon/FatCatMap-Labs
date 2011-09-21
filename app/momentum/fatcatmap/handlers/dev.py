@@ -19,14 +19,14 @@ class Index(WebHandler):
 class CacheManagement(WebHandler):
 	
 	def get(self):
-		if 'message' in self.request.args:
-			return self.render('dev/cache.html', stats=memcache.get_stats(), message=self.request.args.get('message'))
+		if 'message' in self.request.arguments():
+			return self.render('dev/cache.html', stats=memcache.get_stats(), message=self.request.get('message'))
 		else:
 			return self.render('dev/cache.html', stats=memcache.get_stats())
 
 		
 	def post(self):
-		if 'action' in self.request.form and self.request.form.get('action') == 'clear':
+		if 'action' in self.request.arguments() and self.request.get('action') == 'clear':
 			memcache.flush_all()
 			return self.redirect(self.url_for('dev-cache', message='Memcache successfully reset.'))
 		
@@ -51,8 +51,8 @@ class DefaultData(WebHandler):
 class AddData(WebHandler):
 
 	def get(self):
-		if self.request.args.get('msg', False) is not False:
-			message = self.request.args.get('msg')
+		if self.request.get('msg', False) is not False:
+			message = self.request.get('msg')
 		else:
 			message = None
 			
@@ -70,10 +70,10 @@ class AddData(WebHandler):
 							create_relation=new_relation)
 							
 	def post(self):
-		if self.request.form.get('mode', False) == False:
+		if self.request.get('mode', False) == False:
 			return self.redirect_to('dev-add-data', msg='You must post a mode and form data.')
 		else:
-			if self.request.form.get('mode') == 'new_graph_object':
+			if self.request.get('mode') == 'new_graph_object':
 				form = NewObjectCollectionForm(self.request)
 				if form.validate():
 					n = NewObjectCollection(form.object_type.data, form.node_type.data, form.label.data)
@@ -91,7 +91,7 @@ class AddData(WebHandler):
 					return self.redirect_to('dev-add-data', msg='NewObjectCollection pipeline started successfully.')
 				else:
 					return self.redirect_to('dev-add-data', msg='Form would not validate!')
-			elif self.request.form.get('mode') == 'new_graph_relation':
+			elif self.request.get('mode') == 'new_graph_relation':
 				form = NewObjectRelationForm(self.request)
 				if form.validate():
 					r = NewObjectRelation(form.edge_type.data, [form.node1.data, form.node2.data])

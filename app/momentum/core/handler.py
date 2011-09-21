@@ -4,8 +4,8 @@ import ndb
 import config
 import hashlib
 import logging
+import webapp2
 import pipeline
-import werkzeug
 
 try:
 	import json
@@ -18,11 +18,12 @@ except ImportError:
 import httpagentparser
 
 # Tipfy Imports
-from tipfy import Request
-from tipfy import Response
-from tipfy import RequestHandler
-from tipfyext.jinja2 import Jinja2Mixin
-from tipfy.sessions import SessionMiddleware
+from webapp2 import Request
+from webapp2 import Response
+from webapp2 import RequestHandler
+from webapp2_extras import jinja2
+from webapp2_extras.appengine import sessions_ndb
+from webapp2_extras.appengine import sessions_memcache
 
 # Providence/Clarity Imports
 from ProvidenceClarity.struct.util import DictProxy
@@ -67,7 +68,7 @@ _apibridge = CallbackProxy(_loadAPIModule, {
 })
 
 
-class MomentumHandler(RequestHandler, Jinja2Mixin):
+class MomentumHandler(RequestHandler):
 
 	''' Top-level parent class for request handlers based in Tipfy. '''
 	
@@ -75,12 +76,10 @@ class MomentumHandler(RequestHandler, Jinja2Mixin):
 	configPath = None
 	minify = unicode
 	response = Response
+	context = {}
 	uagent = {}
 	
-	## 2: Sessions, auth, etc middleware
-	middleware = [SessionMiddleware()]
-
-	## 3: Shortcuts
+	## 2: Shortcuts
 	api = _apibridge
 
 	ext = DictProxy({
@@ -90,7 +89,7 @@ class MomentumHandler(RequestHandler, Jinja2Mixin):
 	
 	})
 		
-	## 4: HTTP Headers included in every response
+	## 3: HTTP Headers included in every response
 	baseHeaders = {
 		
 		'X-Platform': 'Providence/Clarity-Embedded', # Indicate the platform that is serving this request
@@ -99,7 +98,7 @@ class MomentumHandler(RequestHandler, Jinja2Mixin):
 
 	}
 	
-	## 5: Base template context
+	## 4: Base template context
 	baseContext = {
 	
 		## Python functions
@@ -148,20 +147,24 @@ class MomentumHandler(RequestHandler, Jinja2Mixin):
 	
 
 	## 4: Internal methods
-	@werkzeug.cached_property
+	@webapp2.cached_property
 	def config(self):
 		return config.config
 
-	@werkzeug.cached_property
+	@webapp2.cached_property
 	def _sysConfig(self):
 		return config.config.get(self.configPath)
 
-	@werkzeug.cached_property
+	@webapp2.cached_property
 	def _outputConfig(self):
 		return config.config.get(self.configPath+'.output')
 
+	@webapp2.cached_property
+	def jinja2(self):
+		from momentum.fatcatmap.core.output import fcmOutputEnvironmentFactory
+		return jinja2.get_jinja2(app=self.app, factory=fcmOutputEnvironmentFactory)
 
-	@werkzeug.cached_property
+	@webapp2.cached_property
 	def _bindBaseContext(self):
 		
 		''' Bind base values that are only available at runtime, but not in the context of a particular request. '''
@@ -276,4 +279,8 @@ class MomentumHandler(RequestHandler, Jinja2Mixin):
 		## Bind elements
 		map(self._setcontext, elements)
 		
-		return self.response(response=self.minify(self.render_template(path, **self.context)), content_type=content_type, headers=[(key, value) for key, value in response_headers.items()])
+		self.response.write(self.minify(self.jinja2.render_template(path, **self.context)))
+		self.response.headers = [(key, value) for key, value in response_headers.items()]
+		self.response.content_type = content_type
+		
+		return

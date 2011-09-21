@@ -3,7 +3,7 @@ import logging
 import ndb as n
 
 from protorpc import remote
-from werkzeug import cached_property
+from webapp2 import cached_property
 
 from momentum.fatcatmap import models as m
 

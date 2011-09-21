@@ -45,17 +45,17 @@ class WebHandler(MomentumHandler, AssetsMixin, LiveServicesMixin, SessionsMixin)
 			'successNotice': False
 		}
 		try:
-			params['page']['watermark'] = int(self.request.args.get('_w', 0)) or self._outputConfig['watermark']
+			params['page']['watermark'] = int(self.request.get('_w', 0)) or self._outputConfig['watermark']
 		except Exception:
 			params['page']['watermark'] = True
 			
 		try:
-			params['page']['standalone'] = int(self.request.args.get('_s', 0)) or self._outputConfig['standalone']
+			params['page']['standalone'] = int(self.request.get('_s', 0)) or self._outputConfig['standalone']
 		except Exception:
 			params['page']['standalone'] = False
 		
 		# Optimized (bundled) assets
-		if self._outputConfig['optimize'] == True and self.request.args.get('_op', '1') != '0':
+		if self._outputConfig['optimize'] == True and self.request.get('_op', '1') != '0':
 			params['page']['optimize'] = True
 			
 		# IE and Mobile flags
@@ -68,7 +68,7 @@ class WebHandler(MomentumHandler, AssetsMixin, LiveServicesMixin, SessionsMixin)
 						params['page']['mobile'] = True
 		
 		# Appcaching
-		if self._outputConfig['appcache']['enable'] == True or self.request.args.get('_ac', False) == True:
+		if self._outputConfig['appcache']['enable'] == True or self.request.get('_ac', False) == True:
 				params['page']['manifest'] = self._outputConfig['appcache']['manifest']
 				
 		# Bind Live Services (channel functions)

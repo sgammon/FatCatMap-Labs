@@ -1,6 +1,6 @@
 import config
 import logging
-import werkzeug
+import webapp2
 
 from protorpc.webapp import service_handlers
 
@@ -18,7 +18,7 @@ class MomentumServiceHandler(service_handlers.ServiceHandler):
 
 
 	## == Config == ##
-	@werkzeug.cached_property
+	@webapp2.cached_property
 	def servicesConfig(self):
 		return config.config.get('momentum.services')
 

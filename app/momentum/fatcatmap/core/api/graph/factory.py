@@ -6,7 +6,7 @@ from ndb import model as n
 from ndb import context as c
 from ndb import tasklets as t
 
-from werkzeug import cached_property
+from webapp2 import cached_property
 
 from momentum.fatcatmap import models as m
 from momentum.fatcatmap.core.api import MomentumCoreAPI

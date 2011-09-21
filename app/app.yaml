@@ -1,8 +1,8 @@
 application: fat-cat-map
-version: alpha-154-py27
+version: alpha-161-py27
 runtime: python27
 api_version: 1
-threadsafe: no
+threadsafe: yes
 
 default_expiration: "365d"
 
@@ -198,10 +198,6 @@ handlers:
   static_files: static/google_verify.html
   upload: static/google_verify.html
   
-- url: /_ah/pipeline(.*)
-  script: pipeline/handlers.py
-  login: admin
-
 ###### Send to Tipfy
 - url: /.*
   login: admin

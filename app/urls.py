@@ -8,9 +8,8 @@
     :copyright: 2009 by tipfy.org.
     :license: BSD, see LICENSE.txt for more details.
 """
-from tipfy import Rule
 from config import config
-from werkzeug import import_string
+from webapp2 import import_string
 
 
 def get_rules():
@@ -26,7 +25,7 @@ def get_rules():
     # ``apps_installed`` definition set in config.py.
     rules = []
 
-    for app_module in config.get('tipfy')['apps_installed']:
+    for app_module in config.get('webapp2')['apps_installed']:
         try:
             # Load the urls module from the app and extend our rules.
             app_rules = import_string('%s.routing' % app_module)
