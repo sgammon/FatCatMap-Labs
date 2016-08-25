@@ -56,17 +56,21 @@ class ImmutableStructFactory(type):
 
 	def __new__(cls, name, bases, _dict):
 
-		print ''
-		print 'FACTORY: '
-		print '----------------------------'
-		print '== cls: '+str(cls)
-		print '== name: '+str(name)
-		print '== bases: '+str(bases)
-		print '== dict: '+str(_dict)
-		print ''
+		if object in bases and name == 'SimpleStruct':
+			return type.__new__(cls, name, bases, _dict)
 
-		return NamedTuple(name, bases, _dict)
-
+		else:
+			## Compute fields
+			_fields = [(k, v) for k, v in filter(lambda x: x[0][0] != '_' and True or False, _dict.items())]
+			
+			## Create slots and schema properties
+			_struct = {
+				'_schema': _fields,
+				'__slots__': [str(k) for k, v in _fields]
+			}
+			
+			## Generate rewritten Struct
+			return type.__new__(cls, name, bases, _struct)
 
 
 ## == For the 'Complex' struct type

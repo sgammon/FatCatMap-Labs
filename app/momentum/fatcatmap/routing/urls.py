@@ -1,78 +1,144 @@
 # -*- coding: utf-8 -*-
 """URL definitions."""
-from tipfy import Rule
-from tipfy import HandlerPrefix
+from webapp2 import Route
+from webapp2_extras.routes import HandlerPrefixRoute
 
 rules = [
 
-	HandlerPrefix('momentum.fatcatmap.handlers.', [
+	HandlerPrefixRoute('momentum.fatcatmap.handlers.', [
 	
 		## === Main URLs === ##
-		Rule('/', name='landing', handler='content.map.MapLanding'),
-		Rule('/offline', name='offline', handler='main.Offline'),
+		Route('/', name='landing', handler='content.map.MapLanding'),
+		Route('/offline', name='offline', handler='main.Offline'),
+
+		## === Security URLs === ##
+		HandlerPrefixRoute('security.', [
+
+			Route('/login', name='auth/login', handler='Login'),
+			Route('/logout', name='auth/logout', handler='Logout'),
+			Route('/register', name='auth/register', handler='Register'),		
+		
+		]),
 
 		## === Content Sections == ##
-		Rule('/map', name='map:landing', handler='content.map.MapLanding'),
-		Rule('/browse', name='browse:landing', handler='content.browse.BrowseLanding'),
-		Rule('/search', name='search:landing', handler='content.search.SearchLanding'),
-		Rule('/interact', name='interact:landing', handler='content.interact.InteractLanding'),
-		Rule('/visualize', name='visualize:landing', handler='content.visualize.VisualizeLanding'),
+		HandlerPrefixRoute('content.', [
+
+			Route('/map', name='map:landing', handler='map.MapLanding'),
+			Route('/browse', name='browse:landing', handler='browse.BrowseLanding'),
+			Route('/search', name='search:landing', handler='search.SearchLanding'),
+			Route('/interact', name='interact:landing', handler='interact.InteractLanding'),
+			Route('/visualize', name='visualize:landing', handler='visualize.VisualizeLanding')
+		
+		]),
 		
 		## === Site: About FCM === ##
-		Rule('/about', name='about:landing', handler='site.about.Landing'),
-		Rule('/about/bias', name='about:bias', handler='site.about.Bias'),
-		Rule('/about/mission', name='about:mission', handler='site.about.Mission'),
-		Rule('/about/technology', name='about:poweredby', handler='site.about.PoweredBy'),
+		HandlerPrefixRoute('site.about.', [
+
+			Route('/about', name='about:landing', handler='Landing'),
+			Route('/about/bias', name='about:bias', handler='Bias'),
+			Route('/about/mission', name='about:mission', handler='Mission'),
+			Route('/about/technology', name='about:poweredby', handler='PoweredBy')
+		
+		]),
 
 		## === Site: Help (bug reporter, help topics, 'ask a question') === ##
-		Rule('/help', name='help:landing', handler='site.help.Landing'),
-		Rule('/help/ask', name='help:ask', handler='site.help.AskQuestion'),
-		Rule('/help/faq', name='help:faq', handler='site.help.FAQ'),
-		Rule('/help/topics', name='help:topics:list', handler='site.help.ListTopics'),		
-		Rule('/help/topic/<string:key>', name='help:topic', handler='site.help.ViewTopic'),		
-		Rule('/help/terminology', name='help:terminology', handler='site.help.Terminology'),
-		Rule('/help/something-broke', name='help:bugreporter', handler='site.help.ReportBug'),
+		HandlerPrefixRoute('site.help.', [
+
+			Route('/help', name='help:landing', handler='Landing'),
+			Route('/help/ask', name='help:ask', handler='AskQuestion'),
+			Route('/help/faq', name='help:faq', handler='FAQ'),
+			Route('/help/topics', name='help:topics:list', handler='ListTopics'),		
+			Route('/help/topic/<string:key>', name='help:topic', handler='ViewTopic'),		
+			Route('/help/terminology', name='help:terminology', handler='Terminology'),
+			Route('/help/something-broke', name='help:bugreporter', handler='ReportBug')
+		
+		]),
 		
 		## === Site: Legal (privacy policy, source data, terms of service) === ##
-		Rule('/legal', name='legal:landing', handler='site.legal.Landing'),
-		Rule('/legal/data', name='legal:sourcedata', handler='site.legal.Data'),
-		Rule('/legal/terms', name='legal:terms', handler='site.legal.Terms'),
-		Rule('/legal/privacy', name='legal:privacy', handler='site.legal.Privacy'),
+		HandlerPrefixRoute('site.legal.', [		
+
+			Route('/legal', name='legal:landing', handler='Landing'),
+			Route('/legal/data', name='legal:sourcedata', handler='Data'),
+			Route('/legal/terms', name='legal:terms', handler='Terms'),
+			Route('/legal/privacy', name='legal:privacy', handler='Privacy')
+			
+		]),
 		
 		## === User URLs === ##
-		Rule('/me', name='user:landing', handler='user.Landing'),
-		Rule('/me/inbox', name='user:inbox', handler='user.Inbox'),
-		Rule('/me/stats', name='user:stats', handler='user.Stats'),
-		Rule('/me/profile', name='user:profile', handler='user.Profile'),
-		Rule('/me/history', name='user:history', handler='user.History'),
-		Rule('/me/account', name='user:account', handler='user.Account'),
-		Rule('/me/settings', name='settings:landing', handler='user.Settings'),
-		
-		## === Security URLs === ##
-		Rule('/login', name='auth/login', handler='security.Login'),
-		Rule('/logout', name='auth/logout', handler='security.Logout'),
-		Rule('/register', name='auth/register', handler='security.Register'),
+		HandlerPrefixRoute('user.', [
+
+			Route('/me', name='user:landing', handler='Landing'),
+			Route('/me/inbox', name='user:inbox', handler='Inbox'),
+			Route('/me/stats', name='user:stats', handler='Stats'),
+			Route('/me/profile', name='user:profile', handler='Profile'),
+			Route('/me/history', name='user:history', handler='History'),
+			Route('/me/account', name='user:account', handler='Account'),
+			Route('/me/settings', name='settings:landing', handler='Settings')
+
+		]),
 		
 		## === Dev URLs === ##
-		Rule('/_fcm/dev', name='dev-index', handler='dev.Index'),
-		Rule('/_fcm/dev/cache', name='dev-cache', handler='dev.CacheManagement'),
-		Rule('/_fcm/dev/add-data', name='dev-add-data', handler='dev.AddData'),
-		Rule('/_fcm/dev/default-data', name='dev-default-data', handler='dev.DefaultData'),
-		Rule('/_fcm/dev/rpc-console', name='dev-rpc-console', handler='dev.RPCConsole'),
-		Rule('/_fcm/dev/shell', name='dev-shell', handler='dev.WebShell'),
+		HandlerPrefixRoute('dev.', [
+
+			Route('/_fcm/dev', name='dev-index', handler='Index'),
+			Route('/_fcm/dev/cache', name='dev-cache', handler='CacheManagement'),
+			Route('/_fcm/dev/add-data', name='dev-add-data', handler='AddData'),
+			Route('/_fcm/dev/default-data', name='dev-default-data', handler='DefaultData'),
+			Route('/_fcm/dev/rpc-console', name='dev-rpc-console', handler='RPCConsole'),
+			Route('/_fcm/dev/shell', name='dev-shell', handler='WebShell')
+
+		]),
 		
 		## === Management URLs === ##
-		Rule('/_fcm/manage', name='admin-index', handler='admin.Index'),
+		Route('/_fcm/manage', name='admin-index', handler='admin.Index'),
+		
+		## === Worker URLs === ##
+		HandlerPrefixRoute('workers.', [
+				
+			Route('/_fcm/workers', name='workers', handler='Main'),
+			Route('/_fcm/workers/warmup/<routine>', name='warmup-worker', handler='cache.Warmup'),
+			Route('/_fcm/workers/fetch/ext/<routine>', name='fetch-worker', handler='fetch.FetchExternal'),
+
+			# Scheduler Workers
+			HandlerPrefixRoute('scheduler.', [
+
+				Route('/_fcm/workers/scheduler', name='scheduler-worker', handler='Main'),
+				Route('/_fcm/workers/scheduler/tick', name='scheduler-tick', handler='Tick'),
+				Route('/_fcm/workers/scheduler/callback', name='scheduler-callback', handler='Callback'),
+				Route('/_fcm/workers/scheduler/next', name='scheduler-next', handler='Next'),
+				Route('/_fcm/workers/scheduler/status', name='scheduler-status', handler='Status')
+				
+			]),
+			
+			# Crawler Workers
+			HandlerPrefixRoute('crawler.', [
+			
+				Route('/_fcm/workers/crawler', name='crawler-worker', handler='Main'),
+			
+			]),
+			
+			# Analyzer Workers
+			HandlerPrefixRoute('analyzer.', [
+			
+				Route('/_fcm/workers/analyzer', name='analyzer-worker', handler='Main'),
+			
+			])
+			
+		]),
 		
 		## === API Services === ##
-		Rule('/_api/js', endpoint='js-api', handler='api.JavascriptAPIDispatcher'),
-		Rule('/_api/rpc', endpoint='rpc-api', handler='api.FatcatmapAPIDispatcher'),
-		Rule('/_api/rpc/<string:service>', endpoint='rpc-api-service', handler='api.FatcatmapAPIDispatcher'),
+		HandlerPrefixRoute('api.', [		
 
-		Rule('/_api/<string:module>', endpoint='api', handler='api.FatcatmapAPIDispatcher'),
-		Rule('/_api/<string:module>/<string:service>', endpoint='api-call', handler='api.FatcatmapAPIDispatcher'),
-		Rule('/_api/<string:module>/<string:service>/<string:method>', endpoint='api-call-rest', handler='api.FatcatmapAPIDispatcher'),			
-		Rule('/_api/<string:module>/<string:service>/<string:method>.<string:format>', endpoint='api-request-rest-format', handler='api.FatcatmapAPIDispatcher'),
+			Route('/_api/js', name='js-api', handler='JavascriptAPIDispatcher'),
+			Route('/_api/rpc', name='rpc-api', handler='FatcatmapAPIDispatcher'),
+			Route('/_api/rpc/<service>', name='rpc-api-service', handler='FatcatmapAPIDispatcher'),
+
+			Route('/_api/<module>', name='api', handler='FatcatmapAPIDispatcher'),
+			Route('/_api/<module>/<service>', name='api-call', handler='FatcatmapAPIDispatcher'),
+			Route('/_api/<module>/<service>/<method>', name='api-call-rest', handler='FatcatmapAPIDispatcher'),			
+			Route('/_api/<module>/<service>/<method>.<format>', name='api-request-rest-format', handler='FatcatmapAPIDispatcher')
+			
+		])
 
 	
 	])

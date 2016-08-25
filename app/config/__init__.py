@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
 import logging
 import datetime
-from werkzeug import import_string
+import bootstrap
+
+if 'lib' not in sys.path or 'lib/distlib' not in sys.path:
+	bootstrap.MomentumBootstrapper.prepareImports()
 
 _config = {}
 _compiled_config = None
@@ -16,33 +20,17 @@ debug = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
 	######################################## Tipfy configuration. ########################################
 
 """
-_config['tipfy'] = {
+_config['webapp2'] = {
 
 	# Basic Config Values
 	#'server_name': 'localhost:8080' if debug == True else 'spi.wirestone.staging.ext.providenceclarity.com',
 
-	# Installed middleware modules
-	'middleware': [
-
-	    # Display Midleware
-	    #'tipfy.ext.i18n.I18nMiddleware',  ## Enables automatic string translations based on locale of user
-
-	    # Debugging Middleware
-	    'tipfy.ext.debugger.DebuggerMiddleware',  ## Enable debugger. It will be loaded only when executed from the dev environment.
-	    'tipfy.ext.appstats.AppstatsMiddleware',  ## Enable for good code profiling information
-    
-	    # FCM Middleware
-	    'momentum.fatcatmap.core.middleware.multitenancy.AppVersionNamespacingMiddleware',  ## Restricts the app to it's version-namespace.
-    
-	],
-
 	'apps_installed':[
-		'momentum.platform', ## The Momentum backend behind the data analysis and magic that powers FatCatMap
 		'momentum.fatcatmap' ## The FCM frontend responsible for making that data accessible and useful
 	],
 
 }
-_config['tipfy.sessions'] = {
+_config['webapp2_extras.sessions'] = {
 
 	'secret_key':'ASDkljgdo*(#G!(CDSOICBD&V!OCXVVBIUB#V*C&VLSAXCX212e122d1))',
     'default_backend': 'datastore',
@@ -57,19 +45,17 @@ _config['tipfy.sessions'] = {
     }	
 
 }
-_config['tipfyext.jinja2'] = {
+_config['webapp2_extras.jinja2'] = {
 
-	'templates_dir': 'templates', ## Root directory for template storage
-	'templates_compiled_target': None, ##  Compiled templates directory
-	'force_use_compiled': False, ## Force Jinja to use compiled templates, even on the Dev server
+	'template_path': 'templates/source', ## Root directory for template storage
+	'compiled_path': 'templates.compiled', ##  Compiled templates directory
+	'force_compiled': True, ## Force Jinja to use compiled templates, even on the Dev server
 
 	'environment_args': { ## Jinja constructor arguments
 		'optimized': True,	## 
 	    'autoescape': True, ## Global Autoescape. BE CAREFUL WITH THIS.
-	    'extensions': ['jinja2.ext.autoescape', 'jinja2.ext.with_'],
+	    'extensions': ['jinja2.ext.autoescape', 'jinja2.ext.with_', 'jinja2.ext.i18n'],
 	},
-
-	'after_environment_created': 'momentum.fatcatmap.core.output.fcmOutputEnvironmentFactory', ## Map to the core output factory
 
 }
 
@@ -82,7 +68,7 @@ _config['tipfyext.jinja2'] = {
 ## System Config
 _config['momentum.system'] = {
 
-	'debug': True, # System-level debug messages
+	'debug': False, # System-level debug messages
 
 	'hooks': { # System-level Developer's Hooks
 		'appstats': {'enabled': False}, # AppStats RPC optimization + analysis tool
@@ -102,8 +88,8 @@ _config['momentum.system'] = {
 def systemLog(message, _type='debug'):
 	global debug
 	global _config
-	prefix = '[CORE_SYSTEM]: '
 	if _config['momentum.system']['debug'] is True or _type in ('error', 'critical'):
+		prefix = '[CORE_SYSTEM]: '		
 		if _type == 'debug' or debug is True:
 			logging.debug(prefix+message)
 		elif _type == 'info':
@@ -116,6 +102,7 @@ def systemLog(message, _type='debug'):
 
 def readConfig(config=_config):
 	global _compiled_config
+	from webapp2 import import_string	
 	if _compiled_config is not None:
 		return _compiled_config
 	else:

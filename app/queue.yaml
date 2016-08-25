@@ -1,31 +1,45 @@
 queue:
-- name: default
+
+- name: default # miscellaneous tasks
   rate: 20/s
-- name: mail
+
+- name: mail # outgoing mail
   rate: 2000/d
-  bucket_size: 40
-- name: xmpp
-  rate: 20/s
-  bucket_size: 40
-- name: channel
-  rate: 20/s
-  bucket_size: 40
-- name: indexer
-  rate: 20/s
-  bucket_size: 40
-- name: cacher
-  rate: 20/s
-  bucket_size: 40
-- name: media
+  bucket_size: 50
+  max_concurrent_requests: 30  
+
+- name: xmpp # jabber push notifications
+  rate: 50/s
+  bucket_size: 50
+  max_concurrent_requests: 40
+
+- name: channel # browser push notifications
+  rate: 100/s
+  bucket_size: 100
+  max_concurrent_requests: 100  
+
+- name: analyzer # analyzes datastore + blobstore data
+  rate: 100/s
+  bucket_size: 100
+  max_concurrent_requests: 100
+
+- name: cacher # handles cache priming
+  rate: 100/s
+  bucket_size: 100
+  max_concurrent_requests: 100  
+
+- name: media # handles conversion + deployment of media assets
   rate: 5/s
   bucket_size: 10
-- name: graph
-  rate: 20/s
-  bucket_size: 40
+  max_concurrent_requests: 20
+
+- name: graph # distributed transaction layer for graph mutations
+  rate: 50/s
+  bucket_size: 100
   max_concurrent_requests: 40
   retry_parameters:
-    min_backoff_seconds: 10
-    max_backoff_seconds: 200
-    max_doublings: 2
+    min_backoff_seconds: 5
+    max_backoff_seconds: 25
+    max_doublings: 3
     task_retry_limit: 25
-    task_age_limit: 7d
+    task_age_limit: 2d

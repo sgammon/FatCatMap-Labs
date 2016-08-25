@@ -1,0 +1,120 @@
+<div id='devNotice'>
+	<a href='http://labs.momentum.io/fatcatmap' class='noicon'>FATCATMAP LABS</a> - WORK IN PROGRESS<br />
+	&copy; 2008-2011, POLITICAL <a href='http://momentum.io' class='noicon'>MOMENTUM</a><br />
+
+	{% if api.users.is_current_user_admin() %}
+	
+	<hr />
+	<div id='devMenu'>
+		<ul>
+			<li><a href='#dEnv' onclick="$('.devContentSection').hide(); $('#devMenu').hide(); $('#devTools').show(); $('#devTools').removeClass('hidden');">Development Tools</a></li>
+			<li><a href='#dEnv' onclick="$('.devContentSection').hide(); $('#devMenu').hide(); $('#perfTools').show(); $('#perfTools').removeClass('hidden');">Performance Tools</a></li>
+			<li><a href='#dEnv' onclick="$('.devContentSection').hide(); $('#devMenu').hide(); $('#devEnvironmentInfo').show(); $('#devEnvironmentInfo').removeClass('hidden');">Request Environment</a></li>
+			<li><a href="#dEnv" onclick="$('.devContentSection').hide(); $('#devMenu').hide(); $('#agentEnvironment').show(); $('#agentEnvironment').removeClass('hidden');">Browser Environment</a></li>						
+			<li><a href="#dEnv" onclick="$('.devContentSection').hide(); $('#devMenu').hide(); $('#runtimeEnvironment').show(); $('#runtimeEnvironment').removeClass('hidden');">Runtime Environment</a></li>									
+		</ul>
+	</div>
+	
+	<div id='devContent'>
+
+		<div id='devEnvironmentInfo' class='devContentSection hidden'>
+
+			<b>VERSION:</b> {{ util.config.fcm.version.major }}.{{ util.config.fcm.version.minor }}.{{ util.config.fcm.version.micro }} <b>//</b> <b>BUILD:</b> {{ util.config.fcm.version.build }}-{{ util.config.fcm.version.release }}
+			<br />
+			
+			<b>RELEASE:</b> {{ util.env.get('CURRENT_VERSION_ID').split('.')[0] }} <b>//</b> <b>REVISION:</b> {{ util.env.get('CURRENT_VERSION_ID').split('.')[1] }} <br />
+			
+			<b>NAMESPACE:</b> {% if api.multitenancy.get_namespace() == '' %}None{% else %}{{ api.multitenancy.get_namespace() }}{% endif %} <b>//</b> <b>DATACENTER:</b> {{ util.env.get('DATACENTER') }}
+			 <br /><b>R(hash):</b> {{ util.env.get('REQUEST_ID_HASH') }} <b>//</b> <b>S(hash):</b> None<br />
+			<b>LAYER:</b> {% if api.backends.get_backend() == none %}Frontend{% else %}Backend{% endif %} <b>//</b> <b>BACKEND:</b> {{ api.backends.get_backend() }} <b>//</b> <b>INSTANCE:</b> {{ util.env.get('INSTANCE_ID', '0') }}
+			
+			<br />
+			<br />
+			<a href='#' onclick="$('#devEnvironmentInfo').hide().addClass('hidden'); $('#devMenu').show();">Back to Dev Menu</a>
+
+		</div>
+
+		<div id='perfTools' class='devContentSection hidden'>
+			<a href='#' onclick="fatcatmap.dev.performance.tools.fpsstats.show();">FPS/Memory Counter</a>
+
+			<br />
+			<br />
+			<a href='#' onclick="$('#perfTools').hide().addClass('hidden'); $('#devMenu').show();">Back to Dev Menu</a>
+		</div>
+		
+		<div id='devTools' class='devContentSection hidden'>
+			<a href='/_fcm/dev'>Developer's Console</a><br />
+			<a href='/_fcm/manage'>Management Console</a><br />
+			<a href='/_fcm/platform/manage'>Platform Console</a><br />
+
+			<br />
+			<br />
+			<a href='#' onclick="$('#devTools').hide().addClass('hidden'); $('#devMenu').show();">Back to Dev Menu</a>
+		</div>	
+		
+		<div id='agentEnvironment' class='devContentSection hidden'>
+
+			<div class='floatleft textleft'>
+
+				<i>Platform</i>
+				<ul>
+					<li><b>Browser:</b> <span id='agent_browser'></span></li>
+					<li><b>OS:</b> <span id='agent_os'></span></li>
+					<li><b>Engine:</b> <span id='agent_engine'></span></li>
+					<li><b>Vendor:</b> <span id='agent_vendor'></span></li>
+					<li><b>Version:</b> <span id='agent_version'></span></li>
+				</ul>
+
+			</div>
+			
+			<div class='floatleft textleft'>
+				
+				<i>Capabilities</i>
+				<ul>
+					<li><b>SVG:</b> <span id='capabilities_svg'></span></li>
+					<li><b>Workers:</b> <span id='agent_browser'></span></li>
+					<li><b>AJAX:</b> <span id='capabilities_ajax'></span></li>
+					<li><b>- Storage:</b> <span id='capabilities_simple_storage'></span></li>
+					<li><b>+ Storage:</b> <span id='capabilities_advanced_storage'></span></li>					
+				</ul>
+				
+			</div>
+
+			<div class='clearboth'></div>
+			<br />
+			<br />
+			<a href='#' onclick="$('#agentEnvironment').hide().addClass('hidden'); $('#devMenu').show();">Back to Dev Menu</a>
+		</div>						
+		
+		<div id='runtimeEnvironment' class='devContentSection hidden'>
+			
+			<div class='floatleft textleft'>
+				<i>Libraries:</i>
+				<ul>
+					<li><b>jQuery:</b> <span id='capabilities_svg'></span></li>
+					<li><b>Amplify:</b> <span id='capabilities_svg'></span></li>
+					<li><b>Backbone:</b> <span id='capabilities_svg'></span></li>
+					<li><b>Lawnchair:</b> <span id='capabilities_svg'></span></li>
+					<li><b>DataJS:</b> <span id='capabilities_svg'></span></li>
+				</ul>
+			</div>
+			
+			<div class='floatleft textleft'>
+				<i>Page State:</i>
+				<ul>
+					<li><b>Channel:</b> <span id='capabilities_svg'></span></li>
+					<li><b>Workers:</b> <span id='capabilities_svg'></span></li>
+					<li><b>RPC's:</b> <span id='capabilities_svg'></span></li>
+					<li><b>Session:</b> <span id='capabilities_svg'></span></li>
+					<li><b>User:</b> <span id='capabilities_svg'></span></li>
+			</div>
+			
+			<div class='clearboth'></div>
+			<br />
+			<br />
+			<a href='#' onclick="$('#runtimeEnvironment').hide().addClass('hidden'); $('#devMenu').show();">Back to Dev Menu</a>			
+		</div>
+		
+	</div>
+	{% endif %}
+</div>

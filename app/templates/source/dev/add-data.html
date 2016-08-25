@@ -1,0 +1,30 @@
+{% extends 'layouts/dev.html' %}
+{% from 'macros/form.html' import renderForm %}
+
+{% block page_title %}Add Graph Data{% endblock %}
+{% block panel_header %}Add Graph Data{% endblock %}
+{% block panel_backnav %}<a href="{{ link('dev-index') }}">Development Console</a>{% endblock %}
+
+{% block panel_content %}
+
+{% if msg is not none %}
+	<div class='notice'><p>{{ msg }}</p></div>
+{% endif %}
+
+<div class='floatleft'>
+	<h2>Create Object Collection:</h2><br />
+
+	{{ renderForm(create_collection) }}
+</div>
+
+<div class='floatleft' style='margin-left: 25px'>
+	<h2>Create Object Relation:</h2><br />
+
+	{{ renderForm(create_relation) }}
+</div>
+
+<div class='clearboth'></div>
+
+<br />
+<br />
+{% endblock %}

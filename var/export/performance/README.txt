@@ -1,0 +1,1 @@
+This folder holds exported performance reports, such as profiler runs and memory overhead analysis results.

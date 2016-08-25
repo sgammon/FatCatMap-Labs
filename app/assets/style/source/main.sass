@@ -24,20 +24,17 @@
 
 // ROOT
 html, body
-	overflow: auto
+	overflow: hidden
 	background-color: #222
 	font: 13px/1.231 sans-serif
 	*font-size: small
-	
+
 body
 	
-	
-	// Forms & link icons
-	+link-icons
-	+blueprint-form
-	
 	color: $text_color
-	background: $main_bg	
+	background: $main_bg
+	
+	+blueprint-form
 	
 	a
 		color: $a_color
@@ -46,6 +43,9 @@ body
 			
 	a.noicon
 		+no-link-icon
+		
+	&.fcm-beta
+		text-align: left
 
 // BUTTONS
 a.button
@@ -184,14 +184,16 @@ textarea
 	
 // SUPERBAR
 .litebar
-
 	width: 100%
 	z-index: 600
 	height: 33px
 	background: transparent
 	position: absolute
 	top: 0
-	
+	margin:
+		left: 40px
+		right: 40px	
+		
 	#toploader
 		width: 100%
 		height: 5px
@@ -199,6 +201,10 @@ textarea
 		top: 0
 		position: absolute
 		left: 0
+		z-index: 1500
+		margin:
+			left: -40px
+			right: -40px
 		
 		#globalProgress
 			width: 0
@@ -206,8 +212,28 @@ textarea
 			position: absolute
 			top: 0
 			left: 0
-			background: white
-			
+			background: white	
+
+#liteNavigation
+	background: #111
+	opacity: 0.95
+	height: 5px
+	z-index: 1000
+	top: 0
+	left: 0
+	margin:
+		left: -40px
+		right: -40px
+	
+	#liteNavContent
+		padding:
+			left: 6%
+			right: 6%
+			top: 2%
+			bottom: 2%
+	
+#liteNavigation.expanded
+	margin-top: 0 !important
 
 #liteNavigation.halfheight
 	height: 20%
@@ -221,13 +247,14 @@ textarea
 #fcmTopBranding.pulldown
 
 	padding:
-		top: 5px
+		top: 8px
 		left: 5px
 		right: 5px
 	z-index: 1000
 	width: 228px
 	margin:
-		left: 60px
+		top: 0
+		left: 20px
 	background: $panel_bg
 	text-align: center
 	float: left
@@ -236,6 +263,10 @@ textarea
 	img
 		z-index: 1000
 
+#momentumSuperbar
+	position: absolute
+	top: 0
+	left: 0
 
 .superbar
 	width: 100%
@@ -252,6 +283,8 @@ textarea
 			left: 5px
 			right: 5px
 		width: 165px
+		position: absolute
+		z-index: 900
 		text-align: center
 		float: left
 		
@@ -402,6 +435,7 @@ li.navButton
 .litefooter
 	height: 35px
 	line-height: 35px
+	z-index: 1000
 
 	#globalActivityIndicator
 		width: 16px
@@ -432,6 +466,7 @@ li.navButton
 .fullfooter
 	height: 55px
 	line-height: 55px
+	z-index: 1000	
 	
 	#globalActivityIndicator
 		height: 20px
@@ -459,7 +494,7 @@ li.navButton
 	width: 100%
 	bottom: 0
 	font-weight: normal
-	position: absolute
+	position: fixed
 	background: $panel_bg
 	overflow: hidden
 	opacity: 0.7
@@ -526,10 +561,9 @@ li.navButton
 	margin-top: 0
 
 .content_body
-	top: 0
-	height: 100%
-	width: 100%
+	margin: 0
 	overflow: hidden
+	position: absolute
 	
 .content_footer
 	height: 10%
@@ -577,13 +611,14 @@ li.navButton
 // SIDEBARS
 .sidebar
 	color: #999 important
-	position: absolute
+	position: fixed
 	top: 5px
+	padding-top: 20px
 	bottom: 35px
 	width: 35px
 	background: #111
 	opacity: 0.6
-	z-index: 800
+	z-index: 700
 	
 	&:hover
 		opacity: 0.8
@@ -691,10 +726,10 @@ li.navButton
 
 // DEV NOTICE
 #devNotice
-	position: absolute
+	position: fixed
 	text-align: right
 	right: 75px
-	bottom: 55px
+	bottom: 60px
 	font-size: 7pt
 	color: #666 !important
 	padding: 5px
@@ -736,6 +771,14 @@ li.navButton
 	clear: right
 .clearboth
 	clear: both 
+.bold
+	font-weight: bold
+.inline
+	display: inline
+.relative
+	position: relative
+.absolute
+	position: absolute
 .fullwidth
 	width: 100% 
 .halfwidth

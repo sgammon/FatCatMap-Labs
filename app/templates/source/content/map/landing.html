@@ -1,0 +1,25 @@
+{% extends "content/map/layout.html" %}
+
+{% block subtitle %}{% if origin %}{{ origin.label }}{% else %}Mapper{% endif %}{% endblock %}
+
+{% block grapher %}
+	<script type="text/javascript">
+
+		// Define local context vars
+		_g = null;
+		_graph = null;
+		_visualizer = null;
+		makeGrapher = null;
+
+		$(document).ready(function registerGraphCallback()
+		{
+			$.fatcatmap.state.events.registerHook('PLATFORM_READY', function drawGraph()
+			{
+				_g = new Interaction.Graph('#grapher').build({% autoescape off %}{{ util.converters.json.dumps(rpc_params) }}{% endautoescape %}).render().draw();
+			});
+		});
+	
+	</script>
+{% endblock %}
+
+{% block content_footer %}{% endblock %}

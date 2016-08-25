@@ -6,8 +6,8 @@ project_path = "app/"
 http_path = "/"
 css_dir = "assets/style/static/compiled"
 sass_dir = "assets/style/source"
-images_dir = "assets/img/static/compass"
-javascripts_dir = "assets/js/static/compass"
+images_dir = "assets/img/static"
+javascripts_dir = "assets/js/static"
 
 # You can select your preferred output style here (can be overridden via the command line):
 #output_style = :expanded or :nested or :compact or :compressed

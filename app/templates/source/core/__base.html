@@ -1,0 +1,51 @@
+{%- from "macros/rpc.html" import jsapi_rpc -%}
+{%- from "macros/graph.html" import d3grapher -%}
+{%- from "macros/form.html" import renderForm -%}
+{%- from "macros/chart.html" import renderChart -%}
+{%- from "macros/datagrid.html" import renderDatagrid -%}
+
+{%- block html -%}<!doctype html>
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+
+<!--[if (gt IE 9)|!(IE)]><!-->
+	<html lang="en" class="no-js"{% if page.manifest %} manifest="/{{ page.manifest }}"{% endif %}>
+<!--<![endif]-->
+
+<head>
+
+	<!-- Set charset before title to plug potential XSS vectors -->
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">	
+		
+	<title>{%- block title -%}{% if title %}{{ title }} - {% endif %}FatCatMap Labs ({{ sys.version }}){%- endblock title -%}</title>
+	
+	{%- block north -%}
+	<!-- North Element -->
+		{% block prenorth %}{% endblock %}
+		{% include "elements/__north.html" %}
+		{% block postnorth %}{% endblock %}
+	<!-- End North -->
+	{%- endblock north -%}
+	
+</head>
+
+<body class='{% block body_class %}fcm-dark{% endblock %} fcm-beta'>
+
+	{% block body %}
+	{% endblock %}
+
+
+	{% block south %}
+	<!-- South Element -->
+		{% block presouth %}{% endblock %}
+		{% include 'elements/__south.html' %}
+		{% block postsouth %}{% endblock %}
+	<!-- End South -->
+	{% endblock south %}
+	
+</body>
+</html>{%- endblock -%}

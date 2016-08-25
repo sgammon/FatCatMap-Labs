@@ -1,13 +1,16 @@
+import config
 import logging
 import ndb as n
+
 from protorpc import remote
+from webapp2 import cached_property
 
 from momentum.fatcatmap import models as m
 
 from momentum.fatcatmap.api import FatCatMapAPIService
+from momentum.fatcatmap.api.graph import exceptions
 
 from momentum.fatcatmap.models.core.object import Node
-
 from momentum.fatcatmap.messages.util import DatastoreKey
 
 from momentum.fatcatmap.messages.graph import Graph
@@ -25,22 +28,39 @@ from momentum.fatcatmap.core.api.graph.factory import GraphFactory
 class GraphAPIService(FatCatMapAPIService):
 	
 	configPath = 'services.graph.config'
+	
+	
+	@cached_property
+	def GraphServiceConfig(self):
+		return config.config.get('momentum.fatcatmap.services.graph')
+	
 
 	@remote.method(GraphRequest, GraphResponse)
 	def construct(self, request):
 		
-		logging.info('====== GRAPH API SERVICE =====')
-		logging.info('Request origin: '+str(request.origin))
-		logging.info('Request degree: '+str(request.degree))
-		logging.info('Request limit: '+str(request.limit))
+		if self.GraphServiceConfig.get('debug', False):
+			logging.info('::::::  ======  GRAPH API SERVICE =====  ::::::')
+			logging.info('Graph origin: '+str(request.origin))
+			logging.info('Graph depth: '+str(request.depth))
+			logging.info('Graph limit: '+str(request.limit))
+			logging.info('Graph scope: '+str(request.scope))
+			logging.info('Graph context: '+str(request.context))
 		
 		if request.origin is not None:
 			origin_key = n.key.Key(urlsafe=request.origin)
+			node = origin_key.get()
+			if node is not None:
+				origin_key = node.key
+			else:
+				raise exceptions.NodeNotFound, "The specified Node does not exist, or you do not have permissions to view it."
 		else:
 			node = Node.query().get()
-			origin_key = node.key
+			if node is not None:
+				origin_key = node.key
+			else:
+				raise exceptions.NodeNotFound, "Origin-less graph build failed: there are currently 0 Node records."
 
-		graph, artifacts = GraphFactory(request.degree, request.limit).buildFromNode(origin_key).export_graph()
+		graph, artifacts = GraphFactory(depth=request.depth, limit=request.limit, scope=request.scope, context=request.context).buildFromNode(origin_key).export_graph()
 		
 		## Create nodes
 		graph_nodes = []
@@ -89,8 +109,8 @@ class GraphAPIService(FatCatMapAPIService):
 			graph_hints.append(h)
 			
 			origin = GraphNodeStub(key=graph.origin().urlsafe(), index=node_index[graph.origin().urlsafe()])
-			_graph = Graph(origin=origin, nodes=graph_nodes, edges=graph_edges, hints=graph_hints)
-			
+			_graph = Graph(origin=origin, vertices=graph_nodes, vectors=graph_edges, hints=graph_hints)
+		
 		return GraphResponse(graph=_graph)
 		
 	#@remote.method()

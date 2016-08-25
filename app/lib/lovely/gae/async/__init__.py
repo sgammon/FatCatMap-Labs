@@ -22,7 +22,7 @@ from pickle import loads, dumps
 
 from google.appengine.api import memcache, apiproxy_stub_map
 from google.appengine.api.labs import taskqueue
-from google.appengine.ext import webapp
+import webapp2 as webapp
 
 
 

@@ -1,21 +1,26 @@
 backends:
-- name: crawler
+
+- name: crawler # outgoing crawl requests (pulls down HTML, raw data like CSV/XML/JSON and RSS/ATOM)
   class: B1
   options: dynamic, public
   instances: 5
-- name: analyzer
+
+- name: analyzer # reduces raw data into graph modifications
   class: B2
   instances: 5
   options: dynamic
-- name: scheduler
-  class: B2
-  options: resident
-  instances: 2
-- name: storage
+
+- name: data # processes graph modifications, storage of raw data, and the lowest level of caching for the service layer
   class: B8
-  options: resident
+  options: dynamic, public
   instances: 1
-- name: intake
+
+- name: graph # the "grapher" - extra computing power specifically for doing graph calculations for the service layer. second level of caching
   class: B2
   instances: 5
+  options: dynamic, public
+
+- name: api # the service layer - api clients connect to this to get juicy data
+  class: B1
+  instances: 10
   options: dynamic, public

@@ -21,7 +21,7 @@ In a separate file from the core pipeline module to break circular dependencies.
 
 import logging
 
-from google.appengine.ext import webapp
+import webapp2 as webapp
 from google.appengine.ext.webapp import util as webapp_util
 
 import pipeline

@@ -15,20 +15,33 @@ class MapLanding(WebHandler):
 		rpc = {}
 		node = None
 		elements = {}
-		if 'n' in self.request.args: ## Pull direct node request
-			node_key = k.Key(urlsafe=self.request.args.get('n'))
+		args = self.request.arguments()
+		if 'n' in args: ## Pull direct node request
+			node_key = k.Key(urlsafe=self.request.get('n'))
 			node = node_key.get()
 			if node is not None:
-				rpc['origin'] = self.request.args.get('n')
+				rpc['origin'] = self.request.get('n')
 			else:
 				elements['errorNotice'] = "The specified node key could not be found. :("
 				
-		if 'o' in self.request.args:
-			object_key = k.Key(urlsafe=self.request.args.get('o'))
+		if 'o' in args:
+			object_key = k.Key(urlsafe=self.request.get('o'))
 			object_m = object_key.get()
 			if object_m is not None:
-				rpc['object'] = self.request.args.get('o')
+				rpc['object'] = self.request.get('o')
 			else:
 				elements['errorNotice'] = "The specified object key could not be found. :("
+				
+		if '_nd' in args:
+			rpc['depth'] = int(self.request.get('_nd'))
+			
+		if '_cl' in args:
+			rpc['limit'] = int(self.request.get('_cl'))
+			
+		if '_gs' in args:
+			rpc['scope'] = self.request.get('_gs')
+			
+		if '_vcontext' in args:
+			rpc['context'] = self.request.get('_vcontext')
 
 		return self.render('content/map/landing.html', elements=elements, rpc_params=rpc, origin=node)

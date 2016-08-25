@@ -1,7 +1,7 @@
 import logging
 
-from tipfyext.wtforms import Form
-from tipfyext.wtforms import fields as f
+from wtforms import Form
+from wtforms import fields as f
 
 from wtforms import widgets
 from wtforms import validators

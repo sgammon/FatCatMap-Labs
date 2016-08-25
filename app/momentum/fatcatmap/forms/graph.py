@@ -23,6 +23,7 @@ class NewObjectCollectionForm(FCMForm):
 	object_type = f.TextField(default='natural.Person')
 	node_type = f.TextField(default='politics.legislative.Legislator')
 	label = f.TextField()
+	target = f.RadioField(default='frontend', choices=[('frontend', 'Frontend'), ('data','Data Backend'), ('graph', 'Graph Backend')])	
 	
 	
 class NewObjectRelationForm(FCMForm):
@@ -31,3 +32,4 @@ class NewObjectRelationForm(FCMForm):
 	edge_type = f.TextField(default='social.Friendship')
 	node1 = f.SelectField(choices=getNodeOptions())
 	node2 = f.SelectField(choices=getNodeOptions())
+	target = f.RadioField(default='frontend', choices=[('frontend', 'Frontend'), ('data','Data Backend'), ('graph', 'Graph Backend')])	

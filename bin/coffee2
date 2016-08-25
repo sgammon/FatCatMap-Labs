@@ -1,4 +1,4 @@
-export FATCATMAP="/Users/Sam/Workspace/FatCatMap Labs"
+export FATCATMAP="/Users/admin/Workspace/FatCatMap-Labs"
 export FCM_COFFEE_SOURCE="$FATCATMAP/app/assets/js/source"
 export FCM_COFFEE_COMPILED="$FATCATMAP/app/assets/js/static/compiled"
 
@@ -17,8 +17,10 @@ coffee --join "$FCM_COFFEE_COMPILED/fcm.js" --compile "$FCM_COFFEE_SOURCE/core/_
 coffee --require "$FCM_COFFEE_SOURCE/storage/_driver.coffee" --join "$FCM_COFFEE_COMPILED/storage/local.js" --compile "$FCM_COFFEE_SOURCE/storage/local.coffee" "$FCM_COFFEE_SOURCE/storage/session.coffee"
 
 # IndexedDB and WebSQL drivers are compiled seperately
-coffee --require "$FCM_COFFEE_SOURCE/storage/_driver.coffee" --output "$FCM_COFFEE_COMPILED/storage" --compile "$FCM_COFFEE_SOURCE/storage/object.coffee" "$FCM_COFFEE_SOURCE/storage/sql.coffee"
+coffee --require "$FCM_COFFEE_SOURCE/storage/_driver.coffee" --output "$FCM_COFFEE_COMPILED/storage" --compile "$FCM_COFFEE_SOURCE/storage/local.coffee" "$FCM_COFFEE_SOURCE/storage/session.coffee" "$FCM_COFFEE_SOURCE/storage/object.coffee"
 
+# All Storage
+coffee --require "$FCM_COFFEE_SOURCE/storage/_driver.coffee" --join "$FCM_COFFEE_COMPILED/storage/combined.js" --compile "$FCM_COFFEE_SOURCE/storage/local.coffee" "$FCM_COFFEE_SOURCE/storage/session.coffee" "$FCM_COFFEE_SOURCE/storage/object.coffee"
 
 ## 4: Compile Layout
 coffee --require "$FCM_COFFEE_SOURCE/core/_core.coffee" --join "$FCM_COFFEE_COMPILED/layout.js" --compile "$FCM_COFFEE_SOURCE/layout/_element.coffee" "$FCM_COFFEE_SOURCE/layout/panel.coffee" "$FCM_COFFEE_SOURCE/layout/dialog.coffee" "$FCM_COFFEE_SOURCE/layout/navigation.coffee"

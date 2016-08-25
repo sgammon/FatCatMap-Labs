@@ -1,0 +1,14 @@
+{% extends "layouts/main.html" %}
+
+{% block title %}{% block subtitle %}{% endblock %}Visualize - FatCatMap{% endblock %}
+
+{% block postnorth %}<link rel="stylesheet" media="screen" href="{{ assets.style('visualize', 'site') }}">{% endblock postnorth %}
+
+{% block content_body %}
+
+	<div id='landingWrapper' class='fullwidth fullheight textcenter'>
+		{% block visualizer %}
+		{% endblock %}
+	</div>
+
+{% endblock %}

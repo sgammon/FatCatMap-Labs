@@ -68,16 +68,10 @@ class ObjectProxy(Struct):
 		else:
 			raise KeyError
 		
-	def __setitem__(self, name, value):
-		self._entries[name] = value
-
 	def __delitem__(self, name):
 		if name in self._entries:
 			del self._entries[name]
 
-	def __setattr__(self, name, value):
-		self._entries[name] = value
-		
 	def __getattr__(self, name):
 		return self._entries.get(name)
 		
@@ -90,8 +84,34 @@ class ObjectProxy(Struct):
 			
 	## Utiliy Methods
 	def items(self):
-		return [(k, v) for k, v in self.__dict__.items()]
+		return [(k, v) for k, v in self._entries.items()]
 		
+
+class CallbackProxy(ObjectProxy):
+
+	''' Handy little object that takes a dict and makes it accessible via var[item], but returns the result of an invoked callback(item). '''
+	
+	callback = None
+
+	def __init__(self, callback, struct=None, **kwargs):
+		
+		self.callback = callback
+
+		if struct is not None:
+			self.fillStructure(struct)
+		else:
+			if len(kwargs) > 0:
+				self.fillStructure(**kwargs)
+
+	def __getitem__(self, name):
+		if name in self._entries:
+			return self.callback(self._entries.get(name))
+		else:
+			raise KeyError
+		
+	def __getattr__(self, name):
+		return self.callback(self._entries.get(name))
+
 		
 class ConfigurableStruct(object):
 	

@@ -1,0 +1,28 @@
+export FATCATMAP="/Users/admin/Workspace/FatCatMap-Labs"
+
+export FCM_JS_SOURCE="$FATCATMAP/app/assets/js/static"
+export FCM_STYLE_SOURCE="$FATCATMAP/app/assets/style/static"
+
+
+## -- Images
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t "$FATCATMAP/app/assets/img" gs://cdn.static.momentum.io/
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t "$FATCATMAP/app/assets/img" gs://cdn.static.labs.momentum.io/
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t "$FATCATMAP/app/assets/img" gs://cdn.static.fatcatmap.com/
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t "$FATCATMAP/app/assets/img" gs://cdn.static.fatcatmap.org/
+
+## -- Scripts & Stylesheets
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t -z "txt,html,js,css" "$FATCATMAP/app/assets/style" "$FATCATMAP/app/assets/js" gs://cdn.static.momentum.io/
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t -z "txt,html,js,css" "$FATCATMAP/app/assets/style" "$FATCATMAP/app/assets/js" gs://cdn.static.labs.momentum.io/
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t -z "txt,html,js,css" "$FATCATMAP/app/assets/style" "$FATCATMAP/app/assets/js" gs://cdn.static.fatcatmap.com/
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t -z "txt,html,js,css" "$FATCATMAP/app/assets/style" "$FATCATMAP/app/assets/js" gs://cdn.static.fatcatmap.org/
+
+## -- Ext & Static
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t "$FATCATMAP/app/assets/ext" gs://cdn.static.momentum.io/
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t "$FATCATMAP/app/assets/ext" gs://cdn.static.labs.momentum.io/
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t "$FATCATMAP/app/assets/ext" gs://cdn.static.fatcatmap.com/
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t "$FATCATMAP/app/assets/ext" gs://cdn.static.fatcatmap.org/
+
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t "$FATCATMAP/app/static" gs://cdn.static.momentum.io/
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t "$FATCATMAP/app/static" gs://cdn.static.labs.momentum.io/
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t "$FATCATMAP/app/static" gs://cdn.static.fatcatmap.com/
+gsutil -h "Cache-Control: public,max-age=3600" -h "Expires: Fri, 01 Jan 2021 12:00:00 GMT" cp -R -a public-read -t "$FATCATMAP/app/static" gs://cdn.static.fatcatmap.org/

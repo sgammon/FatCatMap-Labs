@@ -2,6 +2,76 @@
 
 ##Change Log
 
+
+**Wed, September 21 2011 software version tag 1.6.1-BETA**
+
+- First BETA! :)
+- Moved from Tipfy to Webapp2
+- Full, finished service layer
+- Switched to compiled templates for Jinja2, with Rodrigo Moraes' expert speed hax
+- Application now running in threadsafe (and, therefore, multithreaded!)
+- Data API v1.0
+- Frame API v1.0
+- Query API v1.0
+- Core Caching API v1.0
+- Graph API v1.0
+- Version bump
+
+
+**Tue, September 20 2011**
+
+- Pre-BETA commit
+- Massive refactoring and optimization for the Python 2.7 runtime
+- Application now operating via WSGI
+- New logo
+- Many speed and reliability improvements to the CoffeeScript base
+- Huge speed improvements in the Python base
+
+
+**Wed, August 31 2011**
+
+- Refactored core Momentum classes to live in better places
+- Fixed crappy path issues with Core Assets API
+- Beginnings of the Analyzer Engine
+
+
+**Mon, August 22 2011**
+
+- New, cleaner redesign
+- Removed stupid iconset
+- Streamlined asset import
+- CDN-based asset packs
+- Upgraded Core Assets API
+- New boto config for uploading to Google Storage for Developers
+
+
+**Tue, July 21-26 2011**
+
+- Backbone integration
+- Async JS lib loading via Yep/Nope
+- Minification bugfixes
+- Updated coffee build script
+- Officially using the new D3-based Graphing Engine
+- AmplifyJS AJAX adapter finished
+- New setting to enable/disable browser-local caching
+- Improvements and bugfixes to the JSAPI
+- Quick change of import order
+- Working service layer decorators
+- Bugfix for after_request hook in service layer middleware
+- Merge with servicelayer branch changes & improvements
+- Merge with JS platform branch changes & improvements
+- Updated Masonry, fixed bugs in SASS base
+- Working service layer middleware system
+
+
+**Fri, July 08 2011**
+
+- Minor bugfixes
+- Improvements to Cakefile tasks
+- Service layer improvements
+- Prep work for AmplifyJS Adapter
+
+
 **Thu, July 07 2011**
 
 - Numerous bug fixes in the CoreAssetsAPI, along with path/bundle config support

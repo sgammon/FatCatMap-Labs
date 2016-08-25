@@ -9,10 +9,10 @@
     return child;
   }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   LayoutElement = (function() {
+    __extends(LayoutElement, Backbone.View);
     function LayoutElement() {
       LayoutElement.__super__.constructor.apply(this, arguments);
     }
-    __extends(LayoutElement, Backbone.View);
     LayoutElement.prototype.id = null;
     LayoutElement.prototype.name = null;
     LayoutElement.prototype.state = {};
@@ -32,26 +32,26 @@
     window.Layout = {};
   }
   Panel = (function() {
+    __extends(Panel, LayoutElement);
     function Panel() {
       Panel.__super__.constructor.apply(this, arguments);
     }
-    __extends(Panel, LayoutElement);
     Panel.prototype.nothing = function() {};
     return Panel;
   })();
   SuperPanel = (function() {
+    __extends(SuperPanel, LayoutElement);
     function SuperPanel() {
       SuperPanel.__super__.constructor.apply(this, arguments);
     }
-    __extends(SuperPanel, LayoutElement);
     SuperPanel.prototype.nothing = function() {};
     return SuperPanel;
   })();
   SuperBar = (function() {
+    __extends(SuperBar, SuperPanel);
     function SuperBar() {
       SuperBar.__super__.constructor.apply(this, arguments);
     }
-    __extends(SuperBar, SuperPanel);
     SuperBar.prototype.initialize = function() {
       $(this.el).hover(__bind(function() {
         return $(this.el).animate({
@@ -67,10 +67,10 @@
     return SuperBar;
   })();
   SuperFooter = (function() {
+    __extends(SuperFooter, SuperPanel);
     function SuperFooter() {
       SuperFooter.__super__.constructor.apply(this, arguments);
     }
-    __extends(SuperFooter, SuperPanel);
     SuperFooter.prototype.initialize = function() {
       $(this.el).hover(__bind(function() {
         return $(this.el).animate({
@@ -90,6 +90,7 @@
     return SuperFooter;
   })();
   Sidebar = (function() {
+    __extends(Sidebar, LayoutElement);
     function Sidebar(id, config) {
       this.id = id;
       this.el = $(this.id);
@@ -102,7 +103,7 @@
       };
       this.config = {
         maximizable: false,
-        folded_width: 35,
+        folded_width: 40,
         unfolded_width: $('body').width() * .25,
         maximized_width: $('body').width() * .70
       };
@@ -242,7 +243,6 @@
         });
       }, this);
     }
-    __extends(Sidebar, LayoutElement);
     return Sidebar;
   })();
   window.Layout.Panel = Panel;
@@ -251,10 +251,10 @@
   window.Layout.SuperPanel = SuperPanel;
   window.Layout.SuperFooter = SuperFooter;
   Dialog = (function() {
+    __extends(Dialog, LayoutElement);
     function Dialog() {
       Dialog.__super__.constructor.apply(this, arguments);
     }
-    __extends(Dialog, LayoutElement);
     Dialog.prototype.defaults = {
       modal: false,
       opacity: true,
@@ -272,10 +272,10 @@
   window.Layout.Dialog = Dialog;
   Navigation = (function() {
     var pane_class;
+    __extends(Navigation, LayoutElement);
     function Navigation() {
       Navigation.__super__.constructor.apply(this, arguments);
     }
-    __extends(Navigation, LayoutElement);
     pane_class = '.navPane';
     Navigation.prototype.register = function(id) {
       this.id = id;

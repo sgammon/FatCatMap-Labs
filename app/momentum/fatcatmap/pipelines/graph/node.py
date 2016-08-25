@@ -11,7 +11,7 @@ class GraphNode(FCMGraphPipeline):
 	def run(self, object_k, node_type, label, scope=None):
 		nt = self.ndb.model.Key('NodeType', node_type)
 		o = self.ndb.model.Key(urlsafe=object_k)
-		n = Node(key=self.ndb.model.Key(pairs=o.pairs() + [(Node._get_kind(), 1)]), type=nt, label=label).put()
+		n = Node(parent=o, type=nt, label=label).put()
 		
 		self.log.info('===== NODE KEY: '+str(o.urlsafe())+' =====')
 		

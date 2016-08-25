@@ -1,0 +1,41 @@
+{% extends "layouts/lite.html" %}
+
+{% block title %}{% block subtitle %}{% endblock %} - Map influence data in real time - FatCatMap{% endblock %}
+
+{% block northstyle %}
+<link rel='stylesheet' href="{{ assets.style('map', 'site') }}" media='screen'>
+{% endblock %}
+
+
+{% block sidebars %}
+	<!-- Sidebars -->
+	{% include 'elements/pane/details-sidebar.html' %}
+	{% include 'elements/pane/controls-sidebar.html' %}
+{% endblock %}
+
+{% block content_body %}
+	
+	<div id='nodeCompare'>
+		<div id='compareleft' class='graphblock muted'>
+			<span>drag for details</span>
+		</div>
+	
+		<div id='compareright' class='graphblock muted hidden'>
+			<span>drag to compare</span>
+		</div>
+	</div>
+
+	<div id='grapher' class='fullheight fullwidth textcenter'>
+		{% block grapher %}
+		{% endblock %}
+	</div>
+{% endblock %}
+
+{% block southloader %}
+	{
+		load: ["{{ assets.script('core', 'd3') }}"]
+	},
+	{
+		load: ["{{ assets.script('map', 'site') }}"]
+	},
+{% endblock %}

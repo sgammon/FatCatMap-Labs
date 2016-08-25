@@ -1,0 +1,13 @@
+cron:
+    
+- description: Homepage Warmup # homepage warmup
+  url: /
+  schedule: every 15 minutes
+
+- description: Graph Warmup # graph API warmup
+  url: /_fcm/workers/warmup/graph
+  schedule: every 10 minutes
+  
+- description: Scheduler Tick # checks for crawler/intake tasks, analyzer tasks, etc and schedules them
+  url: /_fcm/workers/scheduler/tick
+  schedule: every 5 minutes

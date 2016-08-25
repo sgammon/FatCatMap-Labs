@@ -1,0 +1,121 @@
+application: fat-cat-map
+version: alpha
+runtime: python27
+api_version: 1
+threadsafe: no
+
+
+#### ===== Files to Skip
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?tests$
+
+
+#### ===== Libraries
+libraries:
+- name: numpy
+  version: "latest"
+- name: PIL
+  version: "latest"
+- name: pycrypto
+  version: "latest"
+  
+
+#### ===== Builtin SDK Includes
+builtins:
+- appstats: on
+- deferred: on
+- remote_api: on
+- admin_redirect: on
+- datastore_admin: on
+
+
+#### ===== Incoming Services
+inbound_services:
+- mail
+- xmpp_message
+- xmpp_presence
+- xmpp_subscribe
+- warmup
+
+
+#### ===== Force precompilation
+derived_file_type:
+- python_precompiled
+
+
+#### ===== Error Handlers
+error_handlers:
+  - file: errors/default_error.html
+  - error_code: over_quota
+    file: errors/over_quota.html
+  - error_code: dos_api_denial
+    file: errors/dos_denial.html
+  - error_code: timeout
+    file: errors/timeout.html
+
+
+#### ===== Site Handlers
+handlers:
+
+- url: /_ah/appstats.*
+  script: $PYTHON_LIB.google.appengine.ext.appstats.ui.main
+  login: admin
+  auth_fail_action: unauthorized
+
+- url: /_ah/mapreduce.*
+  script: main.mapreduce
+  login: admin
+  auth_fail_action: unauthorized
+    
+- url: /_ah/warmup.*
+  script: warmup.Warmup
+  login: admin
+  auth_fail_action: unauthorized
+  
+- url: /_ah/pipeline(/.*)?
+  script: pipeline/handlers.py
+  login: admin
+  auth_fail_action: unauthorized
+
+
+- url: /_pc/console/.*
+  script: $PYTHON_LIB.google.appengine.ext.admin.main
+  login: admin
+  secure: always
+  auth_fail_action: redirect  
+
+
+###### Static directory
+- url: /static
+  static_dir: static
+
+
+###### Providence/Clarity Mappings
+- url: /_pc/manage/.*
+  script: momentum.platform.gateway.ManagementConsole
+  login: admin
+  auth_fail_action: redirect
+
+
+###### API Requests to the Gateway
+- url: /_api/rpc.*
+  script: main.services
+  login: optional
+  auth_fail_action: unauthorized
+
+
+###### Send to Tipfy
+- url: /.*
+  login: admin
+  secure: optional
+  script: main.main
+  auth_fail_action: redirect

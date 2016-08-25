@@ -93,7 +93,27 @@ class CoreStateAPI extends CoreAPI
 									@events.history.push(result_calltask)
 									@events.callchain[_event][calltask].executed = true
 									
-		@session = {}
+		@session =
+		
+			_id: null
+			_token: null
+			_tokenHistory: []
+			
+			getID: () ->
+				if @_id?
+					return @_id
+				else
+					return false
+					
+			init: (id, token) ->
+				@_id = id
+				@_token = token
+				@_tokenHistory.push(token)
+				
+			renew: (token) ->
+				@_token = token
+				@_tokenHistory.push(token)
+			
 
 		@local = {}
 		
@@ -164,11 +184,15 @@ class CoreStateAPI extends CoreAPI
 
 		### === Register State Events === ###
 		
+		# Session events
+		@events.registerEvent('SESSION_INIT')
+		@events.registerEvent('SESSION_RENEW')
+		@events.registerEvent('SESSION_CHECKIN')
+		@events.registerEvent('SESSION_EXPIRE')
+
+		# Activity events
 		@events.registerEvent('GLOBAL_ACTIVITY')
 		@events.registerEvent('GLOBAL_ACTIVITY_FINISH')
-		
+				
 		@events.registerHook('GLOBAL_ACTIVITY', => @ui.indicators.startSpinner())
 		@events.registerHook('GLOBAL_ACTIVITY_FINISH', => @ui.indicators.stopSpinner())
-		
-		$('body').bind "ajaxSend", => @events.triggerHook('GLOBAL_ACTIVITY')
-		$('body').bind "ajaxComplete", => @events.triggerHook('GLOBAL_ACTIVITY_FINISH')

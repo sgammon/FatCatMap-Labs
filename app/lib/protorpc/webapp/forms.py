@@ -27,7 +27,7 @@ service_handlers.service_mapping function.
 import logging
 import os
 
-from google.appengine.ext import webapp
+import webapp2
 from google.appengine.ext.webapp import template
 
 __all__ = ['FormsHandler',
@@ -45,7 +45,7 @@ _METHODS_TEMPLATE = os.path.join(_TEMPLATES_DIR, 'methods.html')
 DEFAULT_REGISTRY_PATH = '/protorpc'
 
 
-class ResourceHandler(webapp.RequestHandler):
+class ResourceHandler(webapp2.RequestHandler):
   """Serves static resources without needing to add static files to app.yaml."""
 
   __RESOURCE_MAP = {
@@ -80,7 +80,7 @@ class ResourceHandler(webapp.RequestHandler):
     self.response.out.write(contents)
 
 
-class FormsHandler(webapp.RequestHandler):
+class FormsHandler(webapp2.RequestHandler):
   """Handler for display HTML/javascript forms of ProtoRPC method calls.
 
   When accessed with no query parameters, will show a web page that displays

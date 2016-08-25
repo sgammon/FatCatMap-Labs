@@ -1,3 +1,4 @@
+"""
 export FATCATMAP="/Users/Sam/Workspace/FatCatMap Labs"
 export FCM_COFFEE_SOURCE="$FATCATMAP/app/assets/js/source"
 export FCM_COFFEE_COMPILED="$FATCATMAP/app/assets/js/static/compiled"
@@ -16,3 +17,4 @@ coffee --join "$FCM_COFFEE_COMPILED/interaction.js" --compile "$FCM_COFFEE_SOURC
 
 ## 5: Compile Site
 coffee --join "$FCM_COFFEE_COMPILED/site.js" --compile "$FCM_COFFEE_SOURCE/site/_section.coffee" "$FCM_COFFEE_SOURCE/site/browse.coffee" "$FCM_COFFEE_SOURCE/site/interact.coffee" "$FCM_COFFEE_SOURCE/site/map.coffee" "$FCM_COFFEE_SOURCE/site/search.coffee" "$FCM_COFFEE_SOURCE/site/visualize.coffee"
+""""

@@ -9,11 +9,36 @@
     return child;
   };
   IndexedDBDriver = (function() {
+    __extends(IndexedDBDriver, AdvancedStorageDriver);
     function IndexedDBDriver() {
       IndexedDBDriver.__super__.constructor.apply(this, arguments);
     }
-    __extends(IndexedDBDriver, AdvancedStorageDriver);
-    IndexedDBDriver.prototype.getValueByKey = function(db, kind, key, callbacks) {};
+    IndexedDBDriver.prototype.init = function() {
+      var adapter, idb_adapter, _i, _len, _ref;
+      idb_adapter = null;
+      _ref = Lawnchair.adapters;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        adapter = _ref[_i];
+        if (adapter.adapter === 'indexed-db') {
+          idb_adapter = adapter;
+        }
+      }
+      if (idb_adapter != null) {
+        return this.store = new Lawnchair({
+          name: 'fcm-object',
+          adapter: idb_adapter
+        }, function(store) {
+          $.fatcatmap.dev.log('IDB/ObjectStorage', 'Driver loaded. Object store created.');
+          return $.fatcatmap.state.events.triggerEvent('STORAGE_DB_LOAD', {
+            name: 'fcm-object',
+            store: this.store
+          });
+        });
+      } else {
+        return $.fatcatmap.dev.log('IDB/ObjectStorage', 'Failed to resolve IndexedDB lawnchair driver.');
+      }
+    };
+    IndexedDBDriver.prototype.save = function(db, kind, key, callbacks) {};
     IndexedDBDriver.prototype.setValueByKey = function(db, kind, key, value, callbacks) {};
     IndexedDBDriver.prototype.addValueByKey = function(db, kind, key, value, callbacks) {};
     IndexedDBDriver.prototype.deleteValueByKey = function(db, kind, key, callbacks) {};
@@ -26,5 +51,5 @@
     IndexedDBDriver.prototype.clearCollection = function(db, name) {};
     return IndexedDBDriver;
   })();
-  IndexedDBDriver('objectstorage', {});
+  this.IndexedDBDriver = new IndexedDBDriver().setup('objectstorage', {});
 }).call(this);

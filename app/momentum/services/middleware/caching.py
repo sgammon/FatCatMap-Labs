@@ -25,19 +25,13 @@ class CachingMiddleware(ServiceGatewayMiddleware):
 	
 	def before_request(self, service, request, response):
 		
-		if 'caching' in service.config.get('service')['config']:
+		## @TODO: Clean up this file's logging...
+		if 'caching' in service.config.get('service').get('config', []):
 			self.profile = self.config['middleware_config']['caching']['profiles'][service.config['service']['config']['caching']]
-			
-			logging.info('CACHING PROFILE: '+str(self.profile))
 			
 			if self.profile['activate']['internal'] is True or self.profile['activate']['response'] is True:
 				self.key = self.generateKey(service, request, self.profile.get('localize', False))
 				service._setstate('cache_key', self.key)
-			else:
-				logging.info('CACHING NOT ACTIVATED')
-				
-		else:
-			logging.info('NO CACHING IN '+str(service.config.get('service')))
 		
 		return (service, request, response)
 

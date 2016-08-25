@@ -1,0 +1,169 @@
+{% if not page.standalone %} {# Not a standalone frame #}
+	{% extends "core/__base_web.html" %}
+{% endif %}
+
+{% block superbar %}
+<header id='momentumSuperbar' class='superbar' data-element='superbar' data-element-type='SuperPanel'>
+	{% include 'snippets/superbar.html' %}
+</header>
+{% endblock %}
+
+{% block content %}
+<div id="main" role="main" class='rootContent fcmfull'>
+
+{% if not page.standalone %}
+	<div id='contentHeader' class='{% block content_headerheader_class %}content_header{% endblock %} hidden'>
+		{% block content_header %}
+			<div class='extendedNav'>
+
+				<div id='browsePane' class='navpane hidden' data-navref='browse'>
+
+					<div class='floatleft fullheight tenthwidth'>
+						<a href="{{ link('browse:landing') }}" title='browse raw data, in context and with easy connections to related information'><img src='/assets/img/static/layout/headers/browse.png' alt='fatcatmap: browse' width='124' height='90' /></a>
+					</div>
+				
+					<div class='floatleft fullheight halfwidth'>
+						sup
+					</div>
+
+				</div>
+
+				<div id='searchPane' class='navpane hidden' data-navref='search'>
+
+					<div class='floatleft fullheight tenthwidth'>
+						<a href="{{ link('search:landing') }}" title='search our enourmous database of american political transparency data'><img src='/assets/img/static/layout/headers/search.png' alt='fatcatmap: search' width='124' height='90' /></a>
+					</div>
+				
+					<div class='floatleft fullheight halfwidth'>
+						sup
+					</div>
+
+				</div>
+
+				<div id='mapPane' class='navpane hidden' data-navref='map'>
+				
+					<div class='floatleft fullheight tenthwidth'>
+					
+						<a href="{{ link('map:landing') }}" title='interactively explore data as a map of connected nodes and edges'><img src='/assets/img/static/layout/headers/map.png' alt='fatcatmap: graph' width='124' height='90' /></a>
+					
+					</div>
+				
+					<div class='floatleft fullheight halfwidth'>
+					
+						sup
+					
+					</div>
+				
+				</div>
+
+				<div id='visualizePane' class='navpane hidden' data-navref='visualize'>
+
+					<div class='floatleft fullheight tenthwidth'>
+					
+						<a href="{{ link('visualize:landing') }}" title='mash up, compare, and analyze data in real time with our dynamic charting tools'><img src='/assets/img/static/layout/headers/visualize.png' alt='fatcatmap: visualize' width='124' height='90' /></a>
+					
+					</div>
+				
+					<div class='floatleft fullheight halfwidth'>
+					
+						sup
+					
+					</div>
+
+
+				</div>
+			
+				<div id='interactPane' class='navpane hidden' data-navref='interact'>
+
+					<div class='floatleft fullheight tenthwidth'>
+					
+						<a href="{{ link('interact:landing') }}" title="share interesting data you've found or visualizations you've made with friends and the world"><img src='/assets/img/static/layout/headers/interact.png' alt='fatcatmap: interact' width='124' height='90' />
+					
+					</div>
+				
+					<div class='floatleft fullheight halfwidth'>
+					
+						sup
+					
+					</div>
+
+				</div>				
+
+			</div>		
+		{% endblock %}
+		<div class='foldNavigation'>
+			<a href='#'>close menu</a>
+		</div>
+	</div>
+{% endif %}
+
+	{% if not page.standalone %}
+		<div id='contentBody' class='{% block content_body_class %}content_body{% endblock %}'>
+
+		<div id='globalAlerts'>
+			<div id='globalErrorNotice' class='{% if not page.elements.errorNotice %}hidden {% endif %}error globalAlert'>
+				{% block errorNotice %}
+					{% if page.elements.errorNotice %}
+						{{ page.elements.errorNotice }}
+					{% endif %}
+				{% endblock %}
+			</div>
+
+			<div id='globalInfoNotice' class='{% if not page.elements.infoNotice %}hidden {% endif %}info globalAlert'>
+				{% block infoNotice %}
+					{% if page.elements.infoNotice %}
+						{{ page.elements.infoNotice }}
+					{% endif %}
+				{% endblock %}
+			</div>
+
+			<div id='globalNotice' class='{% if not page.elements.generalNotice %}hidden {% endif %}notice globalAlert'>
+				{% block notice %}
+					{% if page.elements.generalNotice %}
+						{{ page.elements.generalNotice }}
+					{% endif %}
+				{% endblock %}
+			</div>
+			
+			<div id='globalSuccess' class='{% if not page.elements.successNotice %}hidden {% endif %}success globalAlert'>
+				{% block successNotice %}
+					{% if page.elements.successNotice %}
+						{{ page.elements.successNotice }}
+					{% endif %}
+				{% endblock %}
+			</div>
+		</div>
+
+	{% else %}
+		<div id='frameContent'>
+	{% endif %}
+
+		{% block content_body %}
+		{% endblock %}
+
+		{% if not page.standalone %}
+			{% if page.watermark %}
+				{% include "snippets/dev_widget.html" %}
+			{% endif %}
+		{% endif %}
+	
+	</div>
+
+	{% block sidebars %}
+	{% endblock %}
+
+	{% if not page.standalone %}
+		<div id='contentFooter' class='{% block content_footer_class %}content_footer{% endblock %} hidden'>
+			{% block content_footer %}
+			{% endblock %}
+		</div>
+	{% endif %}
+
+</div>
+{% endblock %}
+
+{% block superfooter %}
+<footer id='momentumSuperfooter' class='superfooter fullfooter' data-element='superfooter' data-element-type='SuperPanel'>
+	{% include 'snippets/superfooter.html' %}
+</footer>
+{% endblock %}

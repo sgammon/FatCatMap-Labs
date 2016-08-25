@@ -47,7 +47,7 @@ from google.appengine.api import mail
 from google.appengine.api import users
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
-from google.appengine.ext import webapp
+import webapp2 as webapp
 
 # Relative imports
 import models

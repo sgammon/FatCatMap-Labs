@@ -1,0 +1,149 @@
+{% extends "core/__base.html" %}
+
+{% block prenorth %}
+
+{% if page.optimize %}
+	<link rel="stylesheet" media="screen" href="{{ assets.style('fcm', 'compiled') }}">
+{% else %}
+	<link rel="stylesheet" media="screen" href="{{ assets.style('fonts', 'core') }}">
+	<link rel="stylesheet" media="screen" href="{{ assets.style('main', 'compiled') }}">
+	<link rel="stylesheet" media="screen" href="{{ assets.style('interaction', 'compiled') }}">
+{% endif %}
+
+{% if page.mobile %}
+<link rel="stylesheet" media="handheld" href="{{ assets.style('mobile', 'core') }}">
+{% endif %}
+
+{% if page.print %}
+<link rel="stylesheet" media="screen" href="{{ assets.style('print', 'compiled') }}">
+{% endif %}
+
+{% if page.ie %}
+<link rel="stylesheet" media="screen" href="{{ assets.style('ie', 'compiled') }}">
+{% endif %}
+
+
+{% block northstyle %}{% endblock %}
+
+<!-- jQuery via CDN -->
+<!-- script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script -->
+<script src="{{ assets.script('core', 'jquery') }}"></script>
+
+<!-- Core Dependencies -->
+<script src="{{ assets.script('base', 'fatcatmap') }}"></script>
+<script src="{{ assets.script('yepnope', 'core') }}"></script>
+
+
+{% block northloader %}{% endblock %}
+
+{% endblock %}
+
+{% block body %}
+<div id="container">
+
+	{# Includes super navigation, currently logged in user, etc... #}
+	{% block superbar %}
+	{% endblock %}
+
+	{# Main content div... content panes go in here. #}
+	{% block content %}
+	{% endblock %}
+
+	{# Superfooter is used for branding and copyright stuff... #}
+	{% block superfooter %}
+	{% endblock %}
+	
+</div>
+{% endblock body %}
+
+{% block presouth %}
+<script src="{{ assets.script('backbone', 'core') }}"></script>
+<script src="{{ assets.script('data', 'core') }}"></script>
+<script src="{{ assets.script('lawnchair', 'core') }}"></script>
+<script src="{{ assets.script('modernizr', 'core') }}"></script>
+
+<!-- FatCatMap Platform -->
+<script src="{{ assets.script('fcm', 'fatcatmap') }}"></script>
+
+<script type="text/javascript">
+	{% autoescape false %}
+		yepnope([
+
+			{
+				// Polyfill JSON Support
+				test : window.JSON && window.JSON.parse,
+				nope: "{{ assets.script('json2', 'polyfills') }}"
+			},
+
+			{
+				// Load jQuery and jQuery Plugins
+				test: window.jQuery,
+				nope: "{{ assets.script('core', 'jquery') }}",
+				load: ["{{ assets.script('masonry','jquery-ui') }}", "{{ assets.script('fancybox', 'jquery-ui') }}",
+						"{{ assets.script('easing', 'jquery') }}", "{{ assets.script('mousewheel','jquery') }}"]
+			},
+			
+			{
+				// Load Lawnchair and plugins
+				test: window.Lawnchair,
+				nope: ["{{ assets.script('lawnchair', 'core') }}"]
+			},
+			
+			{
+				// CSS Animations Support
+				test: Modernizr.cssanimations,
+				yep: ["{{ assets.script('animate-enhanced', 'jquery-ui') }}"]
+			},
+
+			{
+				// FCM Layout + Interaction packages
+				test: $.fatcatmap,
+				nope: "{{ assets.script('fcm', 'fatcatmap') }}",
+				load: ["{{ assets.script('layout', 'fatcatmap') }}", "{{ assets.script('interaction', 'fatcatmap') }}"]
+			},
+
+			{
+				// Load FatCatMap JSAPI & Channel JSAPI
+				load: ["{{ link('js-api') }}", "/_ah/channel/jsapi"],
+			},
+
+			{
+				// Combined Storage
+				test: Modernizr.localstorage && Modernizr.sessionstorage && Modernizr.indexeddb,
+				yep: ["{{ assets.script('combined', 'storage') }}"],
+			},
+			
+			{
+				// Local Storage Only
+				test: (Modernizr.localstorage || Modernizr.sessionstorage) && !Modernizr.indexeddb,
+				yep: ["{{ assets.script('local', 'storage') }}"]
+			},
+			
+			{
+				// Object Storage Only
+				test: Modernizr.indexeddb && !(Modernizr.localstorage || Modernizr.sessionstorage),
+				yep: ["{{ assets.script('object', 'storage') }}"]
+			},
+			
+			{% block southloader %}
+			{% endblock southloader %}
+
+			{
+				complete: function (){
+
+					superbar = new Layout.SuperBar({id: 'momentumSuperbar', el: document.getElementById('momentumSuperbar')});
+					$.fatcatmap.api.layout.register('superbar', superbar);
+
+					supernav = new Layout.Navigation({id: 'topnav', el: document.getElementById('topnav')});
+					$.fatcatmap.api.layout.register('supernav', supernav);
+
+					superfooter = new Layout.SuperFooter({id: 'momentumSuperfooter', el: document.getElementById('momentumSuperfooter')});
+					$.fatcatmap.api.layout.register('superfooter', superfooter);					
+					
+					$.fatcatmap.state.events.triggerEvent('PLATFORM_READY', {fcm: $.fatcatmap});
+				}
+			}
+		]);
+	{% endautoescape %}
+</script>
+{% endblock %}
